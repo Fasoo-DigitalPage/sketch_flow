@@ -28,10 +28,10 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
-  sketch_flow:
-    path: ../
   flutter:
     sdk: flutter
+  sketch_flow:
+    path: ../
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
