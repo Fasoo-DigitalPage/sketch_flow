@@ -21,6 +21,9 @@ class SketchController extends ChangeNotifier {
 
   Path _currentPath = Path();
 
+  /// 그리기 활성화 상태
+  bool _isEnabled = true;
+
   SketchContent? createCurrentContent() {
     if(_currentPath == Path()) return null;
 
@@ -41,6 +44,16 @@ class SketchController extends ChangeNotifier {
     }
   }
 
+  void disableDrawing() {
+    _isEnabled = false;
+    notifyListeners();
+  }
+
+  void enableDrawing() {
+    _isEnabled = true;
+    notifyListeners();
+  }
+
   void updateConfig(SketchConfig config) {
     _sketchConfig = config;
     notifyListeners();
@@ -48,17 +61,21 @@ class SketchController extends ChangeNotifier {
 
   /// 그리기 시작
   void startNewLine(Offset offset) {
+    if (!_isEnabled) return;
     _currentPath = Path()..moveTo(offset.dx, offset.dy);
   }
 
   /// 그리기 작업
   void addPoint(Offset offset) {
+    if (!_isEnabled) return;
+
     _currentPath.lineTo(offset.dx, offset.dy);
     notifyListeners();
   }
 
   /// 그리기 종료
   void endLine() {
+    if (!_isEnabled) return;
     final content = createCurrentContent();
 
     if(content != null) {

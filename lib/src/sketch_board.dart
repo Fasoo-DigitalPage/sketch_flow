@@ -1,15 +1,16 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:sketch_flow/src/controller/sketch_controller.dart';
-import 'package:sketch_flow/src/sketch_painter.dart';
+import 'package:sketch_flow/sketch_flow.dart';
+import 'package:sketch_flow/src/sketch_bottom_bar.dart';
 
 class SketchBoard extends StatefulWidget {
   const SketchBoard({
     super.key,
     this.controller,
+    this.boardColor
   });
 
   final SketchController? controller;
+  final Color? boardColor;
 
   @override
   State<StatefulWidget> createState() => _SketchBoardState();
@@ -44,31 +45,30 @@ class _SketchBoardState extends State<SketchBoard> {
                             _controller.addPoint(event.localPosition);
                           },
 
-                          child: Stack(
-                            children: [
-                              Container(color: Colors.white,),
-                              AnimatedBuilder(
-                                  animation: _controller,
-                                  builder: (context, _) {
-                                    // 그리는 영역만 UI 갱신
-                                    return RepaintBoundary(
-                                      child: SizedBox.expand(
-                                        child: Container(
-                                          color: Colors.transparent,
-                                          child: CustomPaint(
-                                            painter: SketchPainter(_controller),
-                                          ),
+                          child: Container(
+                            color: widget.boardColor ?? Colors.white,
+                            child: AnimatedBuilder(
+                                animation: _controller,
+                                builder: (context, _) {
+                                  // 그리는 영역만 UI 갱신
+                                  return RepaintBoundary(
+                                    child: SizedBox.expand(
+                                      child: Container(
+                                        color: Colors.transparent,
+                                        child: CustomPaint(
+                                          painter: SketchPainter(_controller),
                                         ),
                                       ),
-                                    );
-                                  }
-                              )
-                            ],
+                                    ),
+                                  );
+                                }
+                            ),
                           )
                       );
                     }
                 ),
-            )
+            ),
+            SketchBottomBar(controller: _controller)
           ],
         )
     );

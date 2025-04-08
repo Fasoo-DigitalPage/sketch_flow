@@ -25,7 +25,9 @@ class DemoPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SketchBoard(),
+      body: SketchBoard(
+        controller: _sketchController,
+      ),
     );
   }
 
