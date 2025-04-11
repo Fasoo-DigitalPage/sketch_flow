@@ -28,5 +28,4 @@ class DemoPage extends StatelessWidget {
         controller: _sketchController
     );
   }
-
 }

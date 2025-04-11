@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:sketch_flow/src/content/eraser.dart';
-import 'package:sketch_flow/src/content/pencil.dart';
-import 'package:sketch_flow/src/content/sketch_content.dart';
-import 'package:sketch_flow/src/controller/sketch_config.dart';
+import 'package:sketch_flow/sketch_contents.dart';
+import 'package:sketch_flow/sketch_flow.dart';
 
 /// 스케치 화면에서 사용자의 드로잉 상태를 관리하는 컨트롤러
 ///
-/// [thicknessList] 그리기 도구 두께 리스트
+/// [thicknessList] 손글씨 도구 두께 리스트
+///
+/// [colorList] 손글씨 도구 색상 리스트
 class SketchController extends ChangeNotifier {
   SketchController({Color? baseColor, List<Color>? colorList, List<double>? thicknessList})
     : _sketchConfig = SketchConfig(
@@ -14,21 +14,21 @@ class SketchController extends ChangeNotifier {
       color: baseColor ?? Colors.black,
       strokeWidth: thicknessList != null ? thicknessList.reduce((a, b) => a < b ? a : b) : 1,
       thicknessList: [...(thicknessList ?? [1, 2, 3.5, 5, 7])]..sort(),
-      colorList: colorList ?? [Colors.black, Colors.white, Colors.red, Colors.blue, Colors.green]
+      colorList: colorList ?? [Colors.black, Color(0xCFCFCFCF), Colors.red, Colors.blue, Colors.green]
   );
 
-  /// 누적된 그리기 콘텐츠 목록
+  /// 누적된 손글씨 콘텐츠 목록
   final List<SketchContent> _contents = [];
   List<SketchContent> get contents => List.unmodifiable(_contents);
 
-  /// 현재 사용 중인 그리기 도구 설정
+  /// 현재 사용 중인 손글씨 도구 설정
   SketchConfig _sketchConfig;
   SketchConfig get currentSketchConfig => _sketchConfig;
 
   /// 현재 그리고 있는 선의 경로
   Path _currentPath = Path();
 
-  /// 그리기 가능 여부 상태
+  /// 손글씨 가능 여부 상태
   bool _isEnabled = true;
 
   /// 현재 설정에 따른 콘텐츠 생성
@@ -54,19 +54,19 @@ class SketchController extends ChangeNotifier {
     }
   }
 
-  /// 그리기 비활성화
+  /// 손글씨 비활성화
   void disableDrawing() {
     _isEnabled = false;
     notifyListeners();
   }
 
-  /// 그리기 활성화
+  /// 손글씨 활성화
   void enableDrawing() {
     _isEnabled = true;
     notifyListeners();
   }
 
-  /// 그리기 도구 설정 업데이트
+  /// 손글씨 도구 설정 업데이트
   void updateConfig(SketchConfig config) {
     _sketchConfig = config;
     notifyListeners();
@@ -85,7 +85,7 @@ class SketchController extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// 선 그리기 종료 및 콘텐츠 저장 (터치 종료 시)
+  /// 선 손글씨 종료 및 콘텐츠 저장 (터치 종료 시)
   void endLine() {
     if (!_isEnabled) return;
     final content = createCurrentContent();

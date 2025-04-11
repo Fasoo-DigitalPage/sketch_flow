@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import '../../sketch_flow.dart';
+import 'package:sketch_flow/sketch_flow.dart';
 
 /// [toolType] 도구 종류
 ///

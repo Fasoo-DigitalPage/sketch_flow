@@ -1,5 +1,4 @@
 import 'dart:ui';
-
 import 'package:sketch_flow/src/content/sketch_content.dart';
 
 class Pencil extends SketchContent {

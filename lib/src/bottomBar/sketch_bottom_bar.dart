@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:sketch_flow/sketch_flow.dart';
-import 'package:sketch_flow/src/bottomBar/sketch_tool_item.dart';
-import 'package:sketch_flow/src/widgets/base_circle.dart';
-import 'package:sketch_flow/src/widgets/base_thickness.dart';
+import 'package:sketch_flow/sketch_widgets.dart';
 
-/// 그리기 도구 모음 하단바
+/// 손글씨 도구 모음 하단바
 ///
 /// [controller] 스케치 컨트롤러
 ///
-/// [thicknessList] 그리기 도구 두께 리스트
+/// [thicknessList] 손글씨 도구 두께 리스트
 ///
 /// [bottomBarHeight] 하단바 높이
 ///
@@ -72,7 +70,7 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
   /// 옵션 설정 OverlayEntry
   OverlayEntry? _toolConfigOverlay;
 
-  /// 선택한 그리기 도구
+  /// 선택한 손글씨 도구
   SketchToolType _selectedToolType = SketchToolType.pencil;
 
   /// 마지막 탭 시간
@@ -97,17 +95,17 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
     _fadeController.dispose();
   }
 
-  /// 그리기 도구 선택
+  /// 손글씨 도구 선택
   /// 연속 두번 탭하면 옵션 설정을 띄운다 (0.5초 간격)
   void _onToolTap({required SketchToolType toolType}) {
     final now = DateTime.now();
     final lastTap = _lastTapTimes;
 
     /// 서론 다른 탭을 0.5초 이내에 눌렀을 때 옵션창을 띄우는 것을 방지
-    /// 색상은 제외 (그리기 기능에 영향을 주지 않기 때문)
+    /// 색상은 제외 (손글씨 기능에 영향을 주지 않기 때문)
     if((toolType == SketchToolType.palette || _selectedToolType == toolType) &&
         lastTap != null && now.difference(lastTap) < const Duration(milliseconds: 500)) {
-      /// 그리기 비활성화
+      /// 손글씨 비활성화
       _controller.disableDrawing();
       _showToolConfig(toolType: toolType);
     }
@@ -189,12 +187,12 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
 
   /// 펜 굵기 선택 함수
   /// 선택 시 띄워져있는 Overlay 삭제 및 애니메이션 효과를 준다.
-  /// 그리기를 활성화 시킨다.
+  /// 손글씨를 활성화 시킨다.
   void _onThicknessSelected({required double strokeWidth}) {
     _fadeController.reverse().then((_) async {
       _controller.updateConfig(_controller.currentSketchConfig.copyWith(strokeWidth: strokeWidth));
 
-      // 그리기 활성화
+      // 손글씨 활성화
       _controller.enableDrawing();
 
       await Future.delayed(Duration(milliseconds: 100));
@@ -210,7 +208,7 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
     _fadeController.reverse().then((_) async {
       _controller.updateConfig(_controller.currentSketchConfig.copyWith(color: color));
 
-      // 그리기 활성화
+      // 손글씨 활성화
       _controller.enableDrawing();
 
       await Future.delayed(Duration(milliseconds: 100));
@@ -299,7 +297,7 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
   Widget _drawingConfigWidget({required List<double> thicknessList}) {
     return Column(
       children: [
-        /// 그리기 도구 두께 리스트 스크롤뷰
+        /// 손글씨 도구 두께 리스트 스크롤뷰
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
@@ -308,6 +306,8 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
                 return BaseThickness(
                   radius: 17.5,
                   thickness: thicknessList[index],
+                  isSelected: _controller.currentSketchConfig.strokeWidth == thicknessList[index],
+                  color: _controller.currentSketchConfig.color,
                   onClickThickness: () => _onThicknessSelected(strokeWidth: thicknessList[index]),
                 );
               })
