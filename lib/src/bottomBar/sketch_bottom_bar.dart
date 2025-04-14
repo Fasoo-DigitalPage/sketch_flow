@@ -25,6 +25,14 @@ enum EraserType {
 /// [clearIcon] Icon used for the "clear all" function.
 ///
 /// [paletteIcon] Icon for opening the color palette.
+///
+/// [eraserRadioButtonColor] The color of the eraser type radio button
+///
+/// [eraserThicknessSliderColor] The color of the slider used to control the eraser thickness
+///
+/// [eraserThicknessTextStyle] The TextStyle that displays the current eraser thickness as text
+///
+/// [eraserThicknessSliderThemeData] The theme data used to customize the appearance of the eraser thickness slider
 class SketchBottomBar extends StatefulWidget {
   const SketchBottomBar({
     super.key,
@@ -39,6 +47,10 @@ class SketchBottomBar extends StatefulWidget {
     this.inActiveEraserIcon,
     this.clearIcon,
     this.paletteIcon,
+    this.eraserRadioButtonColor,
+    this.eraserThicknessSliderColor,
+    this.eraserThicknessTextStyle,
+    this.eraserThicknessSliderThemeData
   });
 
   final SketchController controller;
@@ -57,6 +69,11 @@ class SketchBottomBar extends StatefulWidget {
   final Widget? paletteIcon;
 
   final Widget? clearIcon;
+
+  final Color? eraserRadioButtonColor;
+  final Color? eraserThicknessSliderColor;
+  final TextStyle? eraserThicknessTextStyle;
+  final SliderThemeData? eraserThicknessSliderThemeData;
 
   @override
   State<StatefulWidget> createState() => _SketchBottomBarState();
@@ -363,7 +380,7 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
               children: [
                 RadioListTile<EraserType>(
                     title: areaEraserText ?? Text("Area eraser", style: TextStyle(fontSize: 14),),
-                    activeColor: Colors.black,
+                    activeColor: widget.eraserRadioButtonColor ?? Colors.black,
                     value: EraserType.area,
                     groupValue: _selectedEraserType,
                     onChanged: (value) {
@@ -377,7 +394,7 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
                 ),
                 RadioListTile<EraserType>(
                     title: strokeEraserText ?? Text("Stroke eraser", style: TextStyle(fontSize: 14),),
-                    activeColor: Colors.black,
+                    activeColor: widget.eraserRadioButtonColor ?? Colors.black,
                     value: EraserType.stroke,
                     groupValue: _selectedEraserType,
                     onChanged: (value) {
@@ -387,23 +404,41 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
                       setModalState((){});
                     }
                 ),
+                SizedBox(height: 12,),
                 Column(
                   children: [
                     Text(
-                      "$_eraserThickness"
+                      "${(_eraserThickness%1 >= 0.75) ? _eraserThickness.ceil() : _eraserThickness.floor()}",
+                      style: widget.eraserThicknessTextStyle ?? TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold
+                      ),
                     ),
-                    Slider(
-                        value: _eraserThickness,
-                        min: config.eraserThicknessMin,
-                        max: config.eraserThicknessMax,
-                        divisions: config.eraserThicknessDivisions,
-                        onChanged: (eraserWidth) {
-                          _controller.updateConfig(_controller.currentSketchConfig.copyWith(eraserThickness: _eraserThickness));
-                          setState(() { _eraserThickness = eraserWidth; });
+                    SliderTheme(
+                        data: widget.eraserThicknessSliderThemeData ?? SliderTheme.of(context).copyWith(
+                          padding: EdgeInsets.symmetric(vertical: 4, horizontal: 25),
+                          activeTrackColor: Colors.black,
+                          inactiveTrackColor: Colors.black.withAlpha(15),
+                          inactiveTickMarkColor: Colors.black,
+                          thumbColor: Colors.black,
+                          overlayColor: Colors.black.withAlpha(8),
+                          secondaryActiveTrackColor: Colors.black,
+                          trackHeight: 4,
+                          thumbShape: RoundSliderThumbShape(enabledThumbRadius: 9),
+                        ),
+                        child: Slider(
+                            value: _eraserThickness,
+                            min: config.eraserThicknessMin,
+                            max: config.eraserThicknessMax,
+                            divisions: config.eraserThicknessDivisions,
+                            onChanged: (eraserWidth) {
+                              _controller.updateConfig(_controller.currentSketchConfig.copyWith(eraserThickness: _eraserThickness));
+                              setState(() { _eraserThickness = eraserWidth; });
 
-                          // Call to show UI immediately reflect slider value in overlay inner widget.
-                          setModalState((){});
-                        }
+                              // Call to show UI immediately reflect slider value in overlay inner widget.
+                              setModalState((){});
+                            }
+                        )
                     )
                   ],
                 )
