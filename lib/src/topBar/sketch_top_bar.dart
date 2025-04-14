@@ -1,28 +1,44 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:sketch_flow/sketch_flow.dart';
 
-/// 상단바
+/// Top bar widget
 ///
-/// [topBarHeight] 상단바 높이
+/// [topBarHeight] The height of the top bar
 ///
-/// [topBarColor] 상단바 색상
+/// [topBarColor] The background color of the top bar
 ///
-/// [topBarBorderColor] 상단바 테두리 색상
+/// [topBarBorderColor] The border color of the top bar
 ///
-/// [topBarBorderWidth] 상단바 테두리 두께
+/// [topBarBorderWidth] he border width of the top bar
 ///
-/// [backButtonIcon] 이전 버튼 아이콘
+/// [backButtonIcon] The icon for the back button
 ///
-/// [onClickBackButton] 이전 버튼 클릭 콜백 함수
+/// [onClickBackButton] Callback function invoked when the back button
+///
+/// [activeUndoIcon] The icon displayed when the undo action is active.
+///
+/// [inActiveUndoIcon] The icon displayed when the undo action is inactive.
+///
+/// [activeRedoIcon] The icon displayed when the redo action is active.
+///
+/// [inActiveRedoIcon] The icon displayed when the redo action is inactive.
 class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
   const SketchTopBar({
     super.key,
+    required this.controller,
     this.topBarHeight,
     this.topBarColor,
     this.topBarBorderColor,
     this.topBarBorderWidth,
     this.backButtonIcon,
-    this.onClickBackButton
+    this.onClickBackButton,
+    this.activeUndoIcon,
+    this.inActiveUndoIcon,
+    this.activeRedoIcon,
+    this.inActiveRedoIcon
   });
+  final SketchController controller;
 
   final double? topBarHeight;
   final Color? topBarColor;
@@ -31,6 +47,12 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
 
   final Widget? backButtonIcon;
   final Function()? onClickBackButton;
+
+  final Widget? activeUndoIcon;
+  final Widget? inActiveUndoIcon;
+
+  final Widget? activeRedoIcon;
+  final Widget? inActiveRedoIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +74,39 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
                 IconButton(
                     icon: backButtonIcon ?? Icon(Icons.arrow_back_ios, color: Colors.black,),
                     onPressed: onClickBackButton,
+                ),
+                Row(
+                  children: [
+                    /// Undo Icon
+                    ValueListenableBuilder<bool>(
+                        valueListenable: controller.canUndoNotifier,
+                        builder: (context, canUndo, _) {
+                          return IconButton(
+                              icon: canUndo
+                                  ? (activeUndoIcon ?? Icon(Icons.undo_rounded))
+                                  : (inActiveUndoIcon ?? Icon(Icons.undo_rounded)),
+                              onPressed: canUndo ? () {
+                                controller.undo();
+                              } : null
+                          );
+                        }
+                    ),
+
+                    /// Redo Icon
+                    ValueListenableBuilder<bool>(
+                        valueListenable: controller.canRedoNotifier,
+                        builder: (context, canRedo, _) {
+                          return IconButton(
+                              icon: canRedo
+                                  ? (activeRedoIcon ?? Icon(Icons.redo_rounded))
+                                  : (inActiveRedoIcon ?? Icon(Icons.redo_rounded)),
+                              onPressed: canRedo ? () {
+                                controller.redo();
+                              } : null
+                          );
+                        }
+                    ),
+                  ],
                 )
               ],
             )

@@ -128,17 +128,14 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
   /// Displays the configuration options for the selected tool
   /// such as thickness, color, or eraser type.
   void _showToolConfig({required SketchToolType toolType}) {
-    /// 기존 Overlay 제거
+    if(toolType == SketchToolType.move) return;
+
     _toolConfigOverlay?.remove();
     _toolConfigOverlay = null;
 
-    /// 두께 리스트
     final thicknessList = _controller.currentSketchConfig.thicknessList;
-
-    /// 색상 리스트
     final colorList = _controller.currentSketchConfig.colorList;
 
-    /// 설정할 옵션 위젯
     final applyWidget = switch(toolType) {
       SketchToolType.pencil => _drawingConfigWidget(thicknessList: thicknessList),
       SketchToolType.eraser => _eraserConfigWidget(),
@@ -249,8 +246,8 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
               _toolButtonWidget(
                   toolItem: SketchToolItem(
                       toolType: SketchToolType.move,
-                      activeIcon: Icon(Icons.access_time_filled_sharp),
-                      inActiveIcon: Icon(Icons.access_time)
+                      activeIcon: Icon(Icons.mouse),
+                      inActiveIcon: Icon(Icons.mouse_outlined)
                   ),
                   selectedToolType: _selectedToolType,
                   onClickToolButton: () => _onToolTap(toolType: SketchToolType.move)

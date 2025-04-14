@@ -24,6 +24,12 @@ class SketchController extends ChangeNotifier {
   /// Notifier for the current tool type (e.g., pencil, eraser).
   final ValueNotifier<SketchToolType> toolTypeNotifier = ValueNotifier(SketchToolType.pencil);
 
+  /// Notifier for the undo
+  final ValueNotifier<bool> canUndoNotifier = ValueNotifier(false);
+
+  /// Notifier for the redo
+  final ValueNotifier<bool> canRedoNotifier = ValueNotifier(false);
+
   /// The current configuration of the sketch tool
   SketchConfig _sketchConfig;
   SketchConfig get currentSketchConfig => _sketchConfig;
@@ -33,6 +39,10 @@ class SketchController extends ChangeNotifier {
 
   /// Indicates whether sketching is enabled.
   bool _isEnabled = true;
+
+  /// undo / redo stack
+  final List<List<SketchContent>> _undoStack = [];
+  final List<List<SketchContent>> _redoStack = [];
 
   /// Creates a new sketch content based on the current configuration and path.
   SketchContent? createCurrentContent() {
@@ -96,6 +106,7 @@ class SketchController extends ChangeNotifier {
     final content = createCurrentContent();
 
     if(content != null) {
+      _saveToUndoStack();
       _contents.add(content);
       _currentPath = Path();
       notifyListeners();
@@ -104,7 +115,32 @@ class SketchController extends ChangeNotifier {
 
   /// Clears all sketch contents from the canvas
   void clear() {
+    _saveToUndoStack();
     _contents.clear();
+    notifyListeners();
+  }
+
+  /// Reverts the canvas to the previous drawing state by popping from the undo stack.
+  /// The current state is pushed onto the redo stack for possible reapplication.
+  void undo() {
+    if(_undoStack.isEmpty) return;
+
+    _redoStack.add(List.from(_contents));
+    _contents..clear()..addAll(_undoStack.removeLast());
+    _updateUndoRedoStatus();
+
+    notifyListeners();
+  }
+
+  /// Reapplies the most recently undone drawing state by popping from the redo stack.
+  /// The current state is pushed back onto the undo stack.
+  void redo() {
+    if(_redoStack.isEmpty) return;
+
+    _undoStack.add(List.from(_contents));
+    _contents..clear()..addAll(_redoStack.removeLast());
+    _updateUndoRedoStatus();
+
     notifyListeners();
   }
 
@@ -112,5 +148,17 @@ class SketchController extends ChangeNotifier {
   bool _isPathEmpty(Path path) {
     final metrics = path.computeMetrics();
     return metrics.isEmpty;
+  }
+
+  void _saveToUndoStack() {
+    _undoStack.add(List.from(_contents));
+    _redoStack.clear();
+    _updateUndoRedoStatus();
+  }
+
+  /// Update notifier values based on current undo/redo stack status
+  void _updateUndoRedoStatus() {
+    canUndoNotifier.value = _undoStack.isNotEmpty;
+    canRedoNotifier.value = _redoStack.isNotEmpty;
   }
 }
