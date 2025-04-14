@@ -80,6 +80,8 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
 
   /// The currently selected eraser type (stroke or area).
   EraserType _selectedEraserType = EraserType.area;
+
+  late double _eraserThickness = widget.controller.currentSketchConfig.eraserThickness;
   
   @override
   void initState() {
@@ -133,11 +135,11 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
     _toolConfigOverlay?.remove();
     _toolConfigOverlay = null;
 
-    final thicknessList = _controller.currentSketchConfig.thicknessList;
+    final strokeThicknessList = _controller.currentSketchConfig.strokeThicknessList;
     final colorList = _controller.currentSketchConfig.colorList;
 
     final applyWidget = switch(toolType) {
-      SketchToolType.pencil => _drawingConfigWidget(thicknessList: thicknessList),
+      SketchToolType.pencil => _drawingConfigWidget(strokeThicknessList: strokeThicknessList),
       SketchToolType.eraser => _eraserConfigWidget(),
       SketchToolType.palette => _paletteConfigWidget(colorList: colorList),
       SketchToolType.move => SizedBox.shrink()
@@ -147,7 +149,7 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
         builder: (context) => GestureDetector(
           // 외부 터치 감지
           behavior: HitTestBehavior.translucent,
-          onTap: () => _onThicknessSelected(strokeWidth: _controller.currentSketchConfig.strokeWidth),
+          onTap: () => _onThicknessSelected(strokeThickness: _controller.currentSketchConfig.strokeThickness),
           child: Stack(
             children: [
               Positioned(
@@ -193,9 +195,9 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
 
   /// Called when a stroke thickness is selected.
   /// Updates the stroke width, closes the overlay, and enables drawing.
-  void _onThicknessSelected({required double strokeWidth}) {
+  void _onThicknessSelected({required double strokeThickness}) {
     _fadeController.reverse().then((_) async {
-      _controller.updateConfig(_controller.currentSketchConfig.copyWith(strokeWidth: strokeWidth));
+      _controller.updateConfig(_controller.currentSketchConfig.copyWith(strokeThickness: strokeThickness));
       _controller.enableDrawing();
 
       await Future.delayed(Duration(milliseconds: 100));
@@ -308,20 +310,20 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
   }
 
   /// Build the stroke thickness selection widget for drawing tools.
-  Widget _drawingConfigWidget({required List<double> thicknessList}) {
+  Widget _drawingConfigWidget({required List<double> strokeThicknessList}) {
     return Column(
       children: [
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: List.generate(thicknessList.length, (index) {
+              children: List.generate(strokeThicknessList.length, (index) {
                 return BaseThickness(
                   radius: 17.5,
-                  thickness: thicknessList[index],
-                  isSelected: _controller.currentSketchConfig.strokeWidth == thicknessList[index],
+                  thickness: strokeThicknessList[index],
+                  isSelected: _controller.currentSketchConfig.strokeThickness == strokeThicknessList[index],
                   color: _controller.currentSketchConfig.color,
-                  onClickThickness: () => _onThicknessSelected(strokeWidth: thicknessList[index]),
+                  onClickThickness: () => _onThicknessSelected(strokeThickness: strokeThicknessList[index]),
                 );
               })
           ),
@@ -354,6 +356,7 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
   Widget _eraserConfigWidget({Text? areaEraserText, Text? strokeEraserText}) {
     return StatefulBuilder(
         builder: (context, setModalState) {
+          final config = _controller.currentSketchConfig;
           return Material(
             color: Colors.white,
             child: Column(
@@ -365,6 +368,10 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
                     groupValue: _selectedEraserType,
                     onChanged: (value) {
                       setState(() { _selectedEraserType = value!; });
+
+                      // Used to induce rebuild in the Stateful Builder inside the overlay.
+                      // Invoking only the outer setState does not update the overlay widget itself
+                      // The setModalState must also be invoked to immediately reflect changes in the internal widget.
                       setModalState((){});
                     }
                 ),
@@ -375,8 +382,30 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
                     groupValue: _selectedEraserType,
                     onChanged: (value) {
                       setState(() { _selectedEraserType = value!; });
+
+                      // Call to show UI immediately reflect radio button value in overlay inner widget.
                       setModalState((){});
                     }
+                ),
+                Column(
+                  children: [
+                    Text(
+                      "$_eraserThickness"
+                    ),
+                    Slider(
+                        value: _eraserThickness,
+                        min: config.eraserThicknessMin,
+                        max: config.eraserThicknessMax,
+                        divisions: config.eraserThicknessDivisions,
+                        onChanged: (eraserWidth) {
+                          _controller.updateConfig(_controller.currentSketchConfig.copyWith(eraserThickness: _eraserThickness));
+                          setState(() { _eraserThickness = eraserWidth; });
+
+                          // Call to show UI immediately reflect slider value in overlay inner widget.
+                          setModalState((){});
+                        }
+                    )
+                  ],
                 )
               ],
             ),

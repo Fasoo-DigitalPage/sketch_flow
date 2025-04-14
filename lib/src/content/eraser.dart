@@ -3,15 +3,15 @@ import 'package:sketch_flow/src/content/sketch_content.dart';
 
 class Eraser extends SketchContent {
   final Path path;
-  final double eraseWidth;
+  final double eraserThickness;
 
-  Eraser({required this.path, this.eraseWidth = 10.0});
+  Eraser({required this.path, required this.eraserThickness});
 
   @override
   void draw(Canvas canvas) {
     final eraserPaint = Paint()
       ..color = Colors.transparent
-      ..strokeWidth = eraseWidth
+      ..strokeWidth = eraserThickness
       ..style = PaintingStyle.stroke
       ..blendMode = BlendMode.clear;
 

@@ -17,42 +17,74 @@ enum SketchToolType {
 ///
 /// [color] The color of the pen
 ///
-/// [strokeWidth] The thickness of the pen stroke
+/// [strokeThickness] The thickness of the stroke
 ///
-/// [thicknessList] A list of available stroke thickness option
+/// [strokeThicknessList] A list of available stroke thickness option
+///
+/// [eraserThickness] The thickness of the eraser
+///
+/// [eraserThicknessMax] The maximum thickness the eraser can be set to
+///
+/// [eraserThicknessMin] The minimum thickness the eraser can be set to
+///
+/// [eraserThicknessDivisions] The number of discrete steps in the eraser thickness slider
 class SketchConfig {
   SketchConfig({
-    required this.toolType,
-    required this.color,
-    required this.strokeWidth,
-    required this.thicknessList,
-    required this.colorList,
-  });
+    this.toolType = SketchToolType.pencil,
+    this.color = Colors.black,
+    this.eraserThickness = 1,
+    this.eraserThicknessMax = 10,
+    this.eraserThicknessMin = 1,
+    this.eraserThicknessDivisions = 9,
+    List<Color>? colorList,
+    double? strokeThickness,
+    List<double>? strokeThicknessList,
+  }) :
+        strokeThicknessList = strokeThicknessList ?? [...(strokeThicknessList ?? [1, 2, 3.5, 5, 7])]..sort(),
+        strokeThickness = strokeThickness ?? ((strokeThicknessList ?? [1, 2, 3.5, 5, 7])..sort()).first,
+        colorList = colorList ?? [Colors.black, Color(0xCFCFCFCF), Colors.red, Colors.blue, Colors.green];
 
   final SketchToolType toolType;
+
   final Color color;
-  final double strokeWidth;
-  final List<double> thicknessList;
   final List<Color> colorList;
+
+  final double strokeThickness;
+  final List<double> strokeThicknessList;
+
+  final double eraserThickness;
+  final double eraserThicknessMax;
+  final double eraserThicknessMin;
+  final int eraserThicknessDivisions;
 
   SketchConfig copyWith({
     SketchToolType? toolType,
     Color? color,
-    double? strokeWidth,
-    List<double>? thicknessList,
     List<Color>? colorList,
+    double? strokeThickness,
+    List<double>? strokeThicknessList,
+    double? eraserThickness,
+    double? eraserThicknessMax,
+    double? eraserThicknessMin,
+    int? eraserThicknessDivisions,
   }) {
     return SketchConfig(
         toolType: toolType ?? this.toolType,
         color: color ?? this.color,
-        strokeWidth: strokeWidth ?? this.strokeWidth,
-        thicknessList: thicknessList ?? this.thicknessList,
-        colorList: colorList ?? this.colorList
+        strokeThickness: strokeThickness ?? this.strokeThickness,
+        strokeThicknessList: strokeThicknessList ?? this.strokeThicknessList,
+        colorList: colorList ?? this.colorList,
+        eraserThickness: eraserThickness ?? this.eraserThickness,
+        eraserThicknessMax: eraserThicknessMax ?? this.eraserThicknessMax,
+        eraserThicknessMin: eraserThicknessMin ?? this.eraserThicknessMin,
+        eraserThicknessDivisions: eraserThicknessDivisions ?? this.eraserThicknessDivisions
     );
   }
 
   @override
   String toString() {
-    return "toolType: ${toolType.name}, color: $color, strokeWidth: $strokeWidth, thicknessList: $thicknessList";
+    return "toolType: ${toolType.name}, color: $color, strokeThickness: $strokeThickness, "
+        "strokeThicknessList: $strokeThicknessList, eraserThickness: $eraserThickness, eraserThickness: $eraserThickness, "
+        "eraserThicknessMax: $eraserThicknessMax, eraserThicknessMin: $eraserThicknessMin, eraserThicknessDivisions: $eraserThicknessDivisions";
   }
 }

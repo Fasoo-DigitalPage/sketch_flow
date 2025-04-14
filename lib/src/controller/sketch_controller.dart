@@ -4,18 +4,23 @@ import 'package:sketch_flow/sketch_flow.dart';
 
 /// A controller that manages the user's sketching state on the canvas.
 ///
+/// [baseColor] Default pen color
+///
 /// [thicknessList] List of available pen thickness options.
 ///
 /// [colorList] List of available pen color options.
+///
+/// [eraserThickness] The thickness of the eraser
+///
+/// [eraserThicknessMax] The maximum thickness the eraser can be set to
+///
+/// [eraserThicknessMin] The minimum thickness the eraser can be set to
+///
+/// [eraserThicknessDivisions] The number of discrete steps in the eraser thickness slider
 class SketchController extends ChangeNotifier {
-  SketchController({Color? baseColor, List<Color>? colorList, List<double>? thicknessList})
-    : _sketchConfig = SketchConfig(
-      toolType: SketchToolType.pencil,
-      color: baseColor ?? Colors.black,
-      strokeWidth: thicknessList != null ? thicknessList.reduce((a, b) => a < b ? a : b) : 1,
-      thicknessList: [...(thicknessList ?? [1, 2, 3.5, 5, 7])]..sort(),
-      colorList: colorList ?? [Colors.black, Color(0xCFCFCFCF), Colors.red, Colors.blue, Colors.green]
-  );
+  SketchController({
+    SketchConfig? sketchConfig
+  }) : _sketchConfig = sketchConfig ?? SketchConfig();
 
   /// The list of all accumulated sketch contents.
   final List<SketchContent> _contents = [];
@@ -57,13 +62,13 @@ class SketchController extends ChangeNotifier {
             path: _currentPath,
             paint: Paint()
               ..color = _sketchConfig.color
-              ..strokeWidth = _sketchConfig.strokeWidth
+              ..strokeWidth = _sketchConfig.strokeThickness
               ..style = PaintingStyle.stroke
         );
       case SketchToolType.eraser:
         return Eraser(
             path: _currentPath,
-            eraseWidth: _sketchConfig.strokeWidth
+            eraserThickness: _sketchConfig.eraserThickness
         );
     }
   }
