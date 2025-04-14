@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:sketch_flow/sketch_contents.dart';
 import 'package:sketch_flow/sketch_flow.dart';
 
-/// 스케치 화면에서 사용자의 드로잉 상태를 관리하는 컨트롤러
+/// A controller that manages the user's sketching state on the canvas.
 ///
-/// [thicknessList] 손글씨 도구 두께 리스트
+/// [thicknessList] List of available pen thickness options.
 ///
-/// [colorList] 손글씨 도구 색상 리스트
+/// [colorList] List of available pen color options.
 class SketchController extends ChangeNotifier {
   SketchController({Color? baseColor, List<Color>? colorList, List<double>? thicknessList})
     : _sketchConfig = SketchConfig(
@@ -17,26 +17,30 @@ class SketchController extends ChangeNotifier {
       colorList: colorList ?? [Colors.black, Color(0xCFCFCFCF), Colors.red, Colors.blue, Colors.green]
   );
 
-  /// 누적된 손글씨 콘텐츠 목록
+  /// The list of all accumulated sketch contents.
   final List<SketchContent> _contents = [];
   List<SketchContent> get contents => List.unmodifiable(_contents);
 
-  /// 현재 사용 중인 손글씨 도구 설정
+  /// Notifier for the current tool type (e.g., pencil, eraser).
+  final ValueNotifier<SketchToolType> toolTypeNotifier = ValueNotifier(SketchToolType.pencil);
+
+  /// The current configuration of the sketch tool
   SketchConfig _sketchConfig;
   SketchConfig get currentSketchConfig => _sketchConfig;
 
-  /// 현재 그리고 있는 선의 경로
+  /// The path currently being drawn
   Path _currentPath = Path();
 
-  /// 손글씨 가능 여부 상태
+  /// Indicates whether sketching is enabled.
   bool _isEnabled = true;
 
-  /// 현재 설정에 따른 콘텐츠 생성
+  /// Creates a new sketch content based on the current configuration and path.
   SketchContent? createCurrentContent() {
     if(_isPathEmpty(_currentPath)) return null;
 
     switch(_sketchConfig.toolType) {
       case SketchToolType.palette:
+      case SketchToolType.move:
          return null;
       case SketchToolType.pencil:
         return Pencil(
@@ -54,38 +58,39 @@ class SketchController extends ChangeNotifier {
     }
   }
 
-  /// 손글씨 비활성화
+  /// Disables sketching functionality
   void disableDrawing() {
     _isEnabled = false;
     notifyListeners();
   }
 
-  /// 손글씨 활성화
+  /// Enables sketching functionality
   void enableDrawing() {
     _isEnabled = true;
     notifyListeners();
   }
 
-  /// 손글씨 도구 설정 업데이트
+  /// Updates the current sketch tool configuration
   void updateConfig(SketchConfig config) {
     _sketchConfig = config;
+    toolTypeNotifier.value = config.toolType;
     notifyListeners();
   }
 
-  /// 새로운 선 시작 (터치 시작 시)
+  /// Starts a new line when the user touches the screen
   void startNewLine(Offset offset) {
     if (!_isEnabled) return;
     _currentPath = Path()..moveTo(offset.dx, offset.dy);
   }
 
-  /// 선에 점 추가 (터치 이동 시)
+  /// Adds a point to the current path as the user move their finger
   void addPoint(Offset offset) {
     if (!_isEnabled) return;
     _currentPath.lineTo(offset.dx, offset.dy);
     notifyListeners();
   }
 
-  /// 선 손글씨 종료 및 콘텐츠 저장 (터치 종료 시)
+  /// Ends the current line and saves the sketch content
   void endLine() {
     if (!_isEnabled) return;
     final content = createCurrentContent();
@@ -97,13 +102,13 @@ class SketchController extends ChangeNotifier {
     }
   }
 
-  /// 모든 콘텐츠 삭제
+  /// Clears all sketch contents from the canvas
   void clear() {
     _contents.clear();
     notifyListeners();
   }
 
-  /// Path 빈 객체 유무
+  /// Checks if a given is empty (i.e., has no drawing metrics).
   bool _isPathEmpty(Path path) {
     final metrics = path.computeMetrics();
     return metrics.isEmpty;

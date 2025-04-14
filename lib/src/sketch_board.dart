@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:sketch_flow/sketch_flow.dart';
 
-/// 손글씨 메인 위젯
+/// Main widget for the sketch board.
 ///
-/// [controller] 스케치 컨트롤러 (SketchController)
+/// [controller] The sketch controller used to manage drawing state.
 ///
-/// [boardColor] 바탕 색상
+/// [boardColor] Background color of the sketch board.
 class SketchBoard extends StatefulWidget {
-  const SketchBoard({
-    super.key,
-    this.controller,
-    this.boardColor
-  });
+  const SketchBoard({super.key, this.controller, this.boardColor});
 
   final SketchController? controller;
   final Color? boardColor;
@@ -25,53 +21,60 @@ class _SketchBoardState extends State<SketchBoard> {
 
   @override
   Widget build(BuildContext context) {
+    // Drawing mode widget
+    Widget drawingArea = Container(
+      color: widget.boardColor ?? Colors.white,
+      child: Listener(
+        onPointerDown: (event) => _controller.startNewLine(event.localPosition),
+        onPointerMove: (event) => _controller.addPoint(event.localPosition),
+        onPointerUp: (_) => _controller.endLine(),
+        child: Container(
+          color: widget.boardColor ?? Colors.white,
+          child: AnimatedBuilder(
+            animation: _controller,
+            builder: (context, _) {
+              // 그리는 영역만 UI 갱신
+              return RepaintBoundary(
+                child: SizedBox.expand(
+                  child: Container(
+                    color: Colors.transparent,
+                    child: CustomPaint(
+                      painter: SketchPainter(_controller),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+
+    // Move mode widget with zoom and pan support
+    Widget moveArea = InteractiveViewer(
+      constrained: false,
+      maxScale: 5.0,
+      minScale: 0.5,
+      child: Container(
+        color: Colors.transparent,
+        width: MediaQuery.of(context).size.width,
+        height: 3000,
+        child: CustomPaint(
+          painter: SketchPainter(_controller),
+        ),
+      ),
+    );
+
     return Scaffold(
       backgroundColor: widget.boardColor ?? Colors.white,
       appBar: SketchTopBar(),
-      body: LayoutBuilder(
-          builder: (BuildContext buildContext, BoxConstraints boxConstraints) {
-            return Listener(
-              // 화면을 터치할 때 호출
-                onPointerDown: (PointerDownEvent event) {
-                  _controller.startNewLine(event.localPosition);
-                },
-                // 손을 화면에서 뗄 때 호출
-                onPointerUp: (PointerUpEvent event) {
-                  _controller.endLine();
-                },
-                // 시스템이 터치를 취소할 때 호출
-                onPointerCancel: (PointerCancelEvent event) {
-
-                },
-                // 터치한 상태에서 손을 움직일 때 호출
-                onPointerMove: (PointerMoveEvent event) {
-                  _controller.addPoint(event.localPosition);
-                },
-
-                child: Container(
-                  color: widget.boardColor ?? Colors.white,
-                  child: AnimatedBuilder(
-                      animation: _controller,
-                      builder: (context, _) {
-                        // 그리는 영역만 UI 갱신
-                        return RepaintBoundary(
-                          child: SizedBox.expand(
-                            child: Container(
-                              color: Colors.transparent,
-                              child: CustomPaint(
-                                painter: SketchPainter(_controller),
-                              ),
-                            ),
-                          ),
-                        );
-                      }
-                  ),
-                )
-            );
+      body: ValueListenableBuilder<SketchToolType>(
+          valueListenable: _controller.toolTypeNotifier,
+          builder: (context, toolType, _) {
+            return toolType == SketchToolType.move ? moveArea : drawingArea;
           }
       ),
       bottomNavigationBar: SketchBottomBar(controller: _controller),
     );
   }
-
 }

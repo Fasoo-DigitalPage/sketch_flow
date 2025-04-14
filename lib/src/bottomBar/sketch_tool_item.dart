@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:sketch_flow/sketch_flow.dart';
 
-/// [toolType] 도구 종류
+/// [toolType] The type of sketch tool represented.
 ///
-/// [activeIcon] 활성 아이콘
+/// [activeIcon] The icon displayed when this tool is selected (active).
 ///
-/// [inActiveIcon] 비활성 아이콘
+/// [inActiveIcon] The icon displayed when this tool is  not selected (inactive).
 class SketchToolItem {
   final SketchToolType toolType;
   final Widget activeIcon;

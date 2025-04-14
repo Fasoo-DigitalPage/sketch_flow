@@ -10,7 +10,6 @@ class SketchPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     canvas.saveLayer(null, Paint());
 
-    /// 완료된 content 손글씨
     for (final content in controller.contents) {
       content.draw(canvas);
     }

@@ -2,27 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:sketch_flow/sketch_flow.dart';
 import 'package:sketch_flow/sketch_widgets.dart';
 
-/// 손글씨 도구 모음 하단바
+enum EraserType {
+  stroke, area
+}
+
+/// A bottom bar that provides tools for handwriting or sketching.
 ///
-/// [controller] 스케치 컨트롤러
+/// [controller] The sketch controller that manages drawing state.
 ///
-/// [thicknessList] 손글씨 도구 두께 리스트
+/// [bottomBarHeight] The height of the bottom bar.
 ///
-/// [bottomBarHeight] 하단바 높이
+/// [bottomBarColor] The background color of the bottom bar.
 ///
-/// [bottomBarColor] 하단바 색상
+/// [activePencilIcon] Icon displayed when the pencil tool is active.
 ///
-/// [activePencilIcon] 연필 활성화 아이콘
+/// [inActivePencilIcon] Icon displayed when the pencil tool is inactive.
 ///
-/// [inActivePencilIcon] 연필 비활성화 아이콘
+/// [activeEraserIcon] Icon displayed when the eraser tool is active.
 ///
-/// [activeEraserIcon] 지우개 활성화 아이콘
+/// [inActiveEraserIcon] Icon displayed when the eraser tool is inactive.
 ///
-/// [inActiveEraserIcon] 지우개 비활성화 아이콘
+/// [clearIcon] Icon used for the "clear all" function.
 ///
-/// [clearIcon] 전체 삭제 아이콘
-///
-/// [paletteIcon] 색상 선택 아이콘
+/// [paletteIcon] Icon for opening the color palette.
 class SketchBottomBar extends StatefulWidget {
   const SketchBottomBar({
     super.key,
@@ -67,14 +69,17 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
   late Animation<double> _fadeAnimation;
   late double _safeAreaBottomPadding;
 
-  /// 옵션 설정 OverlayEntry
+  /// The overlay entry for showing tool configuration options.
   OverlayEntry? _toolConfigOverlay;
 
-  /// 선택한 손글씨 도구
+  /// The currently selected drawing tool.
   SketchToolType _selectedToolType = SketchToolType.pencil;
 
-  /// 마지막 탭 시간
+  /// Timestamp of the last tool tap.
   DateTime? _lastTapTimes;
+
+  /// The currently selected eraser type (stroke or area).
+  EraserType _selectedEraserType = EraserType.area;
   
   @override
   void initState() {
@@ -95,17 +100,17 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
     _fadeController.dispose();
   }
 
-  /// 손글씨 도구 선택
-  /// 연속 두번 탭하면 옵션 설정을 띄운다 (0.5초 간격)
+  /// Handles tool selection.
+  /// If the same tool is tapped twice within 0.5 seconds, show configuration options.
+  /// Palette is excluded from this behavior as it doesn't affect drawing mode.
   void _onToolTap({required SketchToolType toolType}) {
     final now = DateTime.now();
     final lastTap = _lastTapTimes;
 
-    /// 서론 다른 탭을 0.5초 이내에 눌렀을 때 옵션창을 띄우는 것을 방지
-    /// 색상은 제외 (손글씨 기능에 영향을 주지 않기 때문)
+    /// Displays the configuration options for the selected tool
+    /// such as thickness, color, or eraser type.
     if((toolType == SketchToolType.palette || _selectedToolType == toolType) &&
         lastTap != null && now.difference(lastTap) < const Duration(milliseconds: 500)) {
-      /// 손글씨 비활성화
       _controller.disableDrawing();
       _showToolConfig(toolType: toolType);
     }
@@ -120,7 +125,8 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
     _lastTapTimes = now;
   }
 
-  /// 옵션 설정 창
+  /// Displays the configuration options for the selected tool
+  /// such as thickness, color, or eraser type.
   void _showToolConfig({required SketchToolType toolType}) {
     /// 기존 Overlay 제거
     _toolConfigOverlay?.remove();
@@ -135,8 +141,9 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
     /// 설정할 옵션 위젯
     final applyWidget = switch(toolType) {
       SketchToolType.pencil => _drawingConfigWidget(thicknessList: thicknessList),
-      SketchToolType.eraser => _drawingConfigWidget(thicknessList: thicknessList),
-      SketchToolType.palette => _paletteConfigWidget(colorList: colorList)
+      SketchToolType.eraser => _eraserConfigWidget(),
+      SketchToolType.palette => _paletteConfigWidget(colorList: colorList),
+      SketchToolType.move => SizedBox.shrink()
     };
 
     _toolConfigOverlay = OverlayEntry(
@@ -171,7 +178,9 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
                               ]
                           ),
                           padding: EdgeInsets.symmetric(vertical: 10, horizontal: 4),
-                          child: applyWidget,
+                          child: StatefulBuilder(builder: (context, selModalState) {
+                            return applyWidget;
+                          }),
                         ),
                     ),
                   )
@@ -185,14 +194,11 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
     _fadeController.forward(from: 0.0);
   }
 
-  /// 펜 굵기 선택 함수
-  /// 선택 시 띄워져있는 Overlay 삭제 및 애니메이션 효과를 준다.
-  /// 손글씨를 활성화 시킨다.
+  /// Called when a stroke thickness is selected.
+  /// Updates the stroke width, closes the overlay, and enables drawing.
   void _onThicknessSelected({required double strokeWidth}) {
     _fadeController.reverse().then((_) async {
       _controller.updateConfig(_controller.currentSketchConfig.copyWith(strokeWidth: strokeWidth));
-
-      // 손글씨 활성화
       _controller.enableDrawing();
 
       await Future.delayed(Duration(milliseconds: 100));
@@ -204,11 +210,11 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
     });
   }
 
+  /// Called when a color is selected from the palette.
+  /// Updates the drawing color, closes the overlay, and enables drawing.
   void _onColorSelected({required Color color}) {
     _fadeController.reverse().then((_) async {
       _controller.updateConfig(_controller.currentSketchConfig.copyWith(color: color));
-
-      // 손글씨 활성화
       _controller.enableDrawing();
 
       await Future.delayed(Duration(milliseconds: 100));
@@ -222,7 +228,7 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    /// SafeArea 하단 여백 영역
+    /// Bottom safe area padding for proper positioning of the overlay.
     _safeAreaBottomPadding = MediaQuery.of(context).padding.bottom;
 
     return SafeArea(
@@ -240,7 +246,17 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              /// 기본 펜
+              _toolButtonWidget(
+                  toolItem: SketchToolItem(
+                      toolType: SketchToolType.move,
+                      activeIcon: Icon(Icons.access_time_filled_sharp),
+                      inActiveIcon: Icon(Icons.access_time)
+                  ),
+                  selectedToolType: _selectedToolType,
+                  onClickToolButton: () => _onToolTap(toolType: SketchToolType.move)
+              ),
+
+              /// Default pen tool
               _toolButtonWidget(
                   toolItem: SketchToolItem(
                     toolType: SketchToolType.pencil,
@@ -251,7 +267,7 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
                   onClickToolButton: () => _onToolTap(toolType: SketchToolType.pencil)
               ),
 
-              /// 지우개
+              /// Eraser tool
               _toolButtonWidget(
                   toolItem: SketchToolItem(
                       toolType: SketchToolType.eraser,
@@ -262,13 +278,13 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
                   onClickToolButton: () => _onToolTap(toolType: SketchToolType.eraser)
               ),
 
-              /// 색상 선택
+              /// Color palette
               IconButton(
                 icon: widget.paletteIcon ?? Icon(Icons.palette_rounded),
                 onPressed: () => _onToolTap(toolType: SketchToolType.palette),
               ),
 
-              /// 전체 삭제
+              /// Clear all drawings
               IconButton(
                   icon: widget.clearIcon ?? Icon(Icons.cleaning_services_rounded),
                   onPressed: () {
@@ -294,10 +310,10 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
     );
   }
 
+  /// Build the stroke thickness selection widget for drawing tools.
   Widget _drawingConfigWidget({required List<double> thicknessList}) {
     return Column(
       children: [
-        /// 손글씨 도구 두께 리스트 스크롤뷰
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
@@ -317,6 +333,7 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
     );
   }
 
+  /// Builds the color palette selection widget.
   Widget _paletteConfigWidget({required List<Color> colorList}) {
     return Center(
       child: SingleChildScrollView(
@@ -332,6 +349,42 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
           }),
         ),
       ),
+    );
+  }
+
+  /// Build the eraser configuration widget.
+  /// Allows users to choose between area erasing and stroke erasing.
+  Widget _eraserConfigWidget({Text? areaEraserText, Text? strokeEraserText}) {
+    return StatefulBuilder(
+        builder: (context, setModalState) {
+          return Material(
+            color: Colors.white,
+            child: Column(
+              children: [
+                RadioListTile<EraserType>(
+                    title: areaEraserText ?? Text("Area eraser", style: TextStyle(fontSize: 14),),
+                    activeColor: Colors.black,
+                    value: EraserType.area,
+                    groupValue: _selectedEraserType,
+                    onChanged: (value) {
+                      setState(() { _selectedEraserType = value!; });
+                      setModalState((){});
+                    }
+                ),
+                RadioListTile<EraserType>(
+                    title: strokeEraserText ?? Text("Stroke eraser", style: TextStyle(fontSize: 14),),
+                    activeColor: Colors.black,
+                    value: EraserType.stroke,
+                    groupValue: _selectedEraserType,
+                    onChanged: (value) {
+                      setState(() { _selectedEraserType = value!; });
+                      setModalState((){});
+                    }
+                )
+              ],
+            ),
+          );
+        }
     );
   }
 

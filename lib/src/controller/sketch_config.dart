@@ -1,23 +1,25 @@
 import 'package:flutter/material.dart';
 
-/// 도구 타입
+/// Defines the type of sketch tool available.
 ///
-/// [pencil] 연필 (기본 펜)
+/// [pencil] Pencil tool (default drawing tool)
 ///
-/// [eraser] 지우개
+/// [eraser] Eraser tool
 ///
-/// [palette] 색상 선택
+/// [palette] Color palette for selecting drawing colors.
 enum SketchToolType {
-  pencil, eraser, palette
+  pencil, eraser, palette, move
 }
 
-/// [toolType] 펜 도구
+/// Represents the configuration for a sketching tool.
 ///
-/// [color] 펜 색상
+/// [toolType] The type of sketch tool (e.g., pencil, eraser)
 ///
-/// [strokeWidth] 펜 굵기
+/// [color] The color of the pen
 ///
-/// [thicknessList] 펜 굵기 리스트
+/// [strokeWidth] The thickness of the pen stroke
+///
+/// [thicknessList] A list of available stroke thickness option
 class SketchConfig {
   SketchConfig({
     required this.toolType,
