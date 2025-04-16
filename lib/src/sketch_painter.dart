@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:sketch_flow/sketch_flow.dart';
 
 class SketchPainter extends CustomPainter {
@@ -16,6 +17,14 @@ class SketchPainter extends CustomPainter {
 
     final currentContent = controller.createCurrentContent();
     currentContent?.draw(canvas);
+
+    if (controller.toolTypeNotifier.value == SketchToolType.eraser && controller.eraserCirclePosition != null) {
+      final eraserPaint = Paint()
+        ..color = Colors.grey
+        ..style = PaintingStyle.stroke;
+
+      canvas.drawCircle(controller.eraserCirclePosition!, (controller.currentSketchConfig.eraserRadius)/2, eraserPaint);
+    }
 
     canvas.restore();
   }

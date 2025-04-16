@@ -3,20 +3,6 @@ import 'package:sketch_flow/sketch_contents.dart';
 import 'package:sketch_flow/sketch_flow.dart';
 
 /// A controller that manages the user's sketching state on the canvas.
-///
-/// [baseColor] Default pen color
-///
-/// [thicknessList] List of available pen thickness options.
-///
-/// [colorList] List of available pen color options.
-///
-/// [eraserThickness] The thickness of the eraser
-///
-/// [eraserThicknessMax] The maximum thickness the eraser can be set to
-///
-/// [eraserThicknessMin] The minimum thickness the eraser can be set to
-///
-/// [eraserThicknessDivisions] The number of discrete steps in the eraser thickness slider
 class SketchController extends ChangeNotifier {
   SketchController({
     SketchConfig? sketchConfig
@@ -39,8 +25,8 @@ class SketchController extends ChangeNotifier {
   SketchConfig _sketchConfig;
   SketchConfig get currentSketchConfig => _sketchConfig;
 
-  /// The path currently being drawn
-  Path _currentPath = Path();
+  /// The offset currently being drawn
+  List<Offset> _currentOffsets = [];
 
   /// Indicates whether sketching is enabled.
   bool _isEnabled = true;
@@ -49,9 +35,12 @@ class SketchController extends ChangeNotifier {
   final List<List<SketchContent>> _undoStack = [];
   final List<List<SketchContent>> _redoStack = [];
 
+  Offset? _eraserCirclePosition;
+  Offset? get eraserCirclePosition => _eraserCirclePosition;
+
   /// Creates a new sketch content based on the current configuration and path.
   SketchContent? createCurrentContent() {
-    if(_isPathEmpty(_currentPath)) return null;
+    if(_isOffsetsEmpty(_currentOffsets)) return null;
 
     switch(_sketchConfig.toolType) {
       case SketchToolType.palette:
@@ -59,7 +48,7 @@ class SketchController extends ChangeNotifier {
          return null;
       case SketchToolType.pencil:
         return Pencil(
-            path: _currentPath,
+            points: List.from(_currentOffsets),
             paint: Paint()
               ..color = _sketchConfig.color
               ..strokeWidth = _sketchConfig.strokeThickness
@@ -67,8 +56,14 @@ class SketchController extends ChangeNotifier {
         );
       case SketchToolType.eraser:
         return Eraser(
-            path: _currentPath,
-            eraserThickness: _sketchConfig.eraserThickness
+            points: List.from(_currentOffsets),
+            paint: Paint()
+              ..color = Colors.transparent
+              ..blendMode = BlendMode.clear
+              ..style = PaintingStyle.stroke
+              ..strokeCap = StrokeCap.round
+              ..strokeJoin = StrokeJoin.round
+              ..strokeWidth = _sketchConfig.eraserRadius
         );
     }
   }
@@ -95,13 +90,26 @@ class SketchController extends ChangeNotifier {
   /// Starts a new line when the user touches the screen
   void startNewLine(Offset offset) {
     if (!_isEnabled) return;
-    _currentPath = Path()..moveTo(offset.dx, offset.dy);
+
+    _currentOffsets = [offset];
   }
 
   /// Adds a point to the current path as the user move their finger
   void addPoint(Offset offset) {
     if (!_isEnabled) return;
-    _currentPath.lineTo(offset.dx, offset.dy);
+
+    if (_currentOffsets.isNotEmpty && _currentOffsets.last == offset) return;
+
+    _currentOffsets.add(offset);
+
+    if(_sketchConfig.toolType == SketchToolType.eraser) {
+      _eraserCirclePosition = offset;
+    }
+
+    if (_sketchConfig.toolType == SketchToolType.eraser && _sketchConfig.eraserMode == EraserMode.stroke) {
+      //_eraserStrokesIntersecting(eraserOffsets: _currentOffsets);
+    }
+
     notifyListeners();
   }
 
@@ -111,9 +119,21 @@ class SketchController extends ChangeNotifier {
     final content = createCurrentContent();
 
     if(content != null) {
-      _saveToUndoStack();
-      _contents.add(content);
-      _currentPath = Path();
+      // For stroke eraser (EraserMode.stroke), the undo stack and content removal
+      // are already handle inside _eraserStrokesIntersecting.
+      // So we skip saving to undo stack to avoid duplication.
+      final isEraserStroke = content is Eraser && _sketchConfig.eraserMode == EraserMode.stroke;
+
+      if(!isEraserStroke) {
+        _saveToUndoStack();
+        _contents.add(content);
+      }
+
+      if(_sketchConfig.toolType == SketchToolType.eraser) {
+        _eraserCirclePosition = null;
+      }
+
+      _currentOffsets.clear();
       notifyListeners();
     }
   }
@@ -149,11 +169,8 @@ class SketchController extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Checks if a given is empty (i.e., has no drawing metrics).
-  bool _isPathEmpty(Path path) {
-    final metrics = path.computeMetrics();
-    return metrics.isEmpty;
-  }
+  /// Checks if a given is empty.
+  bool _isOffsetsEmpty(List<Offset> offsets) => offsets.length < 2;
 
   void _saveToUndoStack() {
     _undoStack.add(List.from(_contents));

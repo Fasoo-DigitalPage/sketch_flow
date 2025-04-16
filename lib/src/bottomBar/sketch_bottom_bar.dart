@@ -2,10 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:sketch_flow/sketch_flow.dart';
 import 'package:sketch_flow/sketch_widgets.dart';
 
-enum EraserType {
-  stroke, area
-}
-
 /// A bottom bar that provides tools for handwriting or sketching.
 ///
 /// [controller] The sketch controller that manages drawing state.
@@ -95,10 +91,10 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
   /// Timestamp of the last tool tap.
   DateTime? _lastTapTimes;
 
-  /// The currently selected eraser type (stroke or area).
-  EraserType _selectedEraserType = EraserType.area;
+  /// The currently selected eraser mode (stroke or area).
+  EraserMode _selectedEraserType = EraserMode.area;
 
-  late double _eraserThickness = widget.controller.currentSketchConfig.eraserThickness;
+  late double _eraserRadius = widget.controller.currentSketchConfig.eraserRadius;
   
   @override
   void initState() {
@@ -378,13 +374,14 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
             color: Colors.white,
             child: Column(
               children: [
-                RadioListTile<EraserType>(
+                RadioListTile<EraserMode>(
                     title: areaEraserText ?? Text("Area eraser", style: TextStyle(fontSize: 14),),
                     activeColor: widget.eraserRadioButtonColor ?? Colors.black,
-                    value: EraserType.area,
+                    value: EraserMode.area,
                     groupValue: _selectedEraserType,
                     onChanged: (value) {
                       setState(() { _selectedEraserType = value!; });
+                      _controller.updateConfig(_controller.currentSketchConfig.copyWith(eraserMode: value));
 
                       // Used to induce rebuild in the Stateful Builder inside the overlay.
                       // Invoking only the outer setState does not update the overlay widget itself
@@ -392,13 +389,14 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
                       setModalState((){});
                     }
                 ),
-                RadioListTile<EraserType>(
+                RadioListTile<EraserMode>(
                     title: strokeEraserText ?? Text("Stroke eraser", style: TextStyle(fontSize: 14),),
                     activeColor: widget.eraserRadioButtonColor ?? Colors.black,
-                    value: EraserType.stroke,
+                    value: EraserMode.stroke,
                     groupValue: _selectedEraserType,
                     onChanged: (value) {
                       setState(() { _selectedEraserType = value!; });
+                      _controller.updateConfig(_controller.currentSketchConfig.copyWith(eraserMode: value));
 
                       // Call to show UI immediately reflect radio button value in overlay inner widget.
                       setModalState((){});
@@ -408,7 +406,7 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
                 Column(
                   children: [
                     Text(
-                      "${(_eraserThickness%1 >= 0.75) ? _eraserThickness.ceil() : _eraserThickness.floor()}",
+                      "${(_eraserRadius%1 >= 0.75) ? _eraserRadius.ceil() : _eraserRadius.floor()}",
                       style: widget.eraserThicknessTextStyle ?? TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold
@@ -424,16 +422,16 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
                           overlayColor: Colors.black.withAlpha(8),
                           secondaryActiveTrackColor: Colors.black,
                           trackHeight: 4,
-                          thumbShape: RoundSliderThumbShape(enabledThumbRadius: 9),
+                          thumbShape: RoundSliderThumbShape(enabledThumbRadius: 10),
                         ),
                         child: Slider(
-                            value: _eraserThickness,
-                            min: config.eraserThicknessMin,
-                            max: config.eraserThicknessMax,
-                            divisions: config.eraserThicknessDivisions,
-                            onChanged: (eraserWidth) {
-                              _controller.updateConfig(_controller.currentSketchConfig.copyWith(eraserThickness: _eraserThickness));
-                              setState(() { _eraserThickness = eraserWidth; });
+                            value: _eraserRadius,
+                            min: config.eraserRadiusMin,
+                            max: config.eraserRadiusMax,
+                            divisions: config.eraserRadiusDivisions,
+                            onChanged: (eraserRadius) {
+                              _controller.updateConfig(_controller.currentSketchConfig.copyWith(eraserRadius: _eraserRadius));
+                              setState(() { _eraserRadius = eraserRadius; });
 
                               // Call to show UI immediately reflect slider value in overlay inner widget.
                               setModalState((){});

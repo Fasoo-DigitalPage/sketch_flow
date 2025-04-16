@@ -6,9 +6,18 @@ import 'package:flutter/material.dart';
 ///
 /// [eraser] Eraser tool
 ///
-/// [palette] Color palette for selecting drawing colors.
+/// [palette] Color palette for selecting drawing colors
+///
+/// [move] Screen move tool
+///
+///
 enum SketchToolType {
   pencil, eraser, palette, move
+}
+
+
+enum EraserMode {
+  area, stroke
 }
 
 /// Represents the configuration for a sketching tool.
@@ -21,21 +30,22 @@ enum SketchToolType {
 ///
 /// [strokeThicknessList] A list of available stroke thickness option
 ///
-/// [eraserThickness] The thickness of the eraser
+/// [eraserRadius] The radius of the eraser
 ///
-/// [eraserThicknessMax] The maximum thickness the eraser can be set to
+/// [eraserRadiusMax] The maximum thickness the eraser can be set to
 ///
-/// [eraserThicknessMin] The minimum thickness the eraser can be set to
+/// [eraserRadiusMin] The minimum thickness the eraser can be set to
 ///
-/// [eraserThicknessDivisions] The number of discrete steps in the eraser thickness slider
+/// [eraserRadiusDivisions] The number of discrete steps in the eraser thickness slider
 class SketchConfig {
   SketchConfig({
     this.toolType = SketchToolType.pencil,
     this.color = Colors.black,
-    this.eraserThickness = 1,
-    this.eraserThicknessMax = 10,
-    this.eraserThicknessMin = 1,
-    this.eraserThicknessDivisions = 9,
+    this.eraserRadius = 10,
+    this.eraserRadiusMax = 100,
+    this.eraserRadiusMin = 10,
+    this.eraserRadiusDivisions = 9,
+    this.eraserMode = EraserMode.area,
     List<Color>? colorList,
     double? strokeThickness,
     List<double>? strokeThicknessList,
@@ -52,10 +62,12 @@ class SketchConfig {
   final double strokeThickness;
   final List<double> strokeThicknessList;
 
-  final double eraserThickness;
-  final double eraserThicknessMax;
-  final double eraserThicknessMin;
-  final int eraserThicknessDivisions;
+  final double eraserRadius;
+  final double eraserRadiusMax;
+  final double eraserRadiusMin;
+  final int eraserRadiusDivisions;
+
+  final EraserMode eraserMode;
 
   SketchConfig copyWith({
     SketchToolType? toolType,
@@ -63,10 +75,11 @@ class SketchConfig {
     List<Color>? colorList,
     double? strokeThickness,
     List<double>? strokeThicknessList,
-    double? eraserThickness,
-    double? eraserThicknessMax,
-    double? eraserThicknessMin,
-    int? eraserThicknessDivisions,
+    double? eraserRadius,
+    double? eraserRadiusMax,
+    double? eraserRadiusMin,
+    int? eraserRadiusDivisions,
+    EraserMode? eraserMode,
   }) {
     return SketchConfig(
         toolType: toolType ?? this.toolType,
@@ -74,17 +87,19 @@ class SketchConfig {
         strokeThickness: strokeThickness ?? this.strokeThickness,
         strokeThicknessList: strokeThicknessList ?? this.strokeThicknessList,
         colorList: colorList ?? this.colorList,
-        eraserThickness: eraserThickness ?? this.eraserThickness,
-        eraserThicknessMax: eraserThicknessMax ?? this.eraserThicknessMax,
-        eraserThicknessMin: eraserThicknessMin ?? this.eraserThicknessMin,
-        eraserThicknessDivisions: eraserThicknessDivisions ?? this.eraserThicknessDivisions
+        eraserRadius: eraserRadius ?? this.eraserRadius,
+        eraserRadiusMax: eraserRadiusMax ?? this.eraserRadiusMax,
+        eraserRadiusMin: eraserRadiusMin ?? this.eraserRadiusMin,
+        eraserRadiusDivisions: eraserRadiusDivisions ?? this.eraserRadiusDivisions,
+        eraserMode: eraserMode ?? this.eraserMode
     );
   }
 
   @override
   String toString() {
     return "toolType: ${toolType.name}, color: $color, strokeThickness: $strokeThickness, "
-        "strokeThicknessList: $strokeThicknessList, eraserThickness: $eraserThickness, eraserThickness: $eraserThickness, "
-        "eraserThicknessMax: $eraserThicknessMax, eraserThicknessMin: $eraserThicknessMin, eraserThicknessDivisions: $eraserThicknessDivisions";
+        "strokeThicknessList: $strokeThicknessList, eraserRadius: $eraserRadius, eraserRadius: $eraserRadius, "
+        "eraserRadiusMax: $eraserRadiusMax, eraserRadiusMin: $eraserRadiusMin, eraserRadiusDivisions: $eraserRadiusDivisions"
+        "eraserMode: $eraserMode";
   }
 }
