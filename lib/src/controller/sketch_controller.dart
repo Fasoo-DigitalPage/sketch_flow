@@ -107,7 +107,7 @@ class SketchController extends ChangeNotifier {
     }
 
     if (_sketchConfig.toolType == SketchToolType.eraser && _sketchConfig.eraserMode == EraserMode.stroke) {
-      //_eraserStrokesIntersecting(eraserOffsets: _currentOffsets);
+      _eraserStroke(center: offset, radius: _sketchConfig.eraserRadius);
     }
 
     notifyListeners();
@@ -119,18 +119,13 @@ class SketchController extends ChangeNotifier {
     final content = createCurrentContent();
 
     if(content != null) {
-      // For stroke eraser (EraserMode.stroke), the undo stack and content removal
-      // are already handle inside _eraserStrokesIntersecting.
-      // So we skip saving to undo stack to avoid duplication.
-      final isEraserStroke = content is Eraser && _sketchConfig.eraserMode == EraserMode.stroke;
-
-      if(!isEraserStroke) {
-        _saveToUndoStack();
-        _contents.add(content);
+      if (_sketchConfig.toolType == SketchToolType.eraser) {
+        _eraserCirclePosition = null;
       }
 
-      if(_sketchConfig.toolType == SketchToolType.eraser) {
-        _eraserCirclePosition = null;
+      if (_sketchConfig.toolType != SketchToolType.eraser || _sketchConfig.eraserMode != EraserMode.stroke) {
+        _saveToUndoStack();
+        _contents.add(content);
       }
 
       _currentOffsets.clear();
@@ -183,4 +178,44 @@ class SketchController extends ChangeNotifier {
     canUndoNotifier.value = _undoStack.isNotEmpty;
     canRedoNotifier.value = _redoStack.isNotEmpty;
   }
+
+  /// Stroke eraser
+  void _eraserStroke({required Offset center, required double radius}) {
+    List<SketchContent> removedPoints = [];
+
+    // If any point of a stroke lies within the eraser circle, remove that stroke
+    // and add it to the removedPoint list for undo tracking.
+    _contents.removeWhere((content) {
+      if (content is !Eraser) {
+        for (final point in content.points) {
+          if (isPointInsideCircle(point: point, center: center, radius: radius/2)) {
+            removedPoints.add(content);
+            return true;
+          }
+        }
+      }
+      return false;
+    });
+
+    // If any strokes were removed, save the previous state to the undo stack
+    // and clear the redo stack
+    if (removedPoints.isNotEmpty) {
+      _undoStack.add(_contents + removedPoints);
+      _redoStack.clear();
+      _updateUndoRedoStatus();
+    }
+
+    notifyListeners();
+  }
+
+  bool isPointInsideCircle({
+    required Offset point,
+    required Offset center,
+    required double radius
+  }) {
+    final dx = point.dx - center.dx;
+    final dy = point.dy - center.dy;
+    return dx*dx + dy*dy <= radius*radius;
+  }
+
 }
