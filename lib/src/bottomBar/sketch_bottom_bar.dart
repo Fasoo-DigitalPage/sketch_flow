@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sketch_flow/sketch_flow.dart';
 import 'package:sketch_flow/sketch_widgets.dart';
+import 'package:sketch_flow/src/widgets/gradient_track_shape.dart';
 
 /// A bottom bar that provides tools for handwriting or sketching.
 ///
@@ -46,7 +47,8 @@ class SketchBottomBar extends StatefulWidget {
     this.eraserRadioButtonColor,
     this.eraserThicknessSliderColor,
     this.eraserThicknessTextStyle,
-    this.eraserThicknessSliderThemeData
+    this.eraserThicknessSliderThemeData,
+    this.penOpacitySliderThemeData,
   });
 
   final SketchController controller;
@@ -70,6 +72,8 @@ class SketchBottomBar extends StatefulWidget {
   final Color? eraserThicknessSliderColor;
   final TextStyle? eraserThicknessTextStyle;
   final SliderThemeData? eraserThicknessSliderThemeData;
+
+  final SliderThemeData? penOpacitySliderThemeData;
 
   @override
   State<StatefulWidget> createState() => _SketchBottomBarState();
@@ -95,6 +99,7 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
   EraserMode _selectedEraserType = EraserMode.area;
 
   late double _eraserRadius = widget.controller.currentSketchConfig.eraserRadius;
+  late double _penOpacity = widget.controller.currentSketchConfig.opacity;
   
   @override
   void initState() {
@@ -340,6 +345,46 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
                 );
               })
           ),
+        ),
+        SizedBox(height: 4.0,),
+        StatefulBuilder(
+            builder: (context, setModalState) {
+              return Material(
+                color: Colors.white,
+                child: SliderTheme(
+                  data: widget.penOpacitySliderThemeData ?? SliderTheme.of(context).copyWith(
+                    padding: EdgeInsets.symmetric(vertical: 4, horizontal: 25),
+                    activeTrackColor: Colors.transparent,
+                    inactiveTrackColor: Colors.transparent,
+                    trackShape: GradientTrackShape(
+                        trackHeight: 8.0,
+                        gradient: LinearGradient(
+                            colors: [
+                              _controller.currentSketchConfig.color.withValues(alpha: 0.0),
+                              _controller.currentSketchConfig.color.withValues(alpha: 1.0),
+                            ]
+                        )
+                    ),
+                    inactiveTickMarkColor: _controller.currentSketchConfig.color,
+                    thumbColor: _controller.currentSketchConfig.color,
+                    overlayColor: _controller.currentSketchConfig.color.withValues(alpha: 0.05),
+                    thumbShape: RoundSliderThumbShape(enabledThumbRadius: 10)
+                  ),
+                  child: Slider(
+                      value: _penOpacity,
+                      min: 0.0,
+                      max: 1.0,
+                      onChanged: (opacity) {
+                        _controller.updateConfig(_controller.currentSketchConfig.copyWith(opacity: opacity));
+                        setState(() { _penOpacity = opacity; });
+
+                        // Call to show UI immediately reflect slider value in overlay inner widget.
+                        setModalState((){});
+                      }
+                  ),
+                ),
+              );
+            }
         )
       ],
     );
@@ -419,7 +464,7 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
                           inactiveTrackColor: Colors.black.withAlpha(15),
                           inactiveTickMarkColor: Colors.black,
                           thumbColor: Colors.black,
-                          overlayColor: Colors.black.withAlpha(8),
+                          overlayColor: Colors.black.withValues(alpha: 0.05),
                           secondaryActiveTrackColor: Colors.black,
                           trackHeight: 4,
                           thumbShape: RoundSliderThumbShape(enabledThumbRadius: 10),
@@ -430,7 +475,7 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
                             max: config.eraserRadiusMax,
                             divisions: config.eraserRadiusDivisions,
                             onChanged: (eraserRadius) {
-                              _controller.updateConfig(_controller.currentSketchConfig.copyWith(eraserRadius: _eraserRadius));
+                              _controller.updateConfig(_controller.currentSketchConfig.copyWith(eraserRadius: eraserRadius));
                               setState(() { _eraserRadius = eraserRadius; });
 
                               // Call to show UI immediately reflect slider value in overlay inner widget.

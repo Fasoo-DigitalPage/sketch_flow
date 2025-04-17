@@ -26,6 +26,8 @@ enum EraserMode {
 ///
 /// [color] The color of the pen
 ///
+/// [opacity] The opacity of the pen
+///
 /// [strokeThickness] The thickness of the stroke
 ///
 /// [strokeThicknessList] A list of available stroke thickness option
@@ -41,6 +43,7 @@ class SketchConfig {
   SketchConfig({
     this.toolType = SketchToolType.pencil,
     this.color = Colors.black,
+    this.opacity = 1.0,
     this.eraserRadius = 10,
     this.eraserRadiusMax = 100,
     this.eraserRadiusMin = 10,
@@ -59,6 +62,7 @@ class SketchConfig {
   final Color color;
   final List<Color> colorList;
 
+  final double opacity;
   final double strokeThickness;
   final List<double> strokeThicknessList;
 
@@ -72,6 +76,7 @@ class SketchConfig {
   SketchConfig copyWith({
     SketchToolType? toolType,
     Color? color,
+    double? opacity,
     List<Color>? colorList,
     double? strokeThickness,
     List<double>? strokeThicknessList,
@@ -84,6 +89,7 @@ class SketchConfig {
     return SketchConfig(
         toolType: toolType ?? this.toolType,
         color: color ?? this.color,
+        opacity: opacity ?? this.opacity,
         strokeThickness: strokeThickness ?? this.strokeThickness,
         strokeThicknessList: strokeThicknessList ?? this.strokeThicknessList,
         colorList: colorList ?? this.colorList,
@@ -100,6 +106,6 @@ class SketchConfig {
     return "toolType: ${toolType.name}, color: $color, strokeThickness: $strokeThickness, "
         "strokeThicknessList: $strokeThicknessList, eraserRadius: $eraserRadius, eraserRadius: $eraserRadius, "
         "eraserRadiusMax: $eraserRadiusMax, eraserRadiusMin: $eraserRadiusMin, eraserRadiusDivisions: $eraserRadiusDivisions"
-        "eraserMode: $eraserMode";
+        "eraserMode: $eraserMode, opacity: $opacity";
   }
 }

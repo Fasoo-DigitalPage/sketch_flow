@@ -50,7 +50,7 @@ class SketchController extends ChangeNotifier {
         return Pencil(
             points: List.from(_currentOffsets),
             paint: Paint()
-              ..color = _sketchConfig.color
+              ..color = _sketchConfig.color.withValues(alpha: _sketchConfig.opacity)
               ..strokeWidth = _sketchConfig.strokeThickness
               ..style = PaintingStyle.stroke
         );
