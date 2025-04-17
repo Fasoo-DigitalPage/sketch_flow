@@ -63,7 +63,7 @@ class SketchController extends ChangeNotifier {
               ..style = PaintingStyle.stroke
               ..strokeCap = StrokeCap.round
               ..strokeJoin = StrokeJoin.round
-              ..strokeWidth = _sketchConfig.eraserRadius
+              ..strokeWidth = _sketchConfig.eraserRadius * 2
         );
     }
   }
@@ -188,7 +188,7 @@ class SketchController extends ChangeNotifier {
     _contents.removeWhere((content) {
       if (content is !Eraser) {
         for (final point in content.points) {
-          if (isPointInsideCircle(point: point, center: center, radius: radius/2)) {
+          if (isPointInsideCircle(point: point, center: center, radius: radius)) {
             removedPoints.add(content);
             return true;
           }

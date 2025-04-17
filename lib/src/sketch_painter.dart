@@ -23,7 +23,7 @@ class SketchPainter extends CustomPainter {
         ..color = Colors.grey
         ..style = PaintingStyle.stroke;
 
-      canvas.drawCircle(controller.eraserCirclePosition!, (controller.currentSketchConfig.eraserRadius)/2, eraserPaint);
+      canvas.drawCircle(controller.eraserCirclePosition!, (controller.currentSketchConfig.eraserRadius), eraserPaint);
     }
 
     canvas.restore();
