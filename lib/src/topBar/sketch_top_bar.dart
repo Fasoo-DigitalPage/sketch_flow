@@ -29,7 +29,7 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
   const SketchTopBar({
     super.key,
     required this.controller,
-    required this.onClickToJson,
+    this.onClickToJson,
     this.topBarHeight,
     this.topBarColor,
     this.topBarBorderColor,
@@ -60,7 +60,7 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
 
   final bool? showJsonDialogIcon;
 
-  final Function(Map<String, dynamic>) onClickToJson;
+  final Function(Map<String, dynamic>)? onClickToJson;
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +117,11 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
                     if(showJsonDialogIcon ?? false)
                       IconButton(
                         icon: Icon(Icons.javascript),
-                        onPressed: () => onClickToJson(controller.toJson()),
+                        onPressed: () {
+                          if(onClickToJson != null) {
+                            onClickToJson!(controller.toJson());
+                          }
+                        },
                       ),
                   ],
                 ),

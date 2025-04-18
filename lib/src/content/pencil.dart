@@ -14,7 +14,7 @@ class Pencil extends SketchContent {
     return {
       'type': 'pencil',
       'points': points.map((e) => {'dx': e.dx, 'dy': e.dy}).toList(),
-      'color': paint.color.hashCode,
+      'color': paint.color.toARGB32(),
       'strokeWidth': paint.strokeWidth,
     };
   }

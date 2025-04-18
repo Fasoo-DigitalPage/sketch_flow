@@ -178,6 +178,34 @@ class SketchController extends ChangeNotifier {
     };
   }
 
+  void fromJson({required List<Map<String, dynamic>> contents}) {
+    for (final content in contents) {
+      final type = content['type'];
+
+      switch (type) {
+        case 'pencil':
+          final points = (content['points'] as List)
+              .map((e) => Offset(e['dx'], e['dy']))
+              .toList();
+          final color = Color(content['color']);
+          final strokeWidth = (content['strokeWidth'] as num).toDouble();
+
+          _contents.add(
+            Pencil(
+                points: points,
+                paint: Paint()
+                  ..color = color
+                  ..strokeWidth = strokeWidth
+                  ..style = PaintingStyle.stroke
+            )
+          );
+          break;
+      }
+    }
+
+    notifyListeners();
+  }
+
   /// Checks if a given is empty.
   bool _isOffsetsEmpty(List<Offset> offsets) => offsets.length < 2;
 

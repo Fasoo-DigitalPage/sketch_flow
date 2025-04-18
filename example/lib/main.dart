@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:sketch_flow/sketch_flow.dart';
 
@@ -24,9 +26,34 @@ class DemoPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SketchBoard(
-        controller: _sketchController,
-        showJsonDialogIcon: true,
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: SketchTopBar(controller: _sketchController, showJsonDialogIcon: true, onClickToJson: (json) => _showDialog(json: json, context: context)),
+      body: SketchBoard(controller: _sketchController,),
+      bottomNavigationBar: SketchBottomBar(controller: _sketchController),
+    );
+  }
+
+  void _showDialog({required Map<String, dynamic> json, required BuildContext context}) {
+    final prettyJson = const JsonEncoder.withIndent('  ').convert(_sketchController.toJson());
+
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Sketch JSON"),
+          content: SingleChildScrollView(
+            child: SelectableText(
+              prettyJson,
+              style: const TextStyle(fontSize: 12),
+            ),
+          ),
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text("Close")
+            )
+          ],
+        )
     );
   }
 }
