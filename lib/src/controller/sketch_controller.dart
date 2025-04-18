@@ -199,6 +199,24 @@ class SketchController extends ChangeNotifier {
                   ..style = PaintingStyle.stroke
             )
           );
+        case 'eraser':
+          final points = (content['points'] as List)
+              .map((e) => Offset(e['dx'], e['dy']))
+              .toList();
+          final strokeWidth = (content['strokeWidth'] as num).toDouble();
+
+          _contents.add(
+              Eraser(
+                  points: points,
+                  paint: Paint()
+                    ..color = Colors.transparent
+                    ..blendMode = BlendMode.clear
+                    ..style = PaintingStyle.stroke
+                    ..strokeCap = StrokeCap.round
+                    ..strokeJoin = StrokeJoin.round
+                    ..strokeWidth = strokeWidth
+              )
+          );
           break;
       }
     }

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:example/test_data.dart';
 import 'package:flutter/material.dart';
 import 'package:sketch_flow/sketch_flow.dart';
 
@@ -28,7 +29,13 @@ class DemoPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: SketchTopBar(controller: _sketchController, showJsonDialogIcon: true, onClickToJson: (json) => _showDialog(json: json, context: context)),
+      appBar: SketchTopBar(
+          controller: _sketchController,
+          showJsonDialogIcon: true,
+          onClickToJsonButton: (json) => _showDialog(json: json, context: context),
+          showInputTestDataIcon: true,
+          onClickInputTestButton: () => _sketchController.fromJson(contents: testData),
+      ),
       body: SketchBoard(controller: _sketchController,),
       bottomNavigationBar: SketchBottomBar(controller: _sketchController),
     );

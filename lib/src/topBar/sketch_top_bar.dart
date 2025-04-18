@@ -1,35 +1,39 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:sketch_flow/sketch_flow.dart';
 
-/// Top bar widget
-///
-/// [topBarHeight] The height of the top bar
-///
-/// [topBarColor] The background color of the top bar
-///
-/// [topBarBorderColor] The border color of the top bar
-///
-/// [topBarBorderWidth] he border width of the top bar
-///
-/// [backButtonIcon] The icon for the back button
-///
-/// [onClickBackButton] Callback function invoked when the back button
-///
-/// [activeUndoIcon] The icon displayed when the undo action is active.
-///
-/// [inActiveUndoIcon] The icon displayed when the undo action is inactive.
-///
-/// [activeRedoIcon] The icon displayed when the redo action is active.
-///
-/// [inActiveRedoIcon] The icon displayed when the redo action is inactive.
-///
-/// [showJsonDialogIcon] JSON dialog view settings (default false)
 class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
+  /// Top bar widget
+  ///
+  /// [topBarHeight] The height of the top bar
+  ///
+  /// [topBarColor] The background color of the top bar
+  ///
+  /// [topBarBorderColor] The border color of the top bar
+  ///
+  /// [topBarBorderWidth] he border width of the top bar
+  ///
+  /// [backButtonIcon] The icon for the back button
+  ///
+  /// [onClickBackButton] Callback function invoked when the back button
+  ///
+  /// [activeUndoIcon] The icon displayed when the undo action is active.
+  ///
+  /// [inActiveUndoIcon] The icon displayed when the undo action is inactive.
+  ///
+  /// [activeRedoIcon] The icon displayed when the redo action is active.
+  ///
+  /// [inActiveRedoIcon] The icon displayed when the redo action is inactive.
+  ///
+  /// [showJsonDialogIcon] JSON dialog view settings (default false)
+  ///
+  /// [onClickToJsonButton] Callback function invoked when the json button
+  ///
+  /// [showInputTestDataIcon] Input Test Data view settings (default false)
+  ///
+  /// [onClickInputTestButton] Callback function invoked when test input button
   const SketchTopBar({
     super.key,
     required this.controller,
-    this.onClickToJson,
     this.topBarHeight,
     this.topBarColor,
     this.topBarBorderColor,
@@ -41,6 +45,9 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
     this.activeRedoIcon,
     this.inActiveRedoIcon,
     this.showJsonDialogIcon,
+    this.onClickToJsonButton,
+    this.showInputTestDataIcon,
+    this.onClickInputTestButton
   });
   final SketchController controller;
 
@@ -59,8 +66,10 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
   final Widget? inActiveRedoIcon;
 
   final bool? showJsonDialogIcon;
+  final Function(Map<String, dynamic>)? onClickToJsonButton;
 
-  final Function(Map<String, dynamic>)? onClickToJson;
+  final bool? showInputTestDataIcon;
+  final Function()? onClickInputTestButton;
 
   @override
   Widget build(BuildContext context) {
@@ -85,7 +94,7 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
                 Row(
                   children: [
-                    /// Undo Icon
+                    /// Undo Icon button
                     ValueListenableBuilder<bool>(
                         valueListenable: controller.canUndoNotifier,
                         builder: (context, canUndo, _) {
@@ -100,7 +109,7 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
                         }
                     ),
 
-                    /// Redo Icon
+                    /// Redo Icon button
                     ValueListenableBuilder<bool>(
                         valueListenable: controller.canRedoNotifier,
                         builder: (context, canRedo, _) {
@@ -114,14 +123,26 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
                           );
                         }
                     ),
+
+                    /// Button for JSON data debugging
                     if(showJsonDialogIcon ?? false)
                       IconButton(
                         icon: Icon(Icons.javascript),
                         onPressed: () {
-                          if(onClickToJson != null) {
-                            onClickToJson!(controller.toJson());
+                          if(onClickToJsonButton != null) {
+                            onClickToJsonButton!(controller.toJson());
                           }
                         },
+                      ),
+
+                    if(showInputTestDataIcon ?? false)
+                      IconButton(
+                          icon: Icon(Icons.input),
+                          onPressed: ()  {
+                            if (onClickInputTestButton != null) {
+                              onClickInputTestButton!();
+                            }
+                          },
                       ),
                   ],
                 ),
