@@ -1,25 +1,30 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:sketch_flow/sketch_flow.dart';
 
-/// Main widget for the sketch board.
-///
-/// [controller] The sketch controller used to manage drawing state.
-///
-/// [boardColor] Background color of the sketch board.
-///
-/// [boardMaxScale] The maximum zoom level allowed when in move mode. (default is 5.0)
-///
-/// [boardMinScale] The minimum zoom level allowed when in move mode. (default is 1.0)
-///
-/// [backgroundColor] The background color of the Scaffold, which surrounds the canvas area (default is white)
 class SketchBoard extends StatefulWidget {
+  /// Main widget for the sketch board.
+  ///
+  /// [controller] The sketch controller used to manage drawing state.
+  ///
+  /// [boardColor] Background color of the sketch board.
+  ///
+  /// [boardMaxScale] The maximum zoom level allowed when in move mode. (default is 5.0)
+  ///
+  /// [boardMinScale] The minimum zoom level allowed when in move mode. (default is 1.0)
+  ///
+  /// [backgroundColor] The background color of the Scaffold, which surrounds the canvas area (default is white)
+  ///
+  /// [isReadOnly] The Read-only mode (By default, the top and bottom bars are null)
   const SketchBoard({
     super.key,
     this.controller,
     this.boardColor,
     this.boardMaxScale,
     this.boardMinScale,
-    this.backgroundColor
+    this.backgroundColor,
+    this.isReadOnly,
+    this.showJsonDialogIcon
   });
 
   final SketchController? controller;
@@ -27,6 +32,8 @@ class SketchBoard extends StatefulWidget {
   final double? boardMinScale;
   final double? boardMaxScale;
   final Color? backgroundColor;
+  final bool? isReadOnly;
+  final bool? showJsonDialogIcon;
 
   @override
   State<StatefulWidget> createState() => _SketchBoardState();
@@ -34,11 +41,12 @@ class SketchBoard extends StatefulWidget {
 
 class _SketchBoardState extends State<SketchBoard> {
   late final _controller = widget.controller ?? SketchController();
+  late final _isReadOnly = widget.isReadOnly ?? false;
 
   @override
   Widget build(BuildContext context) {
     // Drawing mode widget
-    Widget drawingArea = Listener(
+    Widget drawingModeWidget = Listener(
       onPointerDown: (event) => _controller.startNewLine(event.localPosition),
       onPointerMove: (event) => _controller.addPoint(event.localPosition),
       onPointerUp: (_) => _controller.endLine(),
@@ -60,7 +68,7 @@ class _SketchBoardState extends State<SketchBoard> {
     );
 
     // Move mode widget with zoom and pan support
-    Widget moveArea = Container(
+    Widget viewerModeWidget = Container(
       color: widget.boardColor ?? Colors.white,
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height,
@@ -71,10 +79,12 @@ class _SketchBoardState extends State<SketchBoard> {
 
     return Scaffold(
       backgroundColor: widget.backgroundColor ?? Colors.white,
-      appBar: SketchTopBar(
+      appBar: _isReadOnly ? null : SketchTopBar(
         controller: _controller,
+        showJsonDialogIcon: widget.showJsonDialogIcon,
+        onClickToJson: (json) => _showDialog(json: json),
       ),
-      body: ValueListenableBuilder<SketchToolType>(
+      body: _isReadOnly ? viewerModeWidget : ValueListenableBuilder<SketchToolType>(
           valueListenable: _controller.toolTypeNotifier,
           builder: (context, toolType, _) {
             bool isMoveArea = toolType == SketchToolType.move;
@@ -84,11 +94,34 @@ class _SketchBoardState extends State<SketchBoard> {
                 panEnabled: isMoveArea,
                 maxScale: isMoveArea ? widget.boardMaxScale ?? 5.0 : 1.0,
                 minScale: isMoveArea ? widget.boardMinScale ?? 0.5 : 1.0,
-                child: isMoveArea ? moveArea : drawingArea,
+                child: isMoveArea ? viewerModeWidget : drawingModeWidget,
             );
           }
       ),
-      bottomNavigationBar: SketchBottomBar(controller: _controller),
+      bottomNavigationBar: _isReadOnly ? null : SketchBottomBar(controller: _controller),
+    );
+  }
+
+  void _showDialog({required Map<String, dynamic> json}) {
+    final prettyJson = const JsonEncoder.withIndent('  ').convert(_controller.toJson());
+
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Sketch JSON"),
+          content: SingleChildScrollView(
+            child: SelectableText(
+              prettyJson,
+              style: const TextStyle(fontSize: 12),
+            ),
+          ),
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text("Close")
+            )
+          ],
+        )
     );
   }
 }

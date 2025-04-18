@@ -160,7 +160,8 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
       SketchToolType.pencil => _drawingConfigWidget(strokeThicknessList: strokeThicknessList),
       SketchToolType.eraser => _eraserConfigWidget(),
       SketchToolType.palette => _paletteConfigWidget(colorList: colorList),
-      SketchToolType.move => SizedBox.shrink()
+      SketchToolType.move => SizedBox.shrink(),
+      SketchToolType.readOnly => SizedBox.shrink()
     };
 
     _toolConfigOverlay = OverlayEntry(

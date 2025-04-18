@@ -9,4 +9,12 @@ class Eraser extends SketchContent {
     drawPointAsLine(canvas: canvas, customPaint: paint);
   }
 
+  @override
+  Map<String, dynamic> toJson() {
+    return {
+      'type': 'eraser',
+      'points': points.map((e) => {'dx': e.dx, 'dy': e.dy}).toList(),
+      'strokeWidth': paint.strokeWidth
+    };
+  }
 }

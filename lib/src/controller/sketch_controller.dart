@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:sketch_flow/sketch_contents.dart';
 import 'package:sketch_flow/sketch_flow.dart';
 
-/// A controller that manages the user's sketching state on the canvas.
 class SketchController extends ChangeNotifier {
+  /// A controller that manages the user's sketching state on the canvas.
   SketchController({
     SketchConfig? sketchConfig
   }) : _sketchConfig = sketchConfig ?? SketchConfig();
@@ -31,6 +31,8 @@ class SketchController extends ChangeNotifier {
   /// Indicates whether sketching is enabled.
   bool _isEnabled = true;
 
+  bool _hasErasedContent = false;
+
   /// undo / redo stack
   final List<List<SketchContent>> _undoStack = [];
   final List<List<SketchContent>> _redoStack = [];
@@ -43,6 +45,7 @@ class SketchController extends ChangeNotifier {
     if(_isOffsetsEmpty(_currentOffsets)) return null;
 
     switch(_sketchConfig.toolType) {
+      case SketchToolType.readOnly:
       case SketchToolType.palette:
       case SketchToolType.move:
          return null;
@@ -104,10 +107,12 @@ class SketchController extends ChangeNotifier {
 
     if(_sketchConfig.toolType == SketchToolType.eraser) {
       _eraserCirclePosition = offset;
-    }
 
-    if (_sketchConfig.toolType == SketchToolType.eraser && _sketchConfig.eraserMode == EraserMode.stroke) {
-      _eraserStroke(center: offset, radius: _sketchConfig.eraserRadius);
+      if (_sketchConfig.eraserMode == EraserMode.stroke) {
+        _eraserStroke(center: offset);
+      }else if (!_hasErasedContent && _sketchConfig.eraserMode == EraserMode.area) {
+        _hasErasedContent = _checkErasedContent(center: offset);
+      }
     }
 
     notifyListeners();
@@ -123,7 +128,10 @@ class SketchController extends ChangeNotifier {
         _eraserCirclePosition = null;
       }
 
-      if (_sketchConfig.toolType != SketchToolType.eraser || _sketchConfig.eraserMode != EraserMode.stroke) {
+      final isEraser = _sketchConfig.toolType == SketchToolType.eraser;
+      final isAreaEraseWithEffect = isEraser && _sketchConfig.eraserMode == EraserMode.area && _hasErasedContent;
+
+      if (!isEraser || isAreaEraseWithEffect) {
         _saveToUndoStack();
         _contents.add(content);
       }
@@ -164,6 +172,12 @@ class SketchController extends ChangeNotifier {
     notifyListeners();
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'sketchContents': _contents.map((c) => c.toJson()).toList(),
+    };
+  }
+
   /// Checks if a given is empty.
   bool _isOffsetsEmpty(List<Offset> offsets) => offsets.length < 2;
 
@@ -180,7 +194,7 @@ class SketchController extends ChangeNotifier {
   }
 
   /// Stroke eraser
-  void _eraserStroke({required Offset center, required double radius}) {
+  void _eraserStroke({required Offset center}) {
     List<SketchContent> removedPoints = [];
 
     // If any point of a stroke lies within the eraser circle, remove that stroke
@@ -188,7 +202,7 @@ class SketchController extends ChangeNotifier {
     _contents.removeWhere((content) {
       if (content is !Eraser) {
         for (final point in content.points) {
-          if (isPointInsideCircle(point: point, center: center, radius: radius)) {
+          if (_isPointInsideCircle(point: point, center: center)) {
             removedPoints.add(content);
             return true;
           }
@@ -208,11 +222,22 @@ class SketchController extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool isPointInsideCircle({
+  bool _checkErasedContent({required Offset center}) {
+    for (final content in _contents) {
+      for (final point in content.points) {
+        if(_isPointInsideCircle(point: point, center: center)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  bool _isPointInsideCircle({
     required Offset point,
-    required Offset center,
-    required double radius
+    required Offset center
   }) {
+    final radius = _sketchConfig.eraserRadius;
     final dx = point.dx - center.dx;
     final dy = point.dy - center.dy;
     return dx*dx + dy*dy <= radius*radius;

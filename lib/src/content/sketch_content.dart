@@ -18,4 +18,6 @@ abstract class SketchContent {
 
     canvas.drawPath(path, paint);
   }
+
+  Map<String, dynamic> toJson();
 }

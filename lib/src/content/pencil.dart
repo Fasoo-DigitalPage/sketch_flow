@@ -8,4 +8,14 @@ class Pencil extends SketchContent {
   void draw(Canvas canvas) {
     drawPointAsLine(canvas: canvas, customPaint: paint);
   }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return {
+      'type': 'pencil',
+      'points': points.map((e) => {'dx': e.dx, 'dy': e.dy}).toList(),
+      'color': paint.color.hashCode,
+      'strokeWidth': paint.strokeWidth,
+    };
+  }
 }

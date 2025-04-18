@@ -23,10 +23,13 @@ import 'package:sketch_flow/sketch_flow.dart';
 /// [activeRedoIcon] The icon displayed when the redo action is active.
 ///
 /// [inActiveRedoIcon] The icon displayed when the redo action is inactive.
+///
+/// [showJsonDialogIcon] JSON dialog view settings (default false)
 class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
   const SketchTopBar({
     super.key,
     required this.controller,
+    required this.onClickToJson,
     this.topBarHeight,
     this.topBarColor,
     this.topBarBorderColor,
@@ -36,7 +39,8 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
     this.activeUndoIcon,
     this.inActiveUndoIcon,
     this.activeRedoIcon,
-    this.inActiveRedoIcon
+    this.inActiveRedoIcon,
+    this.showJsonDialogIcon,
   });
   final SketchController controller;
 
@@ -53,6 +57,10 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
 
   final Widget? activeRedoIcon;
   final Widget? inActiveRedoIcon;
+
+  final bool? showJsonDialogIcon;
+
+  final Function(Map<String, dynamic>) onClickToJson;
 
   @override
   Widget build(BuildContext context) {
@@ -106,8 +114,14 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
                           );
                         }
                     ),
+                    if(showJsonDialogIcon ?? false)
+                      IconButton(
+                        icon: Icon(Icons.javascript),
+                        onPressed: () => onClickToJson(controller.toJson()),
+                      ),
                   ],
-                )
+                ),
+
               ],
             )
         )

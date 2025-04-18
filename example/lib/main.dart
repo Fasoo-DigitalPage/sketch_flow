@@ -20,12 +20,13 @@ class MyApp extends StatelessWidget {
 class DemoPage extends StatelessWidget {
   DemoPage({super.key});
 
-  final SketchController _sketchController = SketchController();
+  final SketchController _sketchController = SketchController(sketchConfig: SketchConfig());
 
   @override
   Widget build(BuildContext context) {
     return SketchBoard(
-        controller: _sketchController
+        controller: _sketchController,
+        showJsonDialogIcon: true,
     );
   }
 }
