@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sketch_flow/sketch_contents.dart';
 import 'package:sketch_flow/sketch_flow.dart';
+import 'package:sketch_flow/src/content/brush.dart';
 
 class SketchController extends ChangeNotifier {
   /// A controller that manages the user's sketching state on the canvas.
@@ -45,28 +46,23 @@ class SketchController extends ChangeNotifier {
     if(_isOffsetsEmpty(_currentOffsets)) return null;
 
     switch(_sketchConfig.toolType) {
-      case SketchToolType.readOnly:
       case SketchToolType.palette:
       case SketchToolType.move:
          return null;
       case SketchToolType.pencil:
         return Pencil(
             points: List.from(_currentOffsets),
-            paint: Paint()
-              ..color = _sketchConfig.color.withValues(alpha: _sketchConfig.opacity)
-              ..strokeWidth = _sketchConfig.strokeThickness
-              ..style = PaintingStyle.stroke
+            sketchConfig: _sketchConfig
+        );
+      case SketchToolType.brush:
+        return Brush(
+            points: List.from(_currentOffsets),
+            sketchConfig: _sketchConfig
         );
       case SketchToolType.eraser:
         return Eraser(
             points: List.from(_currentOffsets),
-            paint: Paint()
-              ..color = Colors.transparent
-              ..blendMode = BlendMode.clear
-              ..style = PaintingStyle.stroke
-              ..strokeCap = StrokeCap.round
-              ..strokeJoin = StrokeJoin.round
-              ..strokeWidth = _sketchConfig.eraserRadius * 2
+            sketchConfig: _sketchConfig
         );
     }
   }
@@ -187,36 +183,14 @@ class SketchController extends ChangeNotifier {
           final points = (content['points'] as List)
               .map((e) => Offset(e['dx'], e['dy']))
               .toList();
-          final color = Color(content['color']);
-          final strokeWidth = (content['strokeWidth'] as num).toDouble();
 
-          _contents.add(
-            Pencil(
-                points: points,
-                paint: Paint()
-                  ..color = color
-                  ..strokeWidth = strokeWidth
-                  ..style = PaintingStyle.stroke
-            )
-          );
+          _contents.add(Pencil(points: points, sketchConfig: _sketchConfig));
         case 'eraser':
           final points = (content['points'] as List)
               .map((e) => Offset(e['dx'], e['dy']))
               .toList();
-          final strokeWidth = (content['strokeWidth'] as num).toDouble();
 
-          _contents.add(
-              Eraser(
-                  points: points,
-                  paint: Paint()
-                    ..color = Colors.transparent
-                    ..blendMode = BlendMode.clear
-                    ..style = PaintingStyle.stroke
-                    ..strokeCap = StrokeCap.round
-                    ..strokeJoin = StrokeJoin.round
-                    ..strokeWidth = strokeWidth
-              )
-          );
+          _contents.add(Eraser(points: points, sketchConfig: _sketchConfig));
           break;
       }
     }

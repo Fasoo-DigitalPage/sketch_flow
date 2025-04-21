@@ -1,36 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:sketch_flow/sketch_flow.dart';
 import 'package:sketch_flow/sketch_widgets.dart';
-import 'package:sketch_flow/src/widgets/gradient_track_shape.dart';
 
-/// A bottom bar that provides tools for handwriting or sketching.
-///
-/// [controller] The sketch controller that manages drawing state.
-///
-/// [bottomBarHeight] The height of the bottom bar.
-///
-/// [bottomBarColor] The background color of the bottom bar.
-///
-/// [activePencilIcon] Icon displayed when the pencil tool is active.
-///
-/// [inActivePencilIcon] Icon displayed when the pencil tool is inactive.
-///
-/// [activeEraserIcon] Icon displayed when the eraser tool is active.
-///
-/// [inActiveEraserIcon] Icon displayed when the eraser tool is inactive.
-///
-/// [clearIcon] Icon used for the "clear all" function.
-///
-/// [paletteIcon] Icon for opening the color palette.
-///
-/// [eraserRadioButtonColor] The color of the eraser type radio button
-///
-/// [eraserThicknessSliderColor] The color of the slider used to control the eraser thickness
-///
-/// [eraserThicknessTextStyle] The TextStyle that displays the current eraser thickness as text
-///
-/// [eraserThicknessSliderThemeData] The theme data used to customize the appearance of the eraser thickness slider
 class SketchBottomBar extends StatefulWidget {
+  /// A bottom bar that provides tools for handwriting or sketching.
+  ///
+  /// [controller] The sketch controller that manages drawing state.
+  ///
+  /// [bottomBarHeight] The height of the bottom bar.
+  ///
+  /// [bottomBarColor] The background color of the bottom bar.
+  ///
+  /// [activePencilIcon] Icon displayed when the pencil tool is active.
+  ///
+  /// [inActivePencilIcon] Icon displayed when the pencil tool is inactive.
+  /// 
+  /// [activeBrushIcon] Icon displayed when the brush tool is active.
+  /// 
+  /// [inActiveBrushIcon] Icon displayed when the bursh tool is inactive.
+  ///
+  /// [activeEraserIcon] Icon displayed when the eraser tool is active.
+  ///
+  /// [inActiveEraserIcon] Icon displayed when the eraser tool is inactive.
+  ///
+  /// [clearIcon] Icon used for the "clear all" function.
+  ///
+  /// [paletteIcon] Icon for opening the color palette.
+  ///
+  /// [eraserRadioButtonColor] The color of the eraser type radio button
+  ///
+  /// [eraserThicknessSliderColor] The color of the slider used to control the eraser thickness
+  ///
+  /// [eraserThicknessTextStyle] The TextStyle that displays the current eraser thickness as text
+  ///
+  /// [eraserThicknessSliderThemeData] The theme data used to customize the appearance of the eraser thickness slider
   const SketchBottomBar({
     super.key,
     required this.controller,
@@ -40,6 +43,8 @@ class SketchBottomBar extends StatefulWidget {
     this.bottomBarBorderWidth,
     this.activePencilIcon,
     this.inActivePencilIcon,
+    this.activeBrushIcon,
+    this.inActiveBrushIcon,
     this.activeEraserIcon,
     this.inActiveEraserIcon,
     this.clearIcon,
@@ -60,6 +65,9 @@ class SketchBottomBar extends StatefulWidget {
 
   final Widget? activePencilIcon;
   final Widget? inActivePencilIcon;
+  
+  final Widget? activeBrushIcon;
+  final Widget? inActiveBrushIcon;
 
   final Widget? activeEraserIcon;
   final Widget? inActiveEraserIcon;
@@ -158,15 +166,14 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
 
     final applyWidget = switch(toolType) {
       SketchToolType.pencil => _drawingConfigWidget(strokeThicknessList: strokeThicknessList),
+      SketchToolType.brush => _drawingConfigWidget(strokeThicknessList: strokeThicknessList),
       SketchToolType.eraser => _eraserConfigWidget(),
       SketchToolType.palette => _paletteConfigWidget(colorList: colorList),
       SketchToolType.move => SizedBox.shrink(),
-      SketchToolType.readOnly => SizedBox.shrink()
     };
 
     _toolConfigOverlay = OverlayEntry(
         builder: (context) => GestureDetector(
-          // 외부 터치 감지
           behavior: HitTestBehavior.translucent,
           onTap: () => _onThicknessSelected(strokeThickness: _controller.currentSketchConfig.strokeThickness),
           child: Stack(
@@ -261,55 +268,71 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
                   )
               )
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _toolButtonWidget(
-                  toolItem: SketchToolItem(
-                      toolType: SketchToolType.move,
-                      activeIcon: Icon(Icons.mouse),
-                      inActiveIcon: Icon(Icons.mouse_outlined)
+          child: Center(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  /// Move tool
+                  _toolButtonWidget(
+                      toolItem: SketchToolItem(
+                          toolType: SketchToolType.move,
+                          activeIcon: Icon(Icons.mouse),
+                          inActiveIcon: Icon(Icons.mouse_outlined)
+                      ),
+                      selectedToolType: _selectedToolType,
+                      onClickToolButton: () => _onToolTap(toolType: SketchToolType.move)
                   ),
-                  selectedToolType: _selectedToolType,
-                  onClickToolButton: () => _onToolTap(toolType: SketchToolType.move)
-              ),
 
-              /// Default pen tool
-              _toolButtonWidget(
-                  toolItem: SketchToolItem(
-                    toolType: SketchToolType.pencil,
-                    activeIcon: widget.activePencilIcon ?? Icon(Icons.mode_edit_outline),
-                    inActiveIcon: widget.inActivePencilIcon ?? Icon(Icons.mode_edit_outline_outlined),
+                  /// Default pen tool
+                  _toolButtonWidget(
+                      toolItem: SketchToolItem(
+                        toolType: SketchToolType.pencil,
+                        activeIcon: widget.activePencilIcon ?? Icon(Icons.mode_edit_outline),
+                        inActiveIcon: widget.inActivePencilIcon ?? Icon(Icons.mode_edit_outline_outlined),
+                      ),
+                      selectedToolType: _selectedToolType,
+                      onClickToolButton: () => _onToolTap(toolType: SketchToolType.pencil)
                   ),
-                  selectedToolType: _selectedToolType,
-                  onClickToolButton: () => _onToolTap(toolType: SketchToolType.pencil)
-              ),
 
-              /// Eraser tool
-              _toolButtonWidget(
-                  toolItem: SketchToolItem(
-                      toolType: SketchToolType.eraser,
-                      activeIcon: widget.activeEraserIcon ?? Icon(Icons.square_rounded),
-                      inActiveIcon: widget.inActiveEraserIcon ?? Icon(Icons.square_outlined)
+                  /// Brush tool
+                  _toolButtonWidget(
+                      toolItem: SketchToolItem(
+                          toolType: SketchToolType.brush,
+                          activeIcon: widget.activeBrushIcon ?? Icon(Icons.brush_rounded),
+                          inActiveIcon: widget.inActiveBrushIcon ?? Icon(Icons.brush_outlined)
+                      ),
+                      selectedToolType: _selectedToolType,
+                      onClickToolButton: () => _onToolTap(toolType: SketchToolType.brush)
                   ),
-                  selectedToolType: _selectedToolType,
-                  onClickToolButton: () => _onToolTap(toolType: SketchToolType.eraser)
-              ),
 
-              /// Color palette
-              IconButton(
-                icon: widget.paletteIcon ?? Icon(Icons.palette_rounded),
-                onPressed: () => _onToolTap(toolType: SketchToolType.palette),
-              ),
+                  /// Eraser tool
+                  _toolButtonWidget(
+                      toolItem: SketchToolItem(
+                          toolType: SketchToolType.eraser,
+                          activeIcon: widget.activeEraserIcon ?? Icon(Icons.square_rounded),
+                          inActiveIcon: widget.inActiveEraserIcon ?? Icon(Icons.square_outlined)
+                      ),
+                      selectedToolType: _selectedToolType,
+                      onClickToolButton: () => _onToolTap(toolType: SketchToolType.eraser)
+                  ),
 
-              /// Clear all drawings
-              IconButton(
-                  icon: widget.clearIcon ?? Icon(Icons.cleaning_services_rounded),
-                  onPressed: () {
-                    _controller.clear();
-                  }
+                  /// Color palette
+                  IconButton(
+                    icon: widget.paletteIcon ?? Icon(Icons.palette_rounded),
+                    onPressed: () => _onToolTap(toolType: SketchToolType.palette),
+                  ),
+
+                  /// Clear all drawings
+                  IconButton(
+                      icon: widget.clearIcon ?? Icon(Icons.cleaning_services_rounded),
+                      onPressed: () {
+                        _controller.clear();
+                      }
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         )
     );

@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 ///
 /// [move] Screen move tool
 enum SketchToolType {
-  pencil, eraser, palette, move, readOnly
+  pencil, eraser, palette, move, brush
 }
 
 
