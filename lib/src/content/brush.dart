@@ -13,12 +13,17 @@ class Brush extends SketchContent {
       final p1 = points[i];
       final p2 = points[i+1];
 
+      // calculation of the distance between two points
       final distance = (p2 - p1).distance;
       final speed = distance;
 
-      double minThickness = sketchConfig.strokeThickness * 0.5;
+      double minThickness = sketchConfig.strokeThickness * 0.45;
       double maxThickness = sketchConfig.strokeThickness;
+
+      // If draw it quickly, it becomes thinner
       double thickness = maxThickness - (speed * 0.5);
+
+      // Avoid being too thin or too thick
       thickness = thickness.clamp(minThickness, maxThickness);
 
       final paint = Paint()
@@ -37,7 +42,7 @@ class Brush extends SketchContent {
       'type': 'brush',
       'points': points.map((e) => {'dx': e.dx, 'dy': e.dy}).toList(),
       'color': sketchConfig.color.toARGB32(),
-      'strokeWidth': sketchConfig.strokeThickness
+      'strokeThickness': sketchConfig.strokeThickness
     };
   }
 

@@ -29,7 +29,7 @@ class Eraser extends SketchContent {
     return {
       'type': 'eraser',
       'points': points.map((e) => {'dx': e.dx, 'dy': e.dy}).toList(),
-      'strokeWidth': sketchConfig.strokeThickness
+      'strokeThickness': sketchConfig.strokeThickness
     };
   }
 }

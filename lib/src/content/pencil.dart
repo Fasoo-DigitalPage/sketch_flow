@@ -27,7 +27,7 @@ class Pencil extends SketchContent {
       'type': 'pencil',
       'points': points.map((e) => {'dx': e.dx, 'dy': e.dy}).toList(),
       'color': sketchConfig.color.toARGB32(),
-      'strokeWidth': sketchConfig.strokeThickness,
+      'strokeThickness': sketchConfig.strokeThickness,
     };
   }
 }

@@ -140,7 +140,7 @@ final List<Map<String, dynamic>> testData = [
       }
     ],
     "color": 4278190080,
-    "strokeWidth": 7.0
+    "strokeThickness": 7.0
   },
   {
     "type": "pencil",
@@ -331,7 +331,7 @@ final List<Map<String, dynamic>> testData = [
       }
     ],
     "color": 520093696,
-    "strokeWidth": 7.0
+    "strokeThickness": 7.0
   },
   {
     "type": "pencil",
@@ -418,7 +418,7 @@ final List<Map<String, dynamic>> testData = [
       }
     ],
     "color": 4294198070,
-    "strokeWidth": 3.5
+    "strokeThickness": 3.5
   },
   {
     "type": "pencil",
@@ -649,7 +649,7 @@ final List<Map<String, dynamic>> testData = [
       }
     ],
     "color": 4294198070,
-    "strokeWidth": 3.5
+    "strokeThickness": 3.5
   },
   {
     "type": "pencil",
@@ -776,7 +776,7 @@ final List<Map<String, dynamic>> testData = [
       }
     ],
     "color": 4280391411,
-    "strokeWidth": 3.5
+    "strokeThickness": 3.5
   },
   {
     "type": "pencil",
@@ -1147,7 +1147,7 @@ final List<Map<String, dynamic>> testData = [
       }
     ],
     "color": 4280391411,
-    "strokeWidth": 5.0
+    "strokeThickness": 5.0
   },
   {
     "type": "pencil",
@@ -1238,7 +1238,7 @@ final List<Map<String, dynamic>> testData = [
       }
     ],
     "color": 4283215696,
-    "strokeWidth": 3.5
+    "strokeThickness": 3.5
   },
   {
     "type": "pencil",
@@ -1369,6 +1369,6 @@ final List<Map<String, dynamic>> testData = [
       }
     ],
     "color": 4283215696,
-    "strokeWidth": 3.5
+    "strokeThickness": 3.5
   }
 ];

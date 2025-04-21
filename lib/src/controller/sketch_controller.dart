@@ -177,20 +177,31 @@ class SketchController extends ChangeNotifier {
   void fromJson({required List<Map<String, dynamic>> contents}) {
     for (final content in contents) {
       final type = content['type'];
+      final points = (content['points'] as List)
+          .map((e) {
+        final dx = e['dx'];
+        final dy = e['dy'];
+        if (dx is num && dy is num) {
+          return Offset(dx.toDouble(), dy.toDouble());
+        }
+        return null;
+      })
+          .whereType<Offset>()
+          .toList();
+
+      final color = Color(content['color'] ?? 0xFF000000);
+      final strokeThickness = (content['strokeThickness'] as num?)?.toDouble() ?? 1.0;
+
+      final sketchConfig = SketchConfig(
+        color: color,
+        strokeThickness: strokeThickness
+      );
 
       switch (type) {
         case 'pencil':
-          final points = (content['points'] as List)
-              .map((e) => Offset(e['dx'], e['dy']))
-              .toList();
-
-          _contents.add(Pencil(points: points, sketchConfig: _sketchConfig));
+          _contents.add(Pencil(points: points, sketchConfig: sketchConfig));
         case 'eraser':
-          final points = (content['points'] as List)
-              .map((e) => Offset(e['dx'], e['dy']))
-              .toList();
-
-          _contents.add(Eraser(points: points, sketchConfig: _sketchConfig));
+          _contents.add(Eraser(points: points, sketchConfig: sketchConfig));
           break;
       }
     }
