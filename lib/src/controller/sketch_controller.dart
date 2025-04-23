@@ -191,10 +191,12 @@ class SketchController extends ChangeNotifier {
 
       final color = Color(content['color'] ?? 0xFF000000);
       final strokeThickness = (content['strokeThickness'] as num?)?.toDouble() ?? 1.0;
+      final opacity = (content['opacity'] as num?)?.toDouble() ?? 1.0;
 
       final sketchConfig = SketchConfig(
         color: color,
-        strokeThickness: strokeThickness
+        strokeThickness: strokeThickness,
+        opacity: opacity
       );
 
       switch (type) {

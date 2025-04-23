@@ -776,7 +776,8 @@ final List<Map<String, dynamic>> testData = [
       }
     ],
     "color": 4280391411,
-    "strokeThickness": 3.5
+    "strokeThickness": 10.5,
+    "opacity": 0.3
   },
   {
     "type": "pencil",
