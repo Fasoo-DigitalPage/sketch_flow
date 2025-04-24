@@ -174,6 +174,7 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
 
     _toolConfigOverlay = OverlayEntry(
         builder: (context) => GestureDetector(
+          // Close the overlay when touching the external area.
           behavior: HitTestBehavior.translucent,
           onTap: () => _onThicknessSelected(strokeThickness: _controller.currentSketchConfig.strokeThickness),
           child: Stack(

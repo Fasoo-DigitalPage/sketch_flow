@@ -18,26 +18,26 @@ enum EraserMode {
   area, stroke
 }
 
+/// Represents the configuration for a sketching tool.
+///
+/// [toolType] The type of sketch tool (e.g., pencil, eraser)
+///
+/// [color] The color of the pen
+///
+/// [opacity] The opacity of the pen
+///
+/// [strokeThickness] The thickness of the stroke
+///
+/// [strokeThicknessList] A list of available stroke thickness option
+///
+/// [eraserRadius] The radius of the eraser
+///
+/// [eraserRadiusMax] The maximum thickness the eraser can be set to
+///
+/// [eraserRadiusMin] The minimum thickness the eraser can be set to
+///
+/// [eraserRadiusDivisions] The number of discrete steps in the eraser thickness slider
 class SketchConfig {
-  /// Represents the configuration for a sketching tool.
-  ///
-  /// [toolType] The type of sketch tool (e.g., pencil, eraser)
-  ///
-  /// [color] The color of the pen
-  ///
-  /// [opacity] The opacity of the pen
-  ///
-  /// [strokeThickness] The thickness of the stroke
-  ///
-  /// [strokeThicknessList] A list of available stroke thickness option
-  ///
-  /// [eraserRadius] The radius of the eraser
-  ///
-  /// [eraserRadiusMax] The maximum thickness the eraser can be set to
-  ///
-  /// [eraserRadiusMin] The minimum thickness the eraser can be set to
-  ///
-  /// [eraserRadiusDivisions] The number of discrete steps in the eraser thickness slider
   SketchConfig({
     this.toolType = SketchToolType.pencil,
     this.color = Colors.black,
