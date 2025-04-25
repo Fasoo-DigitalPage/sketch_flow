@@ -122,6 +122,7 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
       });
       _controller.updateConfig(_controller.currentSketchConfig.copyWith(toolType: toolType));
     }
+    _controller.disableDrawing();
   }
 
   /// Displays the configuration options for the selected tool
