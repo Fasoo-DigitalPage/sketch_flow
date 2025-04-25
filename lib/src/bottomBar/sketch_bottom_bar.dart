@@ -11,17 +11,11 @@ class SketchBottomBar extends StatefulWidget {
   ///
   /// [bottomBarColor] The background color of the bottom bar.
   ///
-  /// [activePencilIcon] Icon displayed when the pencil tool is active.
-  ///
-  /// [inActivePencilIcon] Icon displayed when the pencil tool is inactive.
+  /// [pencil] Pencil widget (see SketchToolItem)
   /// 
-  /// [activeBrushIcon] Icon displayed when the brush tool is active.
+  /// [brush] Brush Widget (see SketchToolItem)
   /// 
-  /// [inActiveBrushIcon] Icon displayed when the bursh tool is inactive.
-  ///
-  /// [activeEraserIcon] Icon displayed when the eraser tool is active.
-  ///
-  /// [inActiveEraserIcon] Icon displayed when the eraser tool is inactive.
+  /// [eraser] Eraser Widget (see SketchToolItem)
   ///
   /// [clearIcon] Icon used for the "clear all" function.
   ///
@@ -41,12 +35,9 @@ class SketchBottomBar extends StatefulWidget {
     this.bottomBarColor,
     this.bottomBarBorderColor,
     this.bottomBarBorderWidth,
-    this.activePencilIcon,
-    this.inActivePencilIcon,
-    this.activeBrushIcon,
-    this.inActiveBrushIcon,
-    this.activeEraserIcon,
-    this.inActiveEraserIcon,
+    this.pencil,
+    this.eraser,
+    this.brush,
     this.clearIcon,
     this.paletteIcon,
     this.eraserRadioButtonColor,
@@ -63,17 +54,10 @@ class SketchBottomBar extends StatefulWidget {
   final Color? bottomBarBorderColor;
   final double? bottomBarBorderWidth;
 
-  final Widget? activePencilIcon;
-  final Widget? inActivePencilIcon;
-  
-  final Widget? activeBrushIcon;
-  final Widget? inActiveBrushIcon;
-
-  final Widget? activeEraserIcon;
-  final Widget? inActiveEraserIcon;
-
+  final SketchToolItem? pencil;
+  final SketchToolItem? brush;
+  final SketchToolItem? eraser;
   final Widget? paletteIcon;
-
   final Widget? clearIcon;
 
   final Color? eraserRadioButtonColor;
@@ -99,9 +83,6 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
 
   /// The currently selected drawing tool.
   SketchToolType _selectedToolType = SketchToolType.pencil;
-
-  /// Timestamp of the last tool tap.
-  DateTime? _lastTapTimes;
 
   /// The currently selected eraser mode (stroke or area).
   EraserMode _selectedEraserType = EraserMode.area;
@@ -129,17 +110,9 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
   }
 
   /// Handles tool selection.
-  /// If the same tool is tapped twice within 0.5 seconds, show configuration options.
-  /// Palette is excluded from this behavior as it doesn't affect drawing mode.
+  /// Call _showToolConfig if the tabs currently pressed are the same
   void _onToolTap({required SketchToolType toolType}) {
-    final now = DateTime.now();
-    final lastTap = _lastTapTimes;
-
-    /// Displays the configuration options for the selected tool
-    /// such as thickness, color, or eraser type.
-    if((toolType == SketchToolType.palette || _selectedToolType == toolType) &&
-        lastTap != null && now.difference(lastTap) < const Duration(milliseconds: 500)) {
-      _controller.disableDrawing();
+    if(toolType == _selectedToolType || toolType == SketchToolType.palette) {
       _showToolConfig(toolType: toolType);
     }
 
@@ -149,8 +122,6 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
       });
       _controller.updateConfig(_controller.currentSketchConfig.copyWith(toolType: toolType));
     }
-
-    _lastTapTimes = now;
   }
 
   /// Displays the configuration options for the selected tool
@@ -289,8 +260,8 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
                   _toolButtonWidget(
                       toolItem: SketchToolItem(
                         toolType: SketchToolType.pencil,
-                        activeIcon: widget.activePencilIcon ?? Icon(Icons.mode_edit_outline),
-                        inActiveIcon: widget.inActivePencilIcon ?? Icon(Icons.mode_edit_outline_outlined),
+                        activeIcon: widget.pencil?.activeIcon ?? Icon(Icons.mode_edit_outline),
+                        inActiveIcon: widget.pencil?.inActiveIcon ?? Icon(Icons.mode_edit_outline_outlined),
                       ),
                       selectedToolType: _selectedToolType,
                       onClickToolButton: () => _onToolTap(toolType: SketchToolType.pencil)
@@ -300,8 +271,8 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
                   _toolButtonWidget(
                       toolItem: SketchToolItem(
                           toolType: SketchToolType.brush,
-                          activeIcon: widget.activeBrushIcon ?? Icon(Icons.brush_rounded),
-                          inActiveIcon: widget.inActiveBrushIcon ?? Icon(Icons.brush_outlined)
+                          activeIcon: widget.brush?.activeIcon ?? Icon(Icons.brush_rounded),
+                          inActiveIcon: widget.brush?.inActiveIcon ?? Icon(Icons.brush_outlined)
                       ),
                       selectedToolType: _selectedToolType,
                       onClickToolButton: () => _onToolTap(toolType: SketchToolType.brush)
@@ -311,8 +282,8 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
                   _toolButtonWidget(
                       toolItem: SketchToolItem(
                           toolType: SketchToolType.eraser,
-                          activeIcon: widget.activeEraserIcon ?? Icon(Icons.square_rounded),
-                          inActiveIcon: widget.inActiveEraserIcon ?? Icon(Icons.square_outlined)
+                          activeIcon: widget.eraser?.activeIcon ?? Icon(Icons.square_rounded),
+                          inActiveIcon: widget.eraser?.inActiveIcon ?? Icon(Icons.square_outlined)
                       ),
                       selectedToolType: _selectedToolType,
                       onClickToolButton: () => _onToolTap(toolType: SketchToolType.eraser)

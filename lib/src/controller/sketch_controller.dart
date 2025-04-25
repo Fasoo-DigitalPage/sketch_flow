@@ -43,8 +43,6 @@ class SketchController extends ChangeNotifier {
 
   /// Creates a new sketch content based on the current configuration and path.
   SketchContent? createCurrentContent() {
-    if(_isOffsetsEmpty(_currentOffsets)) return null;
-
     switch(_sketchConfig.toolType) {
       case SketchToolType.palette:
       case SketchToolType.move:
@@ -210,9 +208,6 @@ class SketchController extends ChangeNotifier {
 
     notifyListeners();
   }
-
-  /// Checks if a given is empty.
-  bool _isOffsetsEmpty(List<Offset> offsets) => offsets.length < 2;
 
   void _saveToUndoStack() {
     _undoStack.add(List.from(_contents));
