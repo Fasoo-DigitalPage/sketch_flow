@@ -47,7 +47,8 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
     this.showJsonDialogIcon,
     this.onClickToJsonButton,
     this.showInputTestDataIcon,
-    this.onClickInputTestButton
+    this.onClickInputTestButton,
+    this.onClickExtractPNG
   });
   final SketchController controller;
 
@@ -70,6 +71,8 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
 
   final bool? showInputTestDataIcon;
   final Function()? onClickInputTestButton;
+
+  final Function()? onClickExtractPNG;
 
   @override
   Widget build(BuildContext context) {
@@ -122,6 +125,15 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
                               } : null
                           );
                         }
+                    ),
+
+                    IconButton(
+                        onPressed: () {
+                          if(onClickExtractPNG != null) {
+                            onClickExtractPNG!();
+                          }
+                        },
+                        icon: Icon(Icons.image)
                     ),
 
                     /// Button for JSON data debugging

@@ -6,6 +6,8 @@ class SketchBoard extends StatefulWidget {
   ///
   /// [controller] The sketch controller used to manage drawing state.
   ///
+  /// [repaintKey] RepaintBoundary key value (required for PNG extraction)
+  ///
   /// [boardColor] Background color of the sketch board.
   ///
   /// [boardMaxScale] The maximum zoom level allowed when in move mode. (default is 5.0)
@@ -18,6 +20,7 @@ class SketchBoard extends StatefulWidget {
   const SketchBoard({
     super.key,
     required this.controller,
+    this.repaintKey,
     this.boardColor,
     this.boardMaxScale,
     this.boardMinScale,
@@ -25,6 +28,7 @@ class SketchBoard extends StatefulWidget {
   });
 
   final SketchController controller;
+  final GlobalKey? repaintKey;
   final Color? boardColor;
   final double? boardMinScale;
   final double? boardMaxScale;
@@ -50,6 +54,7 @@ class _SketchBoardState extends State<SketchBoard> {
           animation: widget.controller,
           builder: (context, _) {
             return RepaintBoundary(
+              key: widget.repaintKey,
               child: CustomPaint(
                 painter: SketchPainter(widget.controller),
               ),

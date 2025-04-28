@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:example/test_data.dart';
 import 'package:flutter/material.dart';
 import 'package:sketch_flow/sketch_flow.dart';
@@ -19,28 +20,40 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class DemoPage extends StatelessWidget {
-  DemoPage({super.key});
+class DemoPage extends StatefulWidget {
+  const DemoPage({super.key});
 
+  @override
+  State<StatefulWidget> createState() => _DemoPageState();
+}
+
+class _DemoPageState extends State<DemoPage> {
   final SketchController _sketchController = SketchController(sketchConfig: SketchConfig());
+  final GlobalKey _repaintKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: SketchTopBar(
-          controller: _sketchController,
-          showJsonDialogIcon: true,
-          onClickToJsonButton: (json) => _showDialog(json: json, context: context),
-          showInputTestDataIcon: true,
-          onClickInputTestButton: () => _sketchController.fromJson(contents: testData),
+        controller: _sketchController,
+        showJsonDialogIcon: true,
+        onClickToJsonButton: (json) => _showJsonDialog(json: json, context: context),
+        showInputTestDataIcon: true,
+        onClickInputTestButton: () => _sketchController.fromJson(contents: testData),
+        onClickExtractPNG: () async {
+          final image = await _sketchController.extractWithPNG(repaintKey: _repaintKey);
+          if(context.mounted && image != null) {
+            _showPNGDialog(image: image, context: context);
+          }
+        },
       ),
-      body: SketchBoard(controller: _sketchController,),
+      body: SketchBoard(controller: _sketchController, repaintKey: _repaintKey),
       bottomNavigationBar: SketchBottomBar(controller: _sketchController),
     );
   }
 
-  void _showDialog({required Map<String, dynamic> json, required BuildContext context}) {
+  void _showJsonDialog({required Map<String, dynamic> json, required BuildContext context}) {
     final prettyJson = const JsonEncoder.withIndent('  ').convert(_sketchController.toJson());
 
     showDialog(
@@ -60,6 +73,25 @@ class DemoPage extends StatelessWidget {
             )
           ],
         )
+    );
+  }
+
+  void _showPNGDialog({required Uint8List image, required BuildContext context}) {
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Sketch PNG"),
+          content: SingleChildScrollView(
+            child: Image.memory(image),
+          ),
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text("Close")
+            )
+          ],
+        ),
+
     );
   }
 }
