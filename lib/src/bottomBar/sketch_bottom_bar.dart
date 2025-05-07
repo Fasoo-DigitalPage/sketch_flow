@@ -74,7 +74,7 @@ class SketchBottomBar extends StatefulWidget {
 class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderStateMixin {
   late final _controller = widget.controller;
   
-  late AnimationController _fadeController;
+  late AnimationController _fadeAnimationController;
   late Animation<double> _fadeAnimation;
   late double _safeAreaBottomPadding;
 
@@ -93,12 +93,12 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
   @override
   void initState() {
     super.initState();
-    _fadeController = AnimationController(
+    _fadeAnimationController = AnimationController(
         vsync: this,
         duration: Duration(milliseconds: 200)
     );
     _fadeAnimation = CurvedAnimation(
-        parent: _fadeController,
+        parent: _fadeAnimationController,
         curve: Curves.easeInOut
     );
   }
@@ -106,7 +106,7 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
   @override
   void dispose() {
     super.dispose();
-    _fadeController.dispose();
+    _fadeAnimationController.dispose();
   }
 
   /// Handles tool selection.
@@ -189,13 +189,13 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
     );
 
     Overlay.of(context).insert(_toolConfigOverlay!);
-    _fadeController.forward(from: 0.0);
+    _fadeAnimationController.forward(from: 0.0);
   }
 
   /// Called when a stroke thickness is selected.
   /// Updates the stroke width, closes the overlay, and enables drawing.
   void _onThicknessSelected({required double strokeThickness}) {
-    _fadeController.reverse().then((_) async {
+    _fadeAnimationController.reverse().then((_) async {
       _controller.updateConfig(_controller.currentSketchConfig.copyWith(strokeThickness: strokeThickness));
       _controller.enableDrawing();
 
@@ -211,7 +211,7 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
   /// Called when a color is selected from the palette.
   /// Updates the drawing color, closes the overlay, and enables drawing.
   void _onColorSelected({required Color color}) {
-    _fadeController.reverse().then((_) async {
+    _fadeAnimationController.reverse().then((_) async {
       _controller.updateConfig(_controller.currentSketchConfig.copyWith(color: color));
       _controller.enableDrawing();
 
@@ -317,10 +317,27 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
     required Function() onClickToolButton
   }) {
     final bool isActive = toolItem.toolType == selectedToolType;
+    final double targetSize = isActive ? 36.0 : 24.0;
 
-    return IconButton(
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 0), // 일정한 간격 유지
+      child: IconButton(
         onPressed: onClickToolButton,
-        icon: isActive ? toolItem.activeIcon : toolItem.inActiveIcon
+        icon: TweenAnimationBuilder<double>(
+          tween: Tween<double>(begin: targetSize, end: targetSize),
+          duration: Duration(milliseconds: 200),
+          builder: (context, size, child) {
+            return IconTheme(
+              data: IconThemeData(size: size),
+              child: child!,
+            );
+          },
+          child: isActive ? toolItem.activeIcon : toolItem.inActiveIcon,
+        ),
+        iconSize: 48,
+        padding: EdgeInsets.zero,
+        constraints: BoxConstraints(minWidth: 48, minHeight: 48),
+      ),
     );
   }
 
@@ -348,36 +365,39 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
             builder: (context, setModalState) {
               return Material(
                 color: Colors.white,
-                child: SliderTheme(
-                  data: widget.penOpacitySliderThemeData ?? SliderTheme.of(context).copyWith(
-                    padding: EdgeInsets.symmetric(vertical: 4, horizontal: 25),
-                    activeTrackColor: Colors.transparent,
-                    inactiveTrackColor: Colors.transparent,
-                    trackShape: GradientTrackShape(
-                        trackHeight: 8.0,
-                        gradient: LinearGradient(
-                            colors: [
-                              _controller.currentSketchConfig.color.withValues(alpha: 0.0),
-                              _controller.currentSketchConfig.color.withValues(alpha: 1.0),
-                            ]
-                        )
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.6,
+                  child: SliderTheme(
+                    data: widget.penOpacitySliderThemeData ?? SliderTheme.of(context).copyWith(
+                      padding: EdgeInsets.symmetric(vertical: 4),
+                      activeTrackColor: Colors.transparent,
+                      inactiveTrackColor: Colors.transparent,
+                      trackShape: GradientTrackShape(
+                          trackHeight: 8.0,
+                          gradient: LinearGradient(
+                              colors: [
+                                _controller.currentSketchConfig.color.withValues(alpha: 0.0),
+                                _controller.currentSketchConfig.color.withValues(alpha: 1.0),
+                              ]
+                          )
+                      ),
+                      inactiveTickMarkColor: _controller.currentSketchConfig.color,
+                      thumbColor: _controller.currentSketchConfig.color,
+                      overlayColor: _controller.currentSketchConfig.color.withValues(alpha: 0.05),
+                      thumbShape: RoundSliderThumbShape(enabledThumbRadius: 10),
                     ),
-                    inactiveTickMarkColor: _controller.currentSketchConfig.color,
-                    thumbColor: _controller.currentSketchConfig.color,
-                    overlayColor: _controller.currentSketchConfig.color.withValues(alpha: 0.05),
-                    thumbShape: RoundSliderThumbShape(enabledThumbRadius: 10)
-                  ),
-                  child: Slider(
-                      value: _penOpacity,
-                      min: 0.0,
-                      max: 1.0,
-                      onChanged: (opacity) {
-                        _controller.updateConfig(_controller.currentSketchConfig.copyWith(opacity: opacity));
-                        setState(() { _penOpacity = opacity; });
+                    child: Slider(
+                        value: _penOpacity,
+                        min: 0.0,
+                        max: 1.0,
+                        onChanged: (opacity) {
+                          _controller.updateConfig(_controller.currentSketchConfig.copyWith(opacity: opacity));
+                          setState(() { _penOpacity = opacity; });
 
-                        // Call to show UI immediately reflect slider value in overlay inner widget.
-                        setModalState((){});
-                      }
+                          // Call to show UI immediately reflect slider value in overlay inner widget.
+                          setModalState((){});
+                        }
+                    ),
                   ),
                 ),
               );
