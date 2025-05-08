@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sketch_flow/sketch_contents.dart';
 import 'package:sketch_flow/sketch_flow.dart';
 
 class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
@@ -48,7 +49,8 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
     this.onClickToJsonButton,
     this.showInputTestDataIcon,
     this.onClickInputTestButton,
-    this.onClickExtractPNG
+    this.onClickExtractPNG,
+    this.onClickExtractSVG
   });
   final SketchController controller;
 
@@ -73,6 +75,8 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
   final Function()? onClickInputTestButton;
 
   final Function()? onClickExtractPNG;
+
+  final Function(List<Offset>)? onClickExtractSVG;
 
   @override
   Widget build(BuildContext context) {
@@ -125,6 +129,21 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
                               } : null
                           );
                         }
+                    ),
+
+                    IconButton(
+                        onPressed: () {
+                          if(onClickExtractSVG != null) {
+                            List<Offset> offsets = [];
+
+                            for (final content in controller.contents) {
+                              offsets.addAll(content.points);
+                            }
+
+                            onClickExtractSVG!(offsets);
+                          }
+                        },
+                        icon: Icon(Icons.file_open_outlined)
                     ),
 
                     IconButton(

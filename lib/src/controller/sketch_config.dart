@@ -35,8 +35,6 @@ enum EraserMode {
 /// [eraserRadiusMax] The maximum thickness the eraser can be set to
 ///
 /// [eraserRadiusMin] The minimum thickness the eraser can be set to
-///
-/// [eraserRadiusDivisions] The number of discrete steps in the eraser thickness slider
 class SketchConfig {
   SketchConfig({
     this.toolType = SketchToolType.pencil,
@@ -45,7 +43,6 @@ class SketchConfig {
     this.eraserRadius = 10,
     this.eraserRadiusMax = 100,
     this.eraserRadiusMin = 10,
-    this.eraserRadiusDivisions = 9,
     this.eraserMode = EraserMode.area,
     List<Color>? colorList,
     double? strokeThickness,
@@ -67,7 +64,6 @@ class SketchConfig {
   final double eraserRadius;
   final double eraserRadiusMax;
   final double eraserRadiusMin;
-  final int eraserRadiusDivisions;
 
   final EraserMode eraserMode;
 
@@ -81,7 +77,6 @@ class SketchConfig {
     double? eraserRadius,
     double? eraserRadiusMax,
     double? eraserRadiusMin,
-    int? eraserRadiusDivisions,
     EraserMode? eraserMode,
   }) {
     return SketchConfig(
@@ -94,7 +89,6 @@ class SketchConfig {
         eraserRadius: eraserRadius ?? this.eraserRadius,
         eraserRadiusMax: eraserRadiusMax ?? this.eraserRadiusMax,
         eraserRadiusMin: eraserRadiusMin ?? this.eraserRadiusMin,
-        eraserRadiusDivisions: eraserRadiusDivisions ?? this.eraserRadiusDivisions,
         eraserMode: eraserMode ?? this.eraserMode
     );
   }
@@ -103,7 +97,7 @@ class SketchConfig {
   String toString() {
     return "toolType: ${toolType.name}, color: $color, strokeThickness: $strokeThickness, "
         "strokeThicknessList: $strokeThicknessList, eraserRadius: $eraserRadius, eraserRadius: $eraserRadius, "
-        "eraserRadiusMax: $eraserRadiusMax, eraserRadiusMin: $eraserRadiusMin, eraserRadiusDivisions: $eraserRadiusDivisions"
+        "eraserRadiusMax: $eraserRadiusMax, eraserRadiusMin: $eraserRadiusMin, "
         "eraserMode: $eraserMode, opacity: $opacity";
   }
 }

@@ -567,7 +567,7 @@ class _SketchBottomBarState extends State<SketchBottomBar>
                       value: _eraserRadius,
                       min: config.eraserRadiusMin,
                       max: config.eraserRadiusMax,
-                      divisions: config.eraserRadiusDivisions,
+                      divisions: 9,
                       onChanged: (eraserRadius) {
                         _controller.updateConfig(
                           _controller.currentSketchConfig.copyWith(

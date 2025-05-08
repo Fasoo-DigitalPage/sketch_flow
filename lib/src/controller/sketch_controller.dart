@@ -128,11 +128,13 @@ class SketchController extends ChangeNotifier {
       final isEraser = _sketchConfig.toolType == SketchToolType.eraser;
       final isAreaEraseWithEffect = isEraser && _sketchConfig.eraserMode == EraserMode.area && _hasErasedContent;
 
+      // Save only when something is erased
       if (!isEraser || isAreaEraseWithEffect) {
         _saveToUndoStack();
         _contents.add(content);
       }
 
+      _hasErasedContent = false;
       _currentOffsets.clear();
       notifyListeners();
     }
@@ -227,6 +229,65 @@ class SketchController extends ChangeNotifier {
     }
   }
 
+  String extractWithSVG({required double width, required double height}) {
+    final buffer = StringBuffer();
+    final eraserBuffer = StringBuffer();
+    final pathBuffer = StringBuffer();
+
+    buffer.writeln(
+      '<svg xmlns="http://www.w3.org/2000/svg" width="$width" height="$height" viewBox="0 0 $width $height">',
+    );
+
+    for (final content in _contents) {
+      if (content.points.isEmpty) continue;
+
+      if (content.sketchConfig.toolType == SketchToolType.eraser) {
+        final radius = content.sketchConfig.eraserRadius;
+        for (final point in content.points) {
+          eraserBuffer.writeln(
+            '<circle cx="${point.dx}" cy="${point.dy}" r="$radius" fill="black"/>',
+          );
+        }
+      } else {
+        final pathData = StringBuffer();
+        pathData.write('M ${content.points.first.dx} ${content.points.first.dy} ');
+        for (var i = 1; i < content.points.length; i++) {
+          final p = content.points[i];
+          pathData.write('L ${p.dx} ${p.dy} ');
+        }
+
+        final color = '#${content.sketchConfig.color.toARGB32().toRadixString(16).padLeft(8, '0').substring(2)}';
+        final opacity = content.sketchConfig.opacity;
+        final strokeWidth = content.sketchConfig.strokeThickness;
+
+        pathBuffer.writeln(
+          '<path d="$pathData" stroke="$color" stroke-width="$strokeWidth" '
+              'fill="none" stroke-opacity="$opacity"/>',
+        );
+      }
+    }
+
+    if (eraserBuffer.isNotEmpty) {
+      buffer.writeln('<defs>');
+      buffer.writeln('<mask id="eraser-mask">');
+      buffer.writeln('<rect width="100%" height="100%" fill="white"/>');
+      buffer.write(eraserBuffer.toString());
+      buffer.writeln('</mask>');
+      buffer.writeln('</defs>');
+
+      buffer.writeln('<g mask="url(#eraser-mask)">');
+      buffer.write(pathBuffer.toString());
+      buffer.writeln('</g>');
+    } else {
+      buffer.write(pathBuffer.toString());
+    }
+
+    buffer.writeln('</svg>');
+
+    return buffer.toString();
+  }
+
+
   void _saveToUndoStack() {
     _undoStack.add(List.from(_contents));
     _redoStack.clear();
@@ -241,7 +302,7 @@ class SketchController extends ChangeNotifier {
 
   /// Stroke eraser
   void _eraserStroke({required Offset center}) {
-    List<SketchContent> removedPoints = [];
+    List<SketchContent> removedContents = [];
 
     // If any point of a stroke lies within the eraser circle, remove that stroke
     // and add it to the removedPoint list for undo tracking.
@@ -249,7 +310,7 @@ class SketchController extends ChangeNotifier {
       if (content is !Eraser) {
         for (final point in content.points) {
           if (_isPointInsideCircle(point: point, center: center)) {
-            removedPoints.add(content);
+            removedContents.add(content);
             return true;
           }
         }
@@ -259,8 +320,8 @@ class SketchController extends ChangeNotifier {
 
     // If any strokes were removed, save the previous state to the undo stack
     // and clear the redo stack
-    if (removedPoints.isNotEmpty) {
-      _undoStack.add(_contents + removedPoints);
+    if (removedContents.isNotEmpty) {
+      _undoStack.add(_contents + removedContents);
       _redoStack.clear();
       _updateUndoRedoStatus();
     }
@@ -268,10 +329,14 @@ class SketchController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Determining if there is anything erased
   bool _checkErasedContent({required Offset center}) {
     for (final content in _contents) {
+      if (content.sketchConfig.toolType == SketchToolType.eraser) {
+        continue;
+      }
       for (final point in content.points) {
-        if(_isPointInsideCircle(point: point, center: center)) {
+        if (_isPointInsideCircle(point: point, center: center)) {
           return true;
         }
       }
@@ -286,7 +351,7 @@ class SketchController extends ChangeNotifier {
     final radius = _sketchConfig.eraserRadius;
     final dx = point.dx - center.dx;
     final dy = point.dy - center.dy;
+
     return dx*dx + dy*dy <= radius*radius;
   }
-
 }

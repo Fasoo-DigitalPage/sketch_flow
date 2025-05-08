@@ -1,7 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 import 'package:example/test_data.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:sketch_flow/sketch_flow.dart';
 
 void main() {
@@ -47,6 +50,13 @@ class _DemoPageState extends State<DemoPage> {
             _showPNGDialog(image: image, context: context);
           }
         },
+        onClickExtractSVG: (offsets) {
+          final width = MediaQuery.of(context).size.width;
+          final height = MediaQuery.of(context).size.height;
+          final svgCode = _sketchController.extractWithSVG(width: width, height: height);
+
+          _showSVGDialog(svgCode: svgCode, context: context);
+        },
       ),
       body: SketchBoard(controller: _sketchController, repaintKey: _repaintKey),
       bottomNavigationBar: SketchBottomBar(controller: _sketchController),
@@ -91,7 +101,19 @@ class _DemoPageState extends State<DemoPage> {
             )
           ],
         ),
-
     );
+  }
+
+  void _showSVGDialog({required String svgCode, required BuildContext context}) async {
+    final directory = await getApplicationDocumentsDirectory();
+
+    final file = File('${directory.path}/my_vector_file.svg');
+    
+    final params = ShareParams(
+      text: 'Sketch SVG',
+      files: [XFile(file.path)]
+    );
+
+    SharePlus.instance.share(params);
   }
 }
