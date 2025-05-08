@@ -108,6 +108,8 @@ class _DemoPageState extends State<DemoPage> {
     final directory = await getApplicationDocumentsDirectory();
 
     final file = File('${directory.path}/my_vector_file.svg');
+
+    await file.writeAsString(svgCode);
     
     final params = ShareParams(
       text: 'Sketch SVG',
