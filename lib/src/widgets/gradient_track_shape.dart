@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 class GradientTrackShape extends SliderTrackShape {
   final LinearGradient gradient;
   final double trackHeight;
+  final double squareSize;
 
   GradientTrackShape({
     required this.gradient,
-    this.trackHeight = 4.0
+    this.trackHeight = 4.0,
+    this.squareSize = 4.0, // 체크 무늬 크기
   });
 
   @override
@@ -29,14 +31,39 @@ class GradientTrackShape extends SliderTrackShape {
 
     final Rect trackRect = Rect.fromLTWH(trackLeft, trackTop, trackWidth, height);
 
+    final Canvas canvas = context.canvas;
+
+    _drawCheckerboard(canvas, trackRect);
+
     final Paint paint = Paint()
       ..shader = gradient.createShader(trackRect)
       ..style = PaintingStyle.fill;
 
-    context.canvas.drawRRect(
+    canvas.drawRRect(
       RRect.fromRectAndRadius(trackRect, Radius.circular(height / 2)),
       paint,
     );
+  }
+
+  void _drawCheckerboard(Canvas canvas, Rect rect) {
+    final Paint lightPaint = Paint()..color = Colors.white;
+    final Paint darkPaint = Paint()..color = Colors.grey.shade300;
+
+    final int horSquares = (rect.width / squareSize).ceil();
+    final int verSquares = (rect.height / squareSize).ceil();
+
+    for (int y = 0; y < verSquares; y++) {
+      for (int x = 0; x < horSquares; x++) {
+        final paint = (x + y) % 2 == 0 ? lightPaint : darkPaint;
+        final squareRect = Rect.fromLTWH(
+          rect.left + x * squareSize,
+          rect.top + y * squareSize,
+          squareSize,
+          squareSize,
+        );
+        canvas.drawRect(squareRect, paint);
+      }
+    }
   }
 
   @override
