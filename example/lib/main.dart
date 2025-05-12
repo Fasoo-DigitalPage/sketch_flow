@@ -4,6 +4,8 @@ import 'package:example/test_data.dart';
 import 'package:flutter/material.dart';
 import 'package:jovial_svg/jovial_svg.dart';
 import 'package:sketch_flow/sketch_flow.dart';
+import 'package:sketch_flow/sketch_exporter.dart';
+import 'package:sketch_flow/sketch_serializer.dart';
 
 void main() {
   runApp(const MyApp());
@@ -39,11 +41,17 @@ class _DemoPageState extends State<DemoPage> {
       appBar: SketchTopBar(
         controller: _sketchController,
         showJsonDialogIcon: true,
-        onClickToJsonButton: (json) => _showJsonDialog(json: json, context: context),
+        onClickToJsonButton: () {
+          final json = SketchSerializer.toJson(_sketchController.contents);
+          _showJsonDialog(json: json);
+        },
         showInputTestDataIcon: true,
-        onClickInputTestButton: () => _sketchController.fromJson(contents: testData),
+        onClickInputTestButton: () {
+          final data = SketchSerializer.fromJson(testData);
+          _sketchController.addContents(data: data);
+        },
         onClickExtractPNG: () async {
-          final image = await _sketchController.extractWithPNG(repaintKey: _repaintKey);
+          final image = await SketchPngExporter.extractPNG(repaintKey: _repaintKey);
           if(context.mounted && image != null) {
             _showPNGDialog(image: image);
           }
@@ -51,7 +59,11 @@ class _DemoPageState extends State<DemoPage> {
         onClickExtractSVG: (offsets) {
           final width = MediaQuery.of(context).size.width;
           final height = MediaQuery.of(context).size.height;
-          final svgCode = _sketchController.extractWithSVG(width: width, height: height);
+          final svgCode = SketchSvgExporter.extractSVG(
+              contents: _sketchController.contents,
+              width: width,
+              height: height
+          );
           final scalableImage = ScalableImage.fromSvgString(svgCode);
 
           _showSVGDialog(si: scalableImage);
@@ -62,8 +74,8 @@ class _DemoPageState extends State<DemoPage> {
     );
   }
 
-  void _showJsonDialog({required Map<String, dynamic> json, required BuildContext context}) {
-    final prettyJson = const JsonEncoder.withIndent('  ').convert(_sketchController.toJson());
+  void _showJsonDialog({required Map<String, dynamic> json}) {
+    final prettyJson = const JsonEncoder.withIndent('  ').convert(json);
 
     showDialog(
         context: context,

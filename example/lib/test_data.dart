@@ -1,7 +1,7 @@
 final List<Map<String, dynamic>> testData = [
   {
     "type": "pencil",
-    "points": [
+    "offsets": [
       {
         "dx": 69.08203125,
         "dy": 211.96028645833334
@@ -168,7 +168,7 @@ final List<Map<String, dynamic>> testData = [
   },
   {
     "type": "pencil",
-    "points": [
+    "offsets": [
       {
         "dx": 105.205078125,
         "dy": 217.89778645833334
@@ -323,7 +323,7 @@ final List<Map<String, dynamic>> testData = [
   },
   {
     "type": "pencil",
-    "points": [
+    "offsets": [
       {
         "dx": 148.271484375,
         "dy": 213.44466145833334
@@ -418,7 +418,7 @@ final List<Map<String, dynamic>> testData = [
   },
   {
     "type": "pencil",
-    "points": [
+    "offsets": [
       {
         "dx": 152.666015625,
         "dy": 222.16536458333334
@@ -621,7 +621,7 @@ final List<Map<String, dynamic>> testData = [
   },
   {
     "type": "pencil",
-    "points": [
+    "offsets": [
       {
         "dx": 158.291015625,
         "dy": 248.51302083333334
@@ -728,7 +728,7 @@ final List<Map<String, dynamic>> testData = [
   },
   {
     "type": "pencil",
-    "points": [
+    "offsets": [
       {
         "dx": 248.73046875,
         "dy": 215.67122395833334
@@ -983,7 +983,7 @@ final List<Map<String, dynamic>> testData = [
   },
   {
     "type": "pencil",
-    "points": [
+    "offsets": [
       {
         "dx": 271.142578125,
         "dy": 220.49544270833334
@@ -1078,7 +1078,7 @@ final List<Map<String, dynamic>> testData = [
   },
   {
     "type": "pencil",
-    "points": [
+    "offsets": [
       {
         "dx": 296.89453125,
         "dy": 220.86653645833334
@@ -1185,7 +1185,7 @@ final List<Map<String, dynamic>> testData = [
   },
   {
     "type": "pencil",
-    "points": [
+    "offsets": [
       {
         "dx": 76.46484375,
         "dy": 119.37239583333334
@@ -2144,7 +2144,7 @@ final List<Map<String, dynamic>> testData = [
   },
   {
     "type": "pencil",
-    "points": [
+    "offsets": [
       {
         "dx": 73.564453125,
         "dy": 409.93880208333337
@@ -4139,7 +4139,7 @@ final List<Map<String, dynamic>> testData = [
   },
   {
     "type": "eraser",
-    "points": [
+    "offsets": [
       {
         "dx": 227.197265625,
         "dy": 93.76692708333334
@@ -4153,7 +4153,7 @@ final List<Map<String, dynamic>> testData = [
   },
   {
     "type": "eraser",
-    "points": [
+    "offsets": [
       {
         "dx": 180.3515625,
         "dy": 413.64973958333337

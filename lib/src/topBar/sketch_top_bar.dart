@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sketch_flow/sketch_contents.dart';
 import 'package:sketch_flow/sketch_flow.dart';
 
 class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
@@ -61,7 +60,7 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
   final SketchToolIcon? redoIcon;
 
   final bool? showJsonDialogIcon;
-  final Function(Map<String, dynamic>)? onClickToJsonButton;
+  final Function()? onClickToJsonButton;
 
   final bool? showInputTestDataIcon;
   final Function()? onClickInputTestButton;
@@ -129,7 +128,7 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
                             List<Offset> offsets = [];
 
                             for (final content in controller.contents) {
-                              offsets.addAll(content.points);
+                              offsets.addAll(content.offsets);
                             }
 
                             onClickExtractSVG!(offsets);
@@ -151,11 +150,7 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
                     if(showJsonDialogIcon ?? false)
                       IconButton(
                         icon: Icon(Icons.javascript),
-                        onPressed: () {
-                          if(onClickToJsonButton != null) {
-                            onClickToJsonButton!(controller.toJson());
-                          }
-                        },
+                        onPressed: onClickToJsonButton
                       ),
 
                     if(showInputTestDataIcon ?? false)

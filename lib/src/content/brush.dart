@@ -3,17 +3,17 @@ import 'dart:ui';
 import 'package:sketch_flow/sketch_contents.dart';
 
 class Brush extends SketchContent {
-  Brush({required super.points, required super.sketchConfig});
+  Brush({required super.offsets, required super.sketchConfig});
 
   @override
   void draw(Canvas canvas) {
-    if (points.length < 2) return;
+    if (offsets.length < 2) return;
 
-    for (int i=0; i<points.length-1; i++) {
-      final p1 = points[i];
-      final p2 = points[i+1];
+    for (int i=0; i<offsets.length-1; i++) {
+      final p1 = offsets[i];
+      final p2 = offsets[i+1];
 
-      // calculation of the distance between two points
+      // calculation of the distance between two offsets
       final distance = (p2 - p1).distance;
       final speed = distance;
 
@@ -40,7 +40,7 @@ class Brush extends SketchContent {
   Map<String, dynamic> toJson() {
     return {
       'type': 'brush',
-      'points': points.map((e) => {'dx': e.dx, 'dy': e.dy}).toList(),
+      'offsets': offsets.map((e) => {'dx': e.dx, 'dy': e.dy}).toList(),
       'color': sketchConfig.color.toARGB32(),
       'strokeThickness': sketchConfig.strokeThickness
     };

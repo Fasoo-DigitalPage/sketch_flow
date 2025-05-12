@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:sketch_flow/src/content/sketch_content.dart';
 
 class Eraser extends SketchContent {
-  Eraser({required super.points, required super.sketchConfig});
+  Eraser({required super.offsets, required super.sketchConfig});
 
   @override
   void draw(Canvas canvas) {
-    if (points.length < 2) return;
-    final path = Path()..moveTo(points.first.dx, points.first.dy);
+    if (offsets.length < 2) return;
+    final path = Path()..moveTo(offsets.first.dx, offsets.first.dy);
 
-    for (int i=0; i<points.length-1; i++) {
-      path.lineTo(points[i].dx, points[i].dy);
+    for (int i=0; i<offsets.length-1; i++) {
+      path.lineTo(offsets[i].dx, offsets[i].dy);
     }
 
     final paint = Paint()
@@ -28,7 +28,7 @@ class Eraser extends SketchContent {
   Map<String, dynamic> toJson() {
     return {
       'type': 'eraser',
-      'points': points.map((e) => {'dx': e.dx, 'dy': e.dy}).toList(),
+      'offsets': offsets.map((e) => {'dx': e.dx, 'dy': e.dy}).toList(),
       'eraserRadius': sketchConfig.eraserRadius
     };
   }

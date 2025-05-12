@@ -3,8 +3,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:sketch_flow/sketch_contents.dart';
-import 'package:sketch_flow/sketch_flow.dart';
 import 'package:sketch_flow/src/content/brush.dart';
+import 'package:sketch_flow/sketch_flow.dart';
 
 class SketchController extends ChangeNotifier {
   /// A controller that manages the user's sketching state on the canvas.
@@ -44,6 +44,11 @@ class SketchController extends ChangeNotifier {
   Offset? _eraserCirclePosition;
   Offset? get eraserCirclePosition => _eraserCirclePosition;
 
+  void addContents({required List<SketchContent> data}) {
+    _contents.addAll(data);
+    notifyListeners();
+  }
+
   /// Creates a new sketch content based on the current configuration and path.
   SketchContent? createCurrentContent() {
     switch(_sketchConfig.toolType) {
@@ -52,17 +57,17 @@ class SketchController extends ChangeNotifier {
          return null;
       case SketchToolType.pencil:
         return Pencil(
-            points: List.from(_currentOffsets),
+            offsets: List.from(_currentOffsets),
             sketchConfig: _sketchConfig
         );
       case SketchToolType.brush:
         return Brush(
-            points: List.from(_currentOffsets),
+            offsets: List.from(_currentOffsets),
             sketchConfig: _sketchConfig
         );
       case SketchToolType.eraser:
         return Eraser(
-            points: List.from(_currentOffsets),
+            offsets: List.from(_currentOffsets),
             sketchConfig: _sketchConfig
         );
     }
@@ -96,20 +101,12 @@ class SketchController extends ChangeNotifier {
 
   /// Adds a point to the current path as the user move their finger
   void addPoint(Offset offset) {
-    if (!_isEnabled) return;
+    if (!_isEnabled || _isRedundantOffset(offset: offset)) return;
 
-    if (_currentOffsets.isNotEmpty && _currentOffsets.last == offset) return;
-
-    _currentOffsets.add(offset);
-
-    if(_sketchConfig.toolType == SketchToolType.eraser) {
-      _eraserCirclePosition = offset;
-
-      if (_sketchConfig.eraserMode == EraserMode.stroke) {
-        _eraserStroke(center: offset);
-      }else if (!_hasErasedContent && _sketchConfig.eraserMode == EraserMode.area) {
-        _hasErasedContent = _checkErasedContent(center: offset);
-      }
+    if (_sketchConfig.toolType == SketchToolType.eraser) {
+      _handleEraser(offset: offset);
+    }else {
+      _currentOffsets.add(offset);
     }
 
     notifyListeners();
@@ -118,6 +115,7 @@ class SketchController extends ChangeNotifier {
   /// Ends the current line and saves the sketch content
   void endLine() {
     if (!_isEnabled) return;
+
     final content = createCurrentContent();
 
     if(content != null) {
@@ -171,51 +169,6 @@ class SketchController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'sketchContents': _contents.map((c) => c.toJson()).toList(),
-    };
-  }
-
-  void fromJson({required List<Map<String, dynamic>> contents}) {
-    for (final content in contents) {
-      final type = content['type'];
-      final points = (content['points'] as List)
-          .map((e) {
-        final dx = e['dx'];
-        final dy = e['dy'];
-        if (dx is num && dy is num) {
-          return Offset(dx.toDouble(), dy.toDouble());
-        }
-        return null;
-      })
-          .whereType<Offset>()
-          .toList();
-
-      final color = Color(content['color'] ?? 0xFF000000);
-      final strokeThickness = (content['strokeThickness'] as num?)?.toDouble() ?? 1.0;
-      final opacity = (content['opacity'] as num?)?.toDouble() ?? 1.0;
-      final eraserRadius = (content['eraserRadius'] as num?)?.toDouble() ?? 1.0;
-
-      final sketchConfig = SketchConfig(
-        color: color,
-        strokeThickness: strokeThickness,
-        opacity: opacity,
-        eraserRadius: eraserRadius
-      );
-
-      switch (type) {
-        case 'pencil':
-          _contents.add(Pencil(points: points, sketchConfig: sketchConfig));
-        case 'eraser':
-          _contents.add(Eraser(points: points, sketchConfig: sketchConfig));
-          break;
-      }
-    }
-
-    notifyListeners();
-  }
-
   Future<Uint8List?> extractWithPNG({required GlobalKey repaintKey, double? pixelRatio}) async {
     try {
       final boundary = repaintKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
@@ -228,65 +181,6 @@ class SketchController extends ChangeNotifier {
       return null;
     }
   }
-
-  String extractWithSVG({required double width, required double height}) {
-    final buffer = StringBuffer();
-    final eraserBuffer = StringBuffer();
-    final pathBuffer = StringBuffer();
-
-    buffer.writeln(
-      '<svg xmlns="http://www.w3.org/2000/svg" width="$width" height="$height" viewBox="0 0 $width $height">',
-    );
-
-    for (final content in _contents) {
-      if (content.points.isEmpty) continue;
-
-      if (content.sketchConfig.toolType == SketchToolType.eraser) {
-        final radius = content.sketchConfig.eraserRadius;
-        for (final point in content.points) {
-          eraserBuffer.writeln(
-            '<circle cx="${point.dx}" cy="${point.dy}" r="$radius" fill="black"/>',
-          );
-        }
-      } else {
-        final pathData = StringBuffer();
-        pathData.write('M ${content.points.first.dx} ${content.points.first.dy} ');
-        for (var i = 1; i < content.points.length; i++) {
-          final p = content.points[i];
-          pathData.write('L ${p.dx} ${p.dy} ');
-        }
-
-        final color = '#${content.sketchConfig.color.toARGB32().toRadixString(16).padLeft(8, '0').substring(2)}';
-        final opacity = content.sketchConfig.opacity;
-        final strokeWidth = content.sketchConfig.strokeThickness;
-
-        pathBuffer.writeln(
-          '<path d="$pathData" stroke="$color" stroke-width="$strokeWidth" '
-              'fill="none" stroke-opacity="$opacity"/>',
-        );
-      }
-    }
-
-    if (eraserBuffer.isNotEmpty) {
-      buffer.writeln('<defs>');
-      buffer.writeln('<mask id="eraser-mask">');
-      buffer.writeln('<rect width="100%" height="100%" fill="white"/>');
-      buffer.write(eraserBuffer.toString());
-      buffer.writeln('</mask>');
-      buffer.writeln('</defs>');
-
-      buffer.writeln('<g mask="url(#eraser-mask)">');
-      buffer.write(pathBuffer.toString());
-      buffer.writeln('</g>');
-    } else {
-      buffer.write(pathBuffer.toString());
-    }
-
-    buffer.writeln('</svg>');
-
-    return buffer.toString();
-  }
-
 
   void _saveToUndoStack() {
     _undoStack.add(List.from(_contents));
@@ -308,8 +202,8 @@ class SketchController extends ChangeNotifier {
     // and add it to the removedPoint list for undo tracking.
     _contents.removeWhere((content) {
       if (content is !Eraser) {
-        for (final point in content.points) {
-          if (_isPointInsideCircle(point: point, center: center)) {
+        for (final offset in content.offsets) {
+          if (_isOffsetInsideCircle(offset: offset, center: center)) {
             removedContents.add(content);
             return true;
           }
@@ -335,8 +229,8 @@ class SketchController extends ChangeNotifier {
       if (content.sketchConfig.toolType == SketchToolType.eraser) {
         continue;
       }
-      for (final point in content.points) {
-        if (_isPointInsideCircle(point: point, center: center)) {
+      for (final point in content.offsets) {
+        if (_isOffsetInsideCircle(offset: point, center: center)) {
           return true;
         }
       }
@@ -344,14 +238,36 @@ class SketchController extends ChangeNotifier {
     return false;
   }
 
-  bool _isPointInsideCircle({
-    required Offset point,
+  /// Verify sure it's inside the eraser area
+  bool _isOffsetInsideCircle({
+    required Offset offset,
     required Offset center
   }) {
     final radius = _sketchConfig.eraserRadius;
-    final dx = point.dx - center.dx;
-    final dy = point.dy - center.dy;
+    final dx = offset.dx - center.dx;
+    final dy = offset.dy - center.dy;
 
     return dx*dx + dy*dy <= radius*radius;
   }
+
+  /// Verify that it is a duplicate offset
+  bool _isRedundantOffset({required Offset offset}) {
+    return _currentOffsets.isNotEmpty && _currentOffsets.last == offset;
+  }
+
+  /// Eraser tool handling
+  void _handleEraser({required Offset offset}) {
+    _eraserCirclePosition = offset;
+
+    if (_sketchConfig.eraserMode == EraserMode.stroke) {
+      _eraserStroke(center: offset);
+      return;
+    }
+
+    if (_checkErasedContent(center: offset)) {
+      if (!_hasErasedContent) _hasErasedContent = true;
+      _currentOffsets.add(offset);
+    }
+  }
+  
 }
