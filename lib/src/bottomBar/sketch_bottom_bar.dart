@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sketch_flow/sketch_flow.dart';
 import 'package:sketch_flow/sketch_widgets.dart';
+import 'package:sketch_flow/src/common/sketch_tool_icon.dart';
 
 class SketchBottomBar extends StatefulWidget {
   /// A bottom bar that provides tools for handwriting or sketching.
@@ -11,11 +12,13 @@ class SketchBottomBar extends StatefulWidget {
   ///
   /// [bottomBarColor] The background color of the bottom bar.
   ///
-  /// [pencil] Pencil widget (see SketchToolItem)
+  /// [moveIcon] Move icon (see SketchToolIcon)
   ///
-  /// [brush] Brush Widget (see SketchToolItem)
+  /// [pencilIcon] Pencil icon (see SketchToolIcon)
   ///
-  /// [eraser] Eraser Widget (see SketchToolItem)
+  /// [brushIcon] Brush Icon (see SketchToolIcon)
+  ///
+  /// [eraserIcon] Eraser Icon (see SketchToolIcon)
   ///
   /// [clearIcon] Icon used for the "clear all" function.
   ///
@@ -35,9 +38,10 @@ class SketchBottomBar extends StatefulWidget {
     this.bottomBarColor,
     this.bottomBarBorderColor,
     this.bottomBarBorderWidth,
-    this.pencil,
-    this.eraser,
-    this.brush,
+    this.moveIcon,
+    this.pencilIcon,
+    this.eraserIcon,
+    this.brushIcon,
     this.clearIcon,
     this.paletteIcon,
     this.eraserRadioButtonColor,
@@ -54,9 +58,10 @@ class SketchBottomBar extends StatefulWidget {
   final Color? bottomBarBorderColor;
   final double? bottomBarBorderWidth;
 
-  final SketchToolItem? pencil;
-  final SketchToolItem? brush;
-  final SketchToolItem? eraser;
+  final SketchToolIcon? moveIcon;
+  final SketchToolIcon? pencilIcon;
+  final SketchToolIcon? brushIcon;
+  final SketchToolIcon? eraserIcon;
   final Widget? paletteIcon;
   final Widget? clearIcon;
 
@@ -274,10 +279,10 @@ class _SketchBottomBarState extends State<SketchBottomBar>
               children: [
                 /// Move tool
                 _toolButtonWidget(
-                  toolItem: SketchToolItem(
-                    toolType: SketchToolType.move,
-                    activeIcon: Icon(Icons.mouse),
-                    inActiveIcon: Icon(Icons.mouse_outlined),
+                  toolType: SketchToolType.move,
+                  icon: SketchToolIcon(
+                      enableIcon: widget.moveIcon?.enableIcon ?? Icon(Icons.mouse),
+                      disableIcon: widget.moveIcon?.disableIcon ?? Icon(Icons.mouse_outlined)
                   ),
                   selectedToolType: _selectedToolType,
                   onClickToolButton:
@@ -286,14 +291,10 @@ class _SketchBottomBarState extends State<SketchBottomBar>
 
                 /// Default pen tool
                 _toolButtonWidget(
-                  toolItem: SketchToolItem(
-                    toolType: SketchToolType.pencil,
-                    activeIcon:
-                        widget.pencil?.activeIcon ??
-                        Icon(Icons.mode_edit_outline),
-                    inActiveIcon:
-                        widget.pencil?.inActiveIcon ??
-                        Icon(Icons.mode_edit_outline_outlined),
+                  toolType: SketchToolType.pencil,
+                  icon: SketchToolIcon(
+                      enableIcon: widget.pencilIcon?.enableIcon ?? Icon(Icons.mode_edit_outline),
+                      disableIcon: widget.pencilIcon?.disableIcon ?? Icon(Icons.mode_edit_outline_outlined)
                   ),
                   selectedToolType: _selectedToolType,
                   onClickToolButton:
@@ -302,38 +303,31 @@ class _SketchBottomBarState extends State<SketchBottomBar>
 
                 /// Brush tool
                 _toolButtonWidget(
-                  toolItem: SketchToolItem(
-                    toolType: SketchToolType.brush,
-                    activeIcon:
-                        widget.brush?.activeIcon ?? Icon(Icons.brush_rounded),
-                    inActiveIcon:
-                        widget.brush?.inActiveIcon ??
-                        Icon(Icons.brush_outlined),
+                  toolType: SketchToolType.brush,
+                  icon: SketchToolIcon(
+                    enableIcon: widget.brushIcon?.enableIcon ?? Icon(Icons.brush_rounded),
+                    disableIcon: widget.brushIcon?.disableIcon ?? Icon(Icons.brush_outlined),
                   ),
                   selectedToolType: _selectedToolType,
-                  onClickToolButton:
-                      () => _onToolTap(toolType: SketchToolType.brush),
+                  onClickToolButton: () => _onToolTap(toolType: SketchToolType.brush),
                 ),
 
                 /// Eraser tool
                 _toolButtonWidget(
-                  toolItem: SketchToolItem(
-                    toolType: SketchToolType.eraser,
-                    activeIcon:
-                        widget.eraser?.activeIcon ?? Icon(Icons.square_rounded),
-                    inActiveIcon:
-                        widget.eraser?.inActiveIcon ??
-                        Icon(Icons.square_outlined),
+                  toolType: SketchToolType.eraser,
+                  icon: SketchToolIcon(
+                    enableIcon: widget.eraserIcon?.enableIcon ?? Icon(Icons.square_rounded),
+                    disableIcon: widget.eraserIcon?.disableIcon ?? Icon(Icons.square_outlined),
                   ),
                   selectedToolType: _selectedToolType,
-                  onClickToolButton:
-                      () => _onToolTap(toolType: SketchToolType.eraser),
+                  onClickToolButton: () => _onToolTap(toolType: SketchToolType.eraser),
                 ),
 
                 /// Color palette
                 IconButton(
                   icon: widget.paletteIcon ?? Icon(Icons.palette_rounded),
                   onPressed: () => _onToolTap(toolType: SketchToolType.palette),
+                  iconSize: 24,
                 ),
 
                 /// Clear all drawings
@@ -353,12 +347,15 @@ class _SketchBottomBarState extends State<SketchBottomBar>
   }
 
   Widget _toolButtonWidget({
-    required SketchToolItem toolItem,
+    required SketchToolType toolType,
     required SketchToolType selectedToolType,
     required Function() onClickToolButton,
+    required SketchToolIcon icon,
   }) {
-    final bool isActive = toolItem.toolType == selectedToolType;
-    final double targetSize = isActive ? 36.0 : 24.0;
+    final bool isActive = toolType == selectedToolType;
+    final double targetSize = isActive ? icon.size * 1.5 : icon.size;
+
+    final Widget selectedWidget = isActive ? icon.enableIcon : icon.disableIcon;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 0),
@@ -368,13 +365,22 @@ class _SketchBottomBarState extends State<SketchBottomBar>
           tween: Tween<double>(begin: targetSize, end: targetSize),
           duration: Duration(milliseconds: 200),
           builder: (context, size, child) {
-            return IconTheme(data: IconThemeData(size: size), child: child!);
+            return SizedBox(
+              width: size,
+              height: size,
+              child: Center(
+                child: FittedBox(
+                  fit: BoxFit.contain,
+                  child: child,
+                ),
+              ),
+            );
           },
-          child: isActive ? toolItem.activeIcon : toolItem.inActiveIcon,
+          child: selectedWidget,
         ),
         iconSize: 48,
         padding: EdgeInsets.zero,
-        constraints: BoxConstraints(minWidth: 48, minHeight: 48),
+        constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
       ),
     );
   }

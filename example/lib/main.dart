@@ -1,10 +1,8 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
 import 'package:example/test_data.dart';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
+import 'package:jovial_svg/jovial_svg.dart';
 import 'package:sketch_flow/sketch_flow.dart';
 
 void main() {
@@ -47,19 +45,20 @@ class _DemoPageState extends State<DemoPage> {
         onClickExtractPNG: () async {
           final image = await _sketchController.extractWithPNG(repaintKey: _repaintKey);
           if(context.mounted && image != null) {
-            _showPNGDialog(image: image, context: context);
+            _showPNGDialog(image: image);
           }
         },
         onClickExtractSVG: (offsets) {
           final width = MediaQuery.of(context).size.width;
           final height = MediaQuery.of(context).size.height;
           final svgCode = _sketchController.extractWithSVG(width: width, height: height);
+          final scalableImage = ScalableImage.fromSvgString(svgCode);
 
-          _showSVGDialog(svgCode: svgCode, context: context);
+          _showSVGDialog(si: scalableImage);
         },
       ),
       body: SketchBoard(controller: _sketchController, repaintKey: _repaintKey),
-      bottomNavigationBar: SketchBottomBar(controller: _sketchController),
+      bottomNavigationBar: SketchBottomBar(controller: _sketchController,),
     );
   }
 
@@ -86,7 +85,7 @@ class _DemoPageState extends State<DemoPage> {
     );
   }
 
-  void _showPNGDialog({required Uint8List image, required BuildContext context}) {
+  void _showPNGDialog({required Uint8List image}) {
     showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -104,18 +103,23 @@ class _DemoPageState extends State<DemoPage> {
     );
   }
 
-  void _showSVGDialog({required String svgCode, required BuildContext context}) async {
-    final directory = await getApplicationDocumentsDirectory();
+  void _showSVGDialog({required ScalableImage si}) {
 
-    final file = File('${directory.path}/my_vector_file.svg');
-
-    await file.writeAsString(svgCode);
-    
-    final params = ShareParams(
-      text: 'Sketch SVG',
-      files: [XFile(file.path)]
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Sketch SVG"),
+        content: SingleChildScrollView(
+          child: ScalableImageWidget(si: si)
+        ),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text("Close")
+          )
+        ],
+      ),
     );
-
-    SharePlus.instance.share(params);
+    
   }
 }

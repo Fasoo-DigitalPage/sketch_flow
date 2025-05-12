@@ -17,13 +17,9 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
   ///
   /// [onClickBackButton] Callback function invoked when the back button
   ///
-  /// [activeUndoIcon] The icon displayed when the undo action is active.
+  /// [undoIcon] Undo icon (see SketchToolIcon)
   ///
-  /// [inActiveUndoIcon] The icon displayed when the undo action is inactive.
-  ///
-  /// [activeRedoIcon] The icon displayed when the redo action is active.
-  ///
-  /// [inActiveRedoIcon] The icon displayed when the redo action is inactive.
+  /// [redoIcon] Redo icon (see SketchToolIcon)
   ///
   /// [showJsonDialogIcon] JSON dialog view settings (default false)
   ///
@@ -41,10 +37,8 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
     this.topBarBorderWidth,
     this.backButtonIcon,
     this.onClickBackButton,
-    this.activeUndoIcon,
-    this.inActiveUndoIcon,
-    this.activeRedoIcon,
-    this.inActiveRedoIcon,
+    this.undoIcon,
+    this.redoIcon,
     this.showJsonDialogIcon,
     this.onClickToJsonButton,
     this.showInputTestDataIcon,
@@ -62,11 +56,9 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
   final Widget? backButtonIcon;
   final Function()? onClickBackButton;
 
-  final Widget? activeUndoIcon;
-  final Widget? inActiveUndoIcon;
+  final SketchToolIcon? undoIcon;
 
-  final Widget? activeRedoIcon;
-  final Widget? inActiveRedoIcon;
+  final SketchToolIcon? redoIcon;
 
   final bool? showJsonDialogIcon;
   final Function(Map<String, dynamic>)? onClickToJsonButton;
@@ -107,8 +99,8 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
                         builder: (context, canUndo, _) {
                           return IconButton(
                               icon: canUndo
-                                  ? (activeUndoIcon ?? Icon(Icons.undo_rounded))
-                                  : (inActiveUndoIcon ?? Icon(Icons.undo_rounded)),
+                                  ? (undoIcon?.enableIcon ?? Icon(Icons.undo_rounded))
+                                  : (undoIcon?.disableIcon ?? Icon(Icons.undo_rounded)),
                               onPressed: canUndo ? () {
                                 controller.undo();
                               } : null
@@ -122,8 +114,8 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
                         builder: (context, canRedo, _) {
                           return IconButton(
                               icon: canRedo
-                                  ? (activeRedoIcon ?? Icon(Icons.redo_rounded))
-                                  : (inActiveRedoIcon ?? Icon(Icons.redo_rounded)),
+                                  ? (redoIcon?.enableIcon ?? Icon(Icons.redo_rounded))
+                                  : (redoIcon?.disableIcon ?? Icon(Icons.redo_rounded)),
                               onPressed: canRedo ? () {
                                 controller.redo();
                               } : null
