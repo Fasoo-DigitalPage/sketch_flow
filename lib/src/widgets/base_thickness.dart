@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// [radius] 아이콘 원 반지름
-///
-/// [thickness] 굵기
-///
-/// [onClickThickness] 선택 콜백 함수
 class BaseThickness extends StatelessWidget {
   const BaseThickness({
     super.key,

@@ -58,7 +58,7 @@ class _DemoPageState extends State<DemoPage> {
         },
       ),
       body: SketchBoard(controller: _sketchController, repaintKey: _repaintKey),
-      bottomNavigationBar: SketchBottomBar(controller: _sketchController,),
+      bottomNavigationBar: SketchBottomBar(controller: _sketchController),
     );
   }
 

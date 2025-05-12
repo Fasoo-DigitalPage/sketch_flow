@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sketch_flow/sketch_flow.dart';
 import 'package:sketch_flow/sketch_widgets.dart';
-import 'package:sketch_flow/src/common/sketch_tool_icon.dart';
 
 class SketchBottomBar extends StatefulWidget {
   /// A bottom bar that provides tools for handwriting or sketching.
@@ -26,17 +25,19 @@ class SketchBottomBar extends StatefulWidget {
   ///
   /// [eraserRadioButtonColor] The color of the eraser type radio button
   ///
-  /// [eraserThicknessSliderColor] The color of the slider used to control the eraser thickness
-  ///
   /// [eraserThicknessTextStyle] The TextStyle that displays the current eraser thickness as text
   ///
   /// [eraserThicknessSliderThemeData] The theme data used to customize the appearance of the eraser thickness slider
+  ///
+  /// [penOpacitySliderThemeData] The theme data used to customize the appearance of the pen opacity slider
+  ///
+  /// [overlayBackgroundColor] The color of the overlay
   const SketchBottomBar({
     super.key,
     required this.controller,
     this.bottomBarHeight,
-    this.bottomBarColor,
-    this.bottomBarBorderColor,
+    this.bottomBarColor = Colors.white,
+    this.bottomBarBorderColor = Colors.grey,
     this.bottomBarBorderWidth,
     this.moveIcon,
     this.pencilIcon,
@@ -44,18 +45,18 @@ class SketchBottomBar extends StatefulWidget {
     this.brushIcon,
     this.clearIcon,
     this.paletteIcon,
-    this.eraserRadioButtonColor,
-    this.eraserThicknessSliderColor,
+    this.eraserRadioButtonColor = Colors.black,
     this.eraserThicknessTextStyle,
     this.eraserThicknessSliderThemeData,
     this.penOpacitySliderThemeData,
+    this.overlayBackgroundColor = Colors.white
   });
 
   final SketchController controller;
 
   final double? bottomBarHeight;
-  final Color? bottomBarColor;
-  final Color? bottomBarBorderColor;
+  final Color bottomBarColor;
+  final Color bottomBarBorderColor;
   final double? bottomBarBorderWidth;
 
   final SketchToolIcon? moveIcon;
@@ -65,12 +66,13 @@ class SketchBottomBar extends StatefulWidget {
   final Widget? paletteIcon;
   final Widget? clearIcon;
 
-  final Color? eraserRadioButtonColor;
-  final Color? eraserThicknessSliderColor;
+  final Color eraserRadioButtonColor;
   final TextStyle? eraserThicknessTextStyle;
   final SliderThemeData? eraserThicknessSliderThemeData;
 
   final SliderThemeData? penOpacitySliderThemeData;
+
+  final Color overlayBackgroundColor;
 
   @override
   State<StatefulWidget> createState() => _SketchBottomBarState();
@@ -184,7 +186,7 @@ class _SketchBottomBarState extends State<SketchBottomBar>
                       opacity: _fadeAnimation,
                       child: Container(
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: widget.overlayBackgroundColor,
                           border: Border.all(color: Colors.grey, width: 0.2),
                           borderRadius: BorderRadius.circular(10),
                           boxShadow: [
@@ -264,10 +266,10 @@ class _SketchBottomBarState extends State<SketchBottomBar>
       child: Container(
         height: widget.bottomBarHeight ?? 60,
         decoration: BoxDecoration(
-          color: widget.bottomBarColor ?? Colors.white,
+          color: widget.bottomBarColor,
           border: Border(
             top: BorderSide(
-              color: widget.bottomBarBorderColor ?? Colors.grey,
+              color: widget.bottomBarBorderColor,
               width: widget.bottomBarBorderWidth ?? 0.5,
             ),
           ),
@@ -413,7 +415,7 @@ class _SketchBottomBarState extends State<SketchBottomBar>
         StatefulBuilder(
           builder: (context, setModalState) {
             return Material(
-              color: Colors.white,
+              color: widget.overlayBackgroundColor,
               child: SizedBox(
                 width: MediaQuery.of(context).size.width * 0.6,
                 child: SliderTheme(
@@ -498,14 +500,14 @@ class _SketchBottomBarState extends State<SketchBottomBar>
       builder: (context, setModalState) {
         final config = _controller.currentSketchConfig;
         return Material(
-          color: Colors.white,
+          color: widget.overlayBackgroundColor,
           child: Column(
             children: [
               RadioListTile<EraserMode>(
                 title:
                     areaEraserText ??
                     Text("Area eraser", style: TextStyle(fontSize: 14)),
-                activeColor: widget.eraserRadioButtonColor ?? Colors.black,
+                activeColor: widget.eraserRadioButtonColor,
                 value: EraserMode.area,
                 groupValue: _selectedEraserType,
                 onChanged: (value) {
@@ -526,7 +528,7 @@ class _SketchBottomBarState extends State<SketchBottomBar>
                 title:
                     strokeEraserText ??
                     Text("Stroke eraser", style: TextStyle(fontSize: 14)),
-                activeColor: widget.eraserRadioButtonColor ?? Colors.black,
+                activeColor: widget.eraserRadioButtonColor,
                 value: EraserMode.stroke,
                 groupValue: _selectedEraserType,
                 onChanged: (value) {

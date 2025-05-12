@@ -32,8 +32,8 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
     super.key,
     required this.controller,
     this.topBarHeight,
-    this.topBarColor,
-    this.topBarBorderColor,
+    this.topBarColor = Colors.white,
+    this.topBarBorderColor = Colors.grey,
     this.topBarBorderWidth,
     this.backButtonIcon,
     this.onClickBackButton,
@@ -49,8 +49,8 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
   final SketchController controller;
 
   final double? topBarHeight;
-  final Color? topBarColor;
-  final Color? topBarBorderColor;
+  final Color topBarColor;
+  final Color topBarBorderColor;
   final double? topBarBorderWidth;
 
   final Widget? backButtonIcon;
@@ -76,10 +76,10 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
         child: Container(
             padding: EdgeInsets.symmetric(horizontal: 4, vertical: 8),
             decoration: BoxDecoration(
-                color: topBarColor ?? Colors.white,
+                color: topBarColor,
                 border: Border(
                     bottom: BorderSide(
-                        color: topBarBorderColor ?? Colors.grey,
+                        color: topBarBorderColor,
                         width: topBarBorderWidth ?? 0.5
                     )
                 )
