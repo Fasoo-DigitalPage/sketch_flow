@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:sketch_flow/sketch_flow.dart';
+import 'package:sketch_flow/sketch_model.dart';
+import 'package:sketch_flow/sketch_controller.dart';
 
 class SketchPainter extends CustomPainter {
   final SketchController controller;

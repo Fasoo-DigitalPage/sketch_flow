@@ -1,6 +1,5 @@
 import 'dart:ui';
-import '../../sketch_contents.dart';
-import '../../sketch_flow.dart';
+import 'package:sketch_flow/sketch_model.dart';
 
 class SketchSerializer {
   static Map<String, dynamic> toJson(List<SketchContent> contents) {

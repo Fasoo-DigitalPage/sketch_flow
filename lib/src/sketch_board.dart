@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:sketch_flow/sketch_flow.dart';
+import 'package:sketch_flow/sketch_model.dart';
+import 'package:sketch_flow/sketch_controller.dart';
+import 'package:sketch_flow/sketch_view.dart';
 
 class SketchBoard extends StatefulWidget {
   /// Main widget for the sketch board.

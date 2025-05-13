@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sketch_flow/src/content/sketch_content.dart';
+import 'package:sketch_flow/sketch_model.dart';
 
 class Eraser extends SketchContent {
   Eraser({required super.offsets, required super.sketchConfig});

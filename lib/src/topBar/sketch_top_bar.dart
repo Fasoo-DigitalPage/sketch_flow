@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:sketch_flow/sketch_flow.dart';
+import 'package:sketch_flow/sketch_controller.dart';
+import 'package:sketch_flow/sketch_view.dart';
 
 class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
   /// Top bar widget

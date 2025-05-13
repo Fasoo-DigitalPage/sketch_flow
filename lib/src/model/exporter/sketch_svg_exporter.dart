@@ -1,5 +1,4 @@
-import 'package:sketch_flow/sketch_contents.dart';
-import 'package:sketch_flow/sketch_flow.dart';
+import 'package:sketch_flow/sketch_model.dart';
 
 class SketchSvgExporter {
   static String extractSVG({

@@ -1,5 +1,5 @@
 import 'dart:ui';
-import 'package:sketch_flow/src/content/sketch_content.dart';
+import 'package:sketch_flow/sketch_model.dart';
 
 class Pencil extends SketchContent {
   Pencil({required super.offsets, required super.sketchConfig});

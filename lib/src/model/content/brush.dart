@@ -1,6 +1,5 @@
 import 'dart:ui';
-
-import 'package:sketch_flow/sketch_contents.dart';
+import 'package:sketch_flow/sketch_model.dart';
 
 class Brush extends SketchContent {
   Brush({required super.offsets, required super.sketchConfig});

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:sketch_flow/sketch_flow.dart';
-import 'package:sketch_flow/sketch_widgets.dart';
+import 'package:sketch_flow/sketch_controller.dart';
+import 'package:sketch_flow/sketch_view.dart';
+import 'package:sketch_flow/sketch_model.dart';
 
 class SketchBottomBar extends StatefulWidget {
   /// A bottom bar that provides tools for handwriting or sketching.

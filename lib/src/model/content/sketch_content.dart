@@ -1,5 +1,5 @@
 import 'dart:ui';
-import 'package:sketch_flow/sketch_flow.dart';
+import 'package:sketch_flow/sketch_model.dart';
 
 abstract class SketchContent {
   final List<Offset> offsets;

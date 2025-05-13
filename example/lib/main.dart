@@ -3,9 +3,9 @@ import 'dart:typed_data';
 import 'package:example/test_data.dart';
 import 'package:flutter/material.dart';
 import 'package:jovial_svg/jovial_svg.dart';
-import 'package:sketch_flow/sketch_flow.dart';
-import 'package:sketch_flow/sketch_exporter.dart';
-import 'package:sketch_flow/sketch_serializer.dart';
+import 'package:sketch_flow/sketch_model.dart';
+import 'package:sketch_flow/sketch_controller.dart';
+import 'package:sketch_flow/sketch_view.dart';
 
 void main() {
   runApp(const MyApp());
