@@ -42,11 +42,6 @@ class SketchController extends ChangeNotifier {
   Offset? _eraserCirclePosition;
   Offset? get eraserCirclePosition => _eraserCirclePosition;
 
-  void addContents({required List<SketchContent> data}) {
-    _contents.addAll(data);
-    notifyListeners();
-  }
-
   /// Creates a new sketch content based on the current configuration and path.
   SketchContent? createCurrentContent() {
     switch(_sketchConfig.toolType) {
@@ -167,17 +162,29 @@ class SketchController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<Uint8List?> extractWithPNG({required GlobalKey repaintKey, double? pixelRatio}) async {
-    try {
-      final boundary = repaintKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
-      final image = await boundary.toImage(pixelRatio: pixelRatio ?? 3.0);
-      final byteData = await image.toByteData(format: ImageByteFormat.png);
+  Map<String, dynamic> toJson() {
+    return SketchSerializer.toJson(_contents);
+  }
 
-      return byteData?.buffer.asUint8List();
-    } catch(e) {
-      print('Error capturing image: $e');
-      return null;
-    }
+  void fromJson({required List<Map<String, dynamic>> json}) {
+    final data = SketchSerializer.fromJson(json);
+
+    _contents.addAll(data);
+    notifyListeners();
+  }
+
+  Future<Uint8List?> extractPNG({required GlobalKey repaintKey, double? pixelRatio}) async {
+    final image = await SketchPngExporter.extractPNG(repaintKey: repaintKey);
+
+    return image;
+  }
+
+  String extractSVG({required double width, required double height}) {
+    return SketchSvgExporter.extractSVG(
+        contents: _contents,
+        width: width,
+        height: height
+    );
   }
 
   void _saveToUndoStack() {

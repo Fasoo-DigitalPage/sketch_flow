@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'package:example/test_data.dart';
 import 'package:flutter/material.dart';
 import 'package:jovial_svg/jovial_svg.dart';
-import 'package:sketch_flow/sketch_model.dart';
 import 'package:sketch_flow/sketch_controller.dart';
 import 'package:sketch_flow/sketch_view.dart';
 
@@ -31,7 +30,7 @@ class DemoPage extends StatefulWidget {
 }
 
 class _DemoPageState extends State<DemoPage> {
-  final SketchController _sketchController = SketchController(sketchConfig: SketchConfig());
+  final SketchController _sketchController = SketchController();
   final GlobalKey _repaintKey = GlobalKey();
 
   @override
@@ -42,16 +41,15 @@ class _DemoPageState extends State<DemoPage> {
         controller: _sketchController,
         showJsonDialogIcon: true,
         onClickToJsonButton: () {
-          final json = SketchSerializer.toJson(_sketchController.contents);
+          final json = _sketchController.toJson();
           _showJsonDialog(json: json);
         },
         showInputTestDataIcon: true,
         onClickInputTestButton: () {
-          final data = SketchSerializer.fromJson(testData);
-          _sketchController.addContents(data: data);
+          _sketchController.fromJson(json: testData);
         },
         onClickExtractPNG: () async {
-          final image = await SketchPngExporter.extractPNG(repaintKey: _repaintKey);
+          final image = await _sketchController.extractPNG(repaintKey: _repaintKey);
           if(context.mounted && image != null) {
             _showPNGDialog(image: image);
           }
@@ -59,8 +57,7 @@ class _DemoPageState extends State<DemoPage> {
         onClickExtractSVG: (offsets) {
           final width = MediaQuery.of(context).size.width;
           final height = MediaQuery.of(context).size.height;
-          final svgCode = SketchSvgExporter.extractSVG(
-              contents: _sketchController.contents,
+          final svgCode = _sketchController.extractSVG(
               width: width,
               height: height
           );
