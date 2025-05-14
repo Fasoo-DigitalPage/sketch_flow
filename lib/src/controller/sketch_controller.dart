@@ -162,11 +162,11 @@ class SketchController extends ChangeNotifier {
   }
 
   Map<String, dynamic> toJson() {
-    return SketchSerializer.toJson(_contents);
+    return SketchDataConverter.toJson(_contents);
   }
 
   void fromJson({required List<Map<String, dynamic>> json}) {
-    final data = SketchSerializer.fromJson(json);
+    final data = SketchDataConverter.fromJson(json);
 
     _contents.addAll(data);
     notifyListeners();

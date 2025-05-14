@@ -1,4 +1,4 @@
-export 'src/model/serializer/sketch_serializer.dart';
+export 'src/model/dataConverter/sketch_data_converter.dart';
 
 export 'src/model/content/sketch_content.dart';
 export 'src/model/content/pencil.dart';

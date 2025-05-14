@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:sketch_flow/sketch_model.dart';
 
-class SketchSerializer {
+class SketchDataConverter {
   static Map<String, dynamic> toJson(List<SketchContent> contents) {
     return {
       'sketchContents': contents.map((c) => c.toJson()).toList(),
