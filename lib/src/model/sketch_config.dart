@@ -35,6 +35,12 @@ enum EraserMode {
 /// [eraserRadiusMax] The maximum thickness the eraser can be set to
 ///
 /// [eraserRadiusMin] The minimum thickness the eraser can be set to
+///
+/// [eraserMode] Eraser mode (area, stroke)
+///
+/// [showEraserEffect] Eraser motion effect (true is the default)
+///
+/// [colorList] List of color
 class SketchConfig {
   SketchConfig({
     this.toolType = SketchToolType.pencil,
@@ -44,6 +50,7 @@ class SketchConfig {
     this.eraserRadiusMax = 100,
     this.eraserRadiusMin = 10,
     this.eraserMode = EraserMode.area,
+    this.showEraserEffect = true,
     List<Color>? colorList,
     double? strokeThickness,
     List<double>? strokeThicknessList,
@@ -67,6 +74,8 @@ class SketchConfig {
 
   final EraserMode eraserMode;
 
+  final bool showEraserEffect;
+
   SketchConfig copyWith({
     SketchToolType? toolType,
     Color? color,
@@ -78,6 +87,7 @@ class SketchConfig {
     double? eraserRadiusMax,
     double? eraserRadiusMin,
     EraserMode? eraserMode,
+    bool? showEraserEffect,
   }) {
     return SketchConfig(
         toolType: toolType ?? this.toolType,
@@ -89,7 +99,8 @@ class SketchConfig {
         eraserRadius: eraserRadius ?? this.eraserRadius,
         eraserRadiusMax: eraserRadiusMax ?? this.eraserRadiusMax,
         eraserRadiusMin: eraserRadiusMin ?? this.eraserRadiusMin,
-        eraserMode: eraserMode ?? this.eraserMode
+        eraserMode: eraserMode ?? this.eraserMode,
+        showEraserEffect: showEraserEffect ?? this.showEraserEffect,
     );
   }
 
@@ -98,6 +109,6 @@ class SketchConfig {
     return "toolType: ${toolType.name}, color: $color, strokeThickness: $strokeThickness, "
         "strokeThicknessList: $strokeThicknessList, eraserRadius: $eraserRadius, eraserRadius: $eraserRadius, "
         "eraserRadiusMax: $eraserRadiusMax, eraserRadiusMin: $eraserRadiusMin, "
-        "eraserMode: $eraserMode, opacity: $opacity";
+        "eraserMode: $eraserMode, opacity: $opacity, showEraserEffect: $showEraserEffect";
   }
 }

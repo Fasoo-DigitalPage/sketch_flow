@@ -18,7 +18,8 @@ class SketchPainter extends CustomPainter {
     final currentContent = controller.createCurrentContent();
     currentContent?.draw(canvas);
 
-    if (controller.toolTypeNotifier.value == SketchToolType.eraser && controller.eraserCirclePosition != null) {
+    if (controller.toolTypeNotifier.value == SketchToolType.eraser && controller.eraserCirclePosition != null
+        && controller.currentSketchConfig.showEraserEffect) {
       final eraserPaint = Paint()
         ..color = Colors.grey
         ..style = PaintingStyle.stroke;

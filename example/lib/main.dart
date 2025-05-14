@@ -4,6 +4,7 @@ import 'package:example/test_data.dart';
 import 'package:flutter/material.dart';
 import 'package:jovial_svg/jovial_svg.dart';
 import 'package:sketch_flow/sketch_controller.dart';
+import 'package:sketch_flow/sketch_model.dart';
 import 'package:sketch_flow/sketch_view.dart';
 
 void main() {
@@ -30,7 +31,7 @@ class DemoPage extends StatefulWidget {
 }
 
 class _DemoPageState extends State<DemoPage> {
-  final SketchController _sketchController = SketchController();
+  final SketchController _sketchController = SketchController(sketchConfig: SketchConfig(showEraserEffect: true));
   final GlobalKey _repaintKey = GlobalKey();
 
   @override
