@@ -34,6 +34,7 @@ class SketchController extends ChangeNotifier {
   bool _isEnabled = true;
 
   bool _hasErasedContent = false;
+  bool get hasErasedContent => _hasErasedContent;
 
   /// undo / redo stack
   final List<List<SketchContent>> _undoStack = [];
