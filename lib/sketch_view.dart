@@ -1,9 +1,7 @@
-export 'src/sketch_board.dart';
-export 'src/sketch_painter.dart';
-
-export 'src/bottomBar/sketch_bottom_bar.dart';
-
-export 'src/topBar/sketch_top_bar.dart';
+export 'src/view/board/sketch_board.dart';
+export 'src/view/board/sketch_painter.dart';
+export 'src/view/bottomBar/sketch_bottom_bar.dart';
+export 'src/view/topBar/sketch_top_bar.dart';
 
 export 'src/common/sketch_tool_icon.dart';
 
