@@ -21,15 +21,20 @@ jobs:
       - name: Install Dependencies
         run: flutter pub get
 
-      - name: Build Web
+      - name: Install Dependencies for Example
+        working-directory: example
+        run: flutter pub get
+
+      - name: Build Web from Example
+        working-directory: example
         run: flutter build web --release
 
       - name: Add .nojekyll
-        run: echo > build/web/.nojekyll
+        run: echo > example/build/web/.nojekyll
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.sketch_flow_secret_key }}
-          publish_dir: build/web
+          publish_dir: example/build/web
           publish_branch: gh-pages
