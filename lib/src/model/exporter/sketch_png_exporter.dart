@@ -15,8 +15,7 @@ class SketchPngExporter {
 
       return byteData?.buffer.asUint8List();
     } catch(e) {
-      print('Error capturing image: $e');
-      return null;
+      throw('Error capturing image: $e');
     }
   }
 }
