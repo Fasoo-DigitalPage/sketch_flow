@@ -7,4 +7,5 @@ class SketchToolIcon {
   final double size;
 
   SketchToolIcon({required this.enableIcon, required this.disableIcon, this.size = 24});
+
 }
