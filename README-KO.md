@@ -1,5 +1,5 @@
 # Sketch Flow
-
+[English](https://github.com/JunYeong0314/sketch_flow/edit/main/README.md) / [한국어](https://github.com/JunYeong0314/sketch_flow/blob/main/README-KO.md)  
 **유연하고 강력한 Flutter 스케치 플러그인**  
 심플한 UI와 다양한 내보내기 기능으로 손쉽게 그리기 앱을 만들어보세요.
 
@@ -21,7 +21,7 @@
 - 별도 커스터마이징 없이 바로 사용 가능
 
 ## 🖼️ 미리보기  
-웹에서 테스트 해보기: [바로가기](https://sketch-flow-ashy.vercel.app/)  
+웹에서 테스트 해보기: [바로가기](https://junyeong0314.github.io/sketch_flow/)  
 예제 코드 보기: [main.dart](https://github.com/JunYeong0314/sketch_flow/blob/main/example/lib/main.dart)
 
 <p align="center">
@@ -98,7 +98,7 @@ final Uint8List? image = await _controller.extractPNG(
 ```
 #### SVG
 - `SketchController`를 사용해 그림을 SVG로 쉽게 내보낼 수 있습니다.  
-You can define the canvas width and height to match your needs.
+필요에 맞게 캔버스 너비와 높이를 지정 할 수 있습니다.
 ```dart
 final String svgCode = await _controller.extractSVG(
   width: 300.0, // Define canvas width
@@ -106,14 +106,14 @@ final String svgCode = await _controller.extractSVG(
 );
 ```
 
-## 🔍 Tools Overview
-| Tool Type   | Description                                                                                      |
+## 🔍 도구 개요
+| 도구 유형   | 설명                                                                                      |
 | ----------- | ------------------------------------------------------------------------------------------------ |
-| **Move**    | Enables panning and zooming of the canvas without affecting the drawings.                        |
-| **Pencil**  | Draws a continuous line based on user input. Configurable stroke thickness, color, and opacity.  |
-| **Brush**   | Simulates a brush-like stroke with smooth edges. Supports color and thickness customization.     |
-| **Palette** | Allows users to select colors for drawing tools. |
-| **Eraser**  | Erases drawings either by stroke or by area.    |
+| **Move**    | 도면에 영향을 주지 않고 확대/축소 및 스크롤 할 수 있습니다.                        |
+| **Pencil**  | 사용자 입력에 따라 선을 그립니다. 획의 두께, 색상, 불투명도를 설정 할 수 있습니다.  |
+| **Brush**   | 부드러운 붓 효과가 적용된 선을 그립니다. 획의 두께, 색상, 불투명도를 설정 할 수 있습니다.     |
+| **Palette** | 사용자가 그림 도구의 색상을 선택 할 수 있습니다. |
+| **Eraser**  | 획 지우개, 영역 지우개를 선택 할 수 있으며 그림을 지웁니다.    |
 
 
 

@@ -1,5 +1,5 @@
 # Sketch Flow
-
+[English](https://github.com/JunYeong0314/sketch_flow/edit/main/README.md) / [한국어](https://github.com/JunYeong0314/sketch_flow/blob/main/README-KO.md)  
 **A powerful and flexible Flutter sketching plugin**  
 Easily build drawing applications with elegant UI and comprehensive export features.
 
@@ -20,7 +20,7 @@ Easily build drawing applications with elegant UI and comprehensive export featu
 - Use directly without extra customization for quick prototyping.
 
 ## 🖼️ Preview  
-Test it live!: [Try it](https://sketch-flow-ashy.vercel.app/)  
+Test it live!: [Try it](https://junyeong0314.github.io/sketch_flow/)  
 View example code: [main.dart](https://github.com/JunYeong0314/sketch_flow/blob/main/example/lib/main.dart)
 
 <p align="center">
