@@ -8,7 +8,7 @@ class GradientTrackShape extends SliderTrackShape {
   GradientTrackShape({
     required this.gradient,
     this.trackHeight = 4.0,
-    this.squareSize = 4.0, // 체크 무늬 크기
+    this.squareSize = 4.0,
   });
 
   @override
