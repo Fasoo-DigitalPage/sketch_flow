@@ -2,10 +2,8 @@ import 'dart:ui';
 import 'package:sketch_flow/sketch_model.dart';
 
 class SketchDataConverter {
-  static Map<String, dynamic> toJson(List<SketchContent> contents) {
-    return {
-      'sketchContents': contents.map((c) => c.toJson()).toList(),
-    };
+  static List<Map<String, dynamic>> toJson(List<SketchContent> contents) {
+    return contents.map((c) => c.toJson()).toList();
   }
 
   static List<SketchContent> fromJson(List<Map<String, dynamic>> contents) {

@@ -93,5 +93,42 @@ void main() {
 
       expect(controller.hasErasedContent, isTrue);
     });
+    
+    test('Verification of stroke erasing motion', () {
+      // drawing
+      controller.startNewLine(Offset(10, 10));
+      controller.addPoint(Offset(20, 20));
+      controller.addPoint(Offset(30, 30));
+      controller.endLine();
+
+      controller.updateConfig(SketchConfig(toolType: SketchToolType.eraser, eraserMode: EraserMode.stroke));
+
+      // erasing
+      controller.startNewLine(Offset(15, 15));
+      controller.addPoint(Offset(20, 20));
+      controller.addPoint(Offset(30, 30));
+      controller.endLine();
+
+      expect(controller.contents, isEmpty);
+    });
+
+    test('Verification of JSON converter', () {
+      // drawing
+      controller.startNewLine(Offset(10, 10));
+      controller.addPoint(Offset(20, 20));
+      controller.addPoint(Offset(30, 30));
+      controller.endLine();
+
+      // JSON serialization
+      final List<Map<String, dynamic>> json = controller.toJson();
+
+      // clear
+      controller.clear();
+
+      // Json deserialization
+      controller.fromJson(json: json);
+
+      expect(controller.contents, isNotEmpty);
+    });
   });
 }

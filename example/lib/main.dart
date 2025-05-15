@@ -72,7 +72,7 @@ class _DemoPageState extends State<DemoPage> {
     );
   }
 
-  void _showJsonDialog({required Map<String, dynamic> json}) {
+  void _showJsonDialog({required List<Map<String, dynamic>> json}) {
     final prettyJson = const JsonEncoder.withIndent('  ').convert(json);
 
     showDialog(
