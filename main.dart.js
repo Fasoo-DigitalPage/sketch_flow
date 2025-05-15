@@ -24085,7 +24085,7 @@ this.b=b},
 a5N:function a5N(){},
 fy:function fy(){},
 aug(a){var s=A.X(a).j("a5<1,aQ<k,@>>")
-return A.a(["sketchContents",A.a1(new A.a5(a,new A.aaS(),s),!0,s.j("ax.E"))],t.N,t.z)},
+return A.a1(new A.a5(a,new A.aaS(),s),!0,s.j("ax.E"))},
 aFK(a){var s,r,q,p,o,n,m,l,k,j,i,h,g,f,e=null,d=A.c([],t.HG)
 for(s=t.j,r=t.NT,q=t.FY,p=q.j("u.E"),o=0;o<12;++o){n=a[o]
 m=n.i(0,"type")
