@@ -34,6 +34,7 @@ class BaseThickness extends StatelessWidget {
         onPressed: onClickThickness,
     );
   }
+
 }
 
 class BaseThicknessPainter extends CustomPainter {
