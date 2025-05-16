@@ -130,5 +130,24 @@ void main() {
 
       expect(controller.contents, isNotEmpty);
     });
+
+    test('Verifying that only erased coordinates remain', () {
+      // drawing
+      controller.startNewLine(Offset(10, 10));
+      controller.addPoint(Offset(20, 20));
+      controller.addPoint(Offset(30, 30));
+      controller.addPoint(Offset(40, 40));
+      controller.endLine();
+
+      controller.updateConfig(SketchConfig(toolType: SketchToolType.eraser, eraserMode: EraserMode.area));
+
+      // erasing
+      controller.startNewLine(Offset(30, 30));
+      controller.addPoint(Offset(40, 40));
+      controller.addPoint(Offset(55, 55));
+      controller.endLine();
+
+      expect(controller.contents[1].offsets.length, 2);
+    });
   });
 }
