@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sketch_flow/sketch_controller.dart';
 import 'package:sketch_flow/sketch_view.dart';
 import 'package:sketch_flow/sketch_model.dart';
+import 'package:sketch_flow/src/widgets/color_picker_slider_shape.dart';
 
 class SketchBottomBar extends StatefulWidget {
   /// A bottom bar that provides tools for handwriting or sketching.
@@ -33,6 +34,8 @@ class SketchBottomBar extends StatefulWidget {
   /// [penOpacitySliderThemeData] The theme data used to customize the appearance of the pen opacity slider
   ///
   /// [overlayBackgroundColor] The color of the overlay
+  ///
+  /// [showColorPickerSliderBar] ColorPicker Slider active or not (base true)
   const SketchBottomBar({
     super.key,
     required this.controller,
@@ -50,7 +53,8 @@ class SketchBottomBar extends StatefulWidget {
     this.eraserThicknessTextStyle,
     this.eraserThicknessSliderThemeData,
     this.penOpacitySliderThemeData,
-    this.overlayBackgroundColor = Colors.white
+    this.overlayBackgroundColor = Colors.white,
+    this.showColorPickerSliderBar = true
   });
 
   final SketchController controller;
@@ -74,6 +78,8 @@ class SketchBottomBar extends StatefulWidget {
   final SliderThemeData? penOpacitySliderThemeData;
 
   final Color overlayBackgroundColor;
+
+  final bool showColorPickerSliderBar;
 
   @override
   State<StatefulWidget> createState() => _SketchBottomBarState();
@@ -100,9 +106,18 @@ class _SketchBottomBarState extends State<SketchBottomBar>
       widget.controller.currentSketchConfig.eraserRadius;
   late double _penOpacity = widget.controller.currentSketchConfig.opacity;
 
+  /// ColorPicker color value list
+  late List<Color> _rgbGradientColors;
+
+  /// Number of ColorPicker representation colors
+  final int _colorStepsCounts = 1792;
+
+  late int _selectedColorIndex;
+
   @override
   void initState() {
     super.initState();
+
     _fadeAnimationController = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 200),
@@ -111,6 +126,17 @@ class _SketchBottomBarState extends State<SketchBottomBar>
       parent: _fadeAnimationController,
       curve: Curves.easeInOut,
     );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (widget.showColorPickerSliderBar) {
+      _generateRGBGradientColors(colorStepCounts: _colorStepsCounts);
+
+      _selectedColorIndex = _findClosestColorIndex(target: _controller.currentSketchConfig.color);
+    }
   }
 
   @override
@@ -248,6 +274,13 @@ class _SketchBottomBarState extends State<SketchBottomBar>
         _controller.currentSketchConfig.copyWith(color: color),
       );
       _controller.enableDrawing();
+
+      // Update ColorPicker thumbBar value
+      if (widget.showColorPickerSliderBar) {
+        setState(() {
+          _selectedColorIndex = _findClosestColorIndex(target: _controller.currentSketchConfig.color);
+        });
+      }
 
       await Future.delayed(Duration(milliseconds: 100));
 
@@ -478,18 +511,65 @@ class _SketchBottomBarState extends State<SketchBottomBar>
   /// Builds the color palette selection widget.
   Widget _paletteConfigWidget({required List<Color> colorList}) {
     return Center(
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: List.generate(colorList.length, (index) {
-            return BaseCircle(
-              radius: 17.5,
-              color: colorList[index],
-              onClickCircle: () => _onColorSelected(color: colorList[index]),
-            );
-          }),
-        ),
+      child: Column(
+        children: [
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: List.generate(colorList.length, (index) {
+                return BaseCircle(
+                  radius: 17.5,
+                  color: colorList[index],
+                  onClickCircle: () => _onColorSelected(color: colorList[index]),
+                );
+              }),
+            ),
+          ),
+          if (widget.showColorPickerSliderBar)
+            StatefulBuilder(builder: (context, setModalState) {
+              return Material(
+                color: widget.overlayBackgroundColor,
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.6,
+                  child: SliderTheme(
+                    data: SliderTheme.of(context).copyWith(
+                      padding: EdgeInsets.symmetric(vertical: 4),
+                      activeTrackColor: Colors.transparent,
+                      inactiveTrackColor: Colors.transparent,
+                      trackShape: ColorPickerSliderShape(
+                          trackHeight: 10.0,
+                          colorStepCount: _colorStepsCounts,
+                          colors: _rgbGradientColors
+                      ),
+                      inactiveTickMarkColor: _controller.currentSketchConfig.color,
+                      thumbColor: _controller.currentSketchConfig.color,
+                      overlayColor: _controller.currentSketchConfig.color
+                          .withValues(alpha: 0.05),
+                      thumbShape: RoundSliderThumbShape(
+                        enabledThumbRadius: 10,
+                      ),
+                    ),
+                    child: Slider(
+                      value: _selectedColorIndex.toDouble(),
+                      min: 0.0,
+                      max: (_colorStepsCounts - 1).toDouble(),
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedColorIndex = value.round();
+                          _controller.updateConfig(
+                              _controller.currentSketchConfig.copyWith(color: _rgbGradientColors[_selectedColorIndex])
+                          );
+                        });
+
+                        setModalState(() {});
+                      },
+                    ),
+                  ),
+                ),
+              );
+            })
+        ],
       ),
     );
   }
@@ -599,5 +679,64 @@ class _SketchBottomBarState extends State<SketchBottomBar>
         );
       },
     );
+  }
+
+  /// Initialize gradient color list with RGB values.
+  void _generateRGBGradientColors({required int colorStepCounts}) {
+    List<List<int>> rgbStops = [
+      [255, 255, 255], // white
+      [255, 0, 0],     // red
+      [255, 255, 0],   // yellow
+      [0, 255, 0],     // green
+      [0, 255, 255],   // cyan
+      [0, 0, 255],     // blue
+      [255, 0, 255],   // magenta
+      [0, 0, 0],       // black
+    ];
+
+    _rgbGradientColors = [];
+
+    int segments = rgbStops.length - 1;
+    int stepsPerSegment = (1792 / segments).floor();
+
+    for (int i = 0; i < segments; i++) {
+      List<int> start = rgbStops[i];
+      List<int> end = rgbStops[i + 1];
+
+      for (int j = 0; j < stepsPerSegment; j++) {
+        double t = j / stepsPerSegment;
+        int r = (start[0] + (end[0] - start[0]) * t).round();
+        int g = (start[1] + (end[1] - start[1]) * t).round();
+        int b = (start[2] + (end[2] - start[2]) * t).round();
+        _rgbGradientColors.add(Color.fromARGB(255, r, g, b));
+      }
+    }
+
+    // Add remaining colors
+    while (_rgbGradientColors.length < 1792) {
+      _rgbGradientColors.add(Color.fromARGB(255, 0, 0, 0));
+    }
+  }
+
+  int _findClosestColorIndex({required Color target}) {
+    double minDistance = double.infinity;
+    int closestIndex = 0;
+
+    for (int i = 0; i < _rgbGradientColors.length; i++) {
+      final c = _rgbGradientColors[i];
+
+      final dr = target.r * 255 - c.r * 255;
+      final dg = target.g * 255 - c.g * 255;
+      final db = target.b * 255 - c.b * 255;
+
+      final distance = dr * dr + dg * dg + db * db;
+
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestIndex = i;
+      }
+    }
+
+    return closestIndex;
   }
 }
