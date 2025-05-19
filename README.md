@@ -26,7 +26,7 @@ View example code: [main.dart](https://github.com/JunYeong0314/sketch_flow/blob/
 <p align="center">
 <img width = "24%" src='https://github.com/user-attachments/assets/d9dcbc12-3d7b-4b3d-a047-34608f89452a' border='0'>
 <img width = "24%" src='https://github.com/user-attachments/assets/9f5f8d92-d02e-4768-ae37-bba670bae995' border='0'>
-<img width = "24%" src='https://github.com/user-attachments/assets/1416e050-d1fe-4a60-a733-5c392ecf2581' border='0'>
+<img width = "24%" src='https://github.com/user-attachments/assets/a97e3f3d-9ac4-4da1-8e7f-d3c7bd937682' border='0'>
 <img width = "24%" src='https://github.com/user-attachments/assets/2eb33ff3-3fa4-4c9a-871a-c81320369860' border='0'>
 </p>
 
