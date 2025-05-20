@@ -42,7 +42,7 @@ View example code: [main.dart](https://github.com/JunYeong0314/sketch_flow/blob/
 <img width = "70%" src='https://github.com/user-attachments/assets/bd3e5e2f-147b-4965-a65d-fe7daadfcf34' border='0'>
 </p>
 
-## ✍How to Use `sketch_flow`
+## How to Use `sketch_flow`
 #### Install the package
 - Add this to your `pubspec.yaml`:
 ```dart
