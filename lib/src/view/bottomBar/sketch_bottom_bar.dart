@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sketch_flow/sketch_controller.dart';
+import 'package:sketch_flow/sketch_view_model.dart';
 import 'package:sketch_flow/sketch_view.dart';
 import 'package:sketch_flow/sketch_model.dart';
 import 'package:sketch_flow/src/widgets/color_picker_slider_shape.dart';
@@ -7,7 +7,7 @@ import 'package:sketch_flow/src/widgets/color_picker_slider_shape.dart';
 class SketchBottomBar extends StatefulWidget {
   /// A bottom bar that provides tools for handwriting or sketching.
   ///
-  /// [controller] The sketch controller that manages drawing state.
+  /// [viewModel] The sketch viewModel that manages drawing state.
   ///
   /// [bottomBarHeight] The height of the bottom bar.
   ///
@@ -38,7 +38,7 @@ class SketchBottomBar extends StatefulWidget {
   /// [showColorPickerSliderBar] ColorPicker Slider active or not (base true)
   const SketchBottomBar({
     super.key,
-    required this.controller,
+    required this.viewModel,
     this.bottomBarHeight,
     this.bottomBarColor = Colors.white,
     this.bottomBarBorderColor = Colors.grey,
@@ -57,7 +57,7 @@ class SketchBottomBar extends StatefulWidget {
     this.showColorPickerSliderBar = true
   });
 
-  final SketchController controller;
+  final SketchViewModel viewModel;
 
   final double? bottomBarHeight;
   final Color bottomBarColor;
@@ -87,7 +87,7 @@ class SketchBottomBar extends StatefulWidget {
 
 class _SketchBottomBarState extends State<SketchBottomBar>
     with TickerProviderStateMixin {
-  late final _controller = widget.controller;
+  late final _viewModel = widget.viewModel;
 
   late AnimationController _fadeAnimationController;
   late Animation<double> _fadeAnimation;
@@ -103,8 +103,8 @@ class _SketchBottomBarState extends State<SketchBottomBar>
   EraserMode _selectedEraserType = EraserMode.area;
 
   late double _eraserRadius =
-      widget.controller.currentSketchConfig.eraserRadius;
-  late double _penOpacity = widget.controller.currentSketchConfig.opacity;
+      widget.viewModel.currentSketchConfig.eraserRadius;
+  late double _penOpacity = widget.viewModel.currentSketchConfig.opacity;
 
   /// ColorPicker color value list
   late List<Color> _rgbGradientColors;
@@ -135,7 +135,7 @@ class _SketchBottomBarState extends State<SketchBottomBar>
     if (widget.showColorPickerSliderBar) {
       _generateRGBGradientColors(colorStepCounts: _colorStepsCounts);
 
-      _selectedColorIndex = _findClosestColorIndex(target: _controller.currentSketchConfig.color);
+      _selectedColorIndex = _findClosestColorIndex(target: _viewModel.currentSketchConfig.color);
     }
   }
 
@@ -150,15 +150,15 @@ class _SketchBottomBarState extends State<SketchBottomBar>
   void _onToolTap({required SketchToolType toolType}) {
     if (toolType == _selectedToolType || toolType == SketchToolType.palette) {
       _showToolConfig(toolType: toolType);
-      _controller.disableDrawing();
+      _viewModel.disableDrawing();
     }
 
     if (toolType != SketchToolType.palette) {
       setState(() {
         _selectedToolType = toolType;
       });
-      _controller.updateConfig(
-        _controller.currentSketchConfig.copyWith(toolType: toolType),
+      _viewModel.updateConfig(
+        _viewModel.currentSketchConfig.copyWith(toolType: toolType),
       );
     }
   }
@@ -172,8 +172,8 @@ class _SketchBottomBarState extends State<SketchBottomBar>
     _toolConfigOverlay = null;
 
     final strokeThicknessList =
-        _controller.currentSketchConfig.strokeThicknessList;
-    final colorList = _controller.currentSketchConfig.colorList;
+        _viewModel.currentSketchConfig.strokeThicknessList;
+    final colorList = _viewModel.currentSketchConfig.colorList;
 
     final applyWidget = switch (toolType) {
       SketchToolType.pencil => _drawingConfigWidget(
@@ -193,7 +193,7 @@ class _SketchBottomBarState extends State<SketchBottomBar>
             // Close the overlay when touching the external area.
             behavior: HitTestBehavior.translucent,
             onTap: () {
-              _controller.enableDrawing();
+              _viewModel.enableDrawing();
 
               if (_toolConfigOverlay != null) {
                 _toolConfigOverlay!.remove();
@@ -250,12 +250,12 @@ class _SketchBottomBarState extends State<SketchBottomBar>
   /// Updates the stroke width, closes the overlay, and enables drawing.
   void _onThicknessSelected({required double strokeThickness}) {
     _fadeAnimationController.reverse().then((_) async {
-      _controller.updateConfig(
-        _controller.currentSketchConfig.copyWith(
+      _viewModel.updateConfig(
+        _viewModel.currentSketchConfig.copyWith(
           strokeThickness: strokeThickness,
         ),
       );
-      _controller.enableDrawing();
+      _viewModel.enableDrawing();
 
       await Future.delayed(Duration(milliseconds: 100));
 
@@ -270,15 +270,15 @@ class _SketchBottomBarState extends State<SketchBottomBar>
   /// Updates the drawing color, closes the overlay, and enables drawing.
   void _onColorSelected({required Color color}) {
     _fadeAnimationController.reverse().then((_) async {
-      _controller.updateConfig(
-        _controller.currentSketchConfig.copyWith(color: color),
+      _viewModel.updateConfig(
+        _viewModel.currentSketchConfig.copyWith(color: color),
       );
-      _controller.enableDrawing();
+      _viewModel.enableDrawing();
 
       // Update ColorPicker thumbBar value
       if (widget.showColorPickerSliderBar) {
         setState(() {
-          _selectedColorIndex = _findClosestColorIndex(target: _controller.currentSketchConfig.color);
+          _selectedColorIndex = _findClosestColorIndex(target: _viewModel.currentSketchConfig.color);
         });
       }
 
@@ -371,7 +371,7 @@ class _SketchBottomBarState extends State<SketchBottomBar>
                   icon:
                       widget.clearIcon ?? Icon(Icons.cleaning_services_rounded),
                   onPressed: () {
-                    _controller.clear();
+                    _viewModel.clear();
                   },
                 ),
               ],
@@ -434,9 +434,9 @@ class _SketchBottomBarState extends State<SketchBottomBar>
                 radius: 17.5,
                 thickness: strokeThicknessList[index],
                 isSelected:
-                    _controller.currentSketchConfig.strokeThickness ==
+                    _viewModel.currentSketchConfig.strokeThickness ==
                     strokeThicknessList[index],
-                color: _controller.currentSketchConfig.color,
+                color: _viewModel.currentSketchConfig.color,
                 onClickThickness:
                     () => _onThicknessSelected(
                       strokeThickness: strokeThicknessList[index],
@@ -463,19 +463,19 @@ class _SketchBottomBarState extends State<SketchBottomBar>
                           trackHeight: 8.0,
                           gradient: LinearGradient(
                             colors: [
-                              _controller.currentSketchConfig.color.withValues(
+                              _viewModel.currentSketchConfig.color.withValues(
                                 alpha: 0.0,
                               ),
-                              _controller.currentSketchConfig.color.withValues(
+                              _viewModel.currentSketchConfig.color.withValues(
                                 alpha: 1.0,
                               ),
                             ],
                           ),
                         ),
                         inactiveTickMarkColor:
-                            _controller.currentSketchConfig.color,
-                        thumbColor: _controller.currentSketchConfig.color,
-                        overlayColor: _controller.currentSketchConfig.color
+                            _viewModel.currentSketchConfig.color,
+                        thumbColor: _viewModel.currentSketchConfig.color,
+                        overlayColor: _viewModel.currentSketchConfig.color
                             .withValues(alpha: 0.05),
                         thumbShape: RoundSliderThumbShape(
                           enabledThumbRadius: 10,
@@ -486,8 +486,8 @@ class _SketchBottomBarState extends State<SketchBottomBar>
                     min: 0.0,
                     max: 1.0,
                     onChanged: (opacity) {
-                      _controller.updateConfig(
-                        _controller.currentSketchConfig.copyWith(
+                      _viewModel.updateConfig(
+                        _viewModel.currentSketchConfig.copyWith(
                           opacity: opacity,
                         ),
                       );
@@ -542,9 +542,9 @@ class _SketchBottomBarState extends State<SketchBottomBar>
                           colorStepCount: _colorStepsCounts,
                           colors: _rgbGradientColors
                       ),
-                      inactiveTickMarkColor: _controller.currentSketchConfig.color,
-                      thumbColor: _controller.currentSketchConfig.color,
-                      overlayColor: _controller.currentSketchConfig.color
+                      inactiveTickMarkColor: _viewModel.currentSketchConfig.color,
+                      thumbColor: _viewModel.currentSketchConfig.color,
+                      overlayColor: _viewModel.currentSketchConfig.color
                           .withValues(alpha: 0.05),
                       thumbShape: RoundSliderThumbShape(
                         enabledThumbRadius: 10,
@@ -557,8 +557,8 @@ class _SketchBottomBarState extends State<SketchBottomBar>
                       onChanged: (value) {
                         setState(() {
                           _selectedColorIndex = value.round();
-                          _controller.updateConfig(
-                              _controller.currentSketchConfig.copyWith(color: _rgbGradientColors[_selectedColorIndex])
+                          _viewModel.updateConfig(
+                              _viewModel.currentSketchConfig.copyWith(color: _rgbGradientColors[_selectedColorIndex])
                           );
                         });
 
@@ -579,7 +579,7 @@ class _SketchBottomBarState extends State<SketchBottomBar>
   Widget _eraserConfigWidget({Text? areaEraserText, Text? strokeEraserText}) {
     return StatefulBuilder(
       builder: (context, setModalState) {
-        final config = _controller.currentSketchConfig;
+        final config = _viewModel.currentSketchConfig;
         return Material(
           color: widget.overlayBackgroundColor,
           child: Column(
@@ -595,8 +595,8 @@ class _SketchBottomBarState extends State<SketchBottomBar>
                   setState(() {
                     _selectedEraserType = value!;
                   });
-                  _controller.updateConfig(
-                    _controller.currentSketchConfig.copyWith(eraserMode: value),
+                  _viewModel.updateConfig(
+                    _viewModel.currentSketchConfig.copyWith(eraserMode: value),
                   );
 
                   // Used to induce rebuild in the Stateful Builder inside the overlay.
@@ -616,8 +616,8 @@ class _SketchBottomBarState extends State<SketchBottomBar>
                   setState(() {
                     _selectedEraserType = value!;
                   });
-                  _controller.updateConfig(
-                    _controller.currentSketchConfig.copyWith(eraserMode: value),
+                  _viewModel.updateConfig(
+                    _viewModel.currentSketchConfig.copyWith(eraserMode: value),
                   );
 
                   // Call to show UI immediately reflect radio button value in overlay inner widget.
@@ -658,8 +658,8 @@ class _SketchBottomBarState extends State<SketchBottomBar>
                       max: config.eraserRadiusMax,
                       divisions: 9,
                       onChanged: (eraserRadius) {
-                        _controller.updateConfig(
-                          _controller.currentSketchConfig.copyWith(
+                        _viewModel.updateConfig(
+                          _viewModel.currentSketchConfig.copyWith(
                             eraserRadius: eraserRadius,
                           ),
                         );

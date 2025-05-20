@@ -2,9 +2,9 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:sketch_flow/sketch_model.dart';
 
-class SketchController extends ChangeNotifier {
-  /// A controller that manages the user's sketching state on the canvas.
-  SketchController({
+class SketchViewModel extends ChangeNotifier {
+  /// A viewModel that manages the user's sketching state on the canvas.
+  SketchViewModel({
     SketchConfig? sketchConfig
   }) : _sketchConfig = sketchConfig ?? SketchConfig();
 

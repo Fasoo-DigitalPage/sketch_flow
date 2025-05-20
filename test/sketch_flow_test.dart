@@ -1,153 +1,153 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sketch_flow/sketch_controller.dart';
+import 'package:sketch_flow/sketch_view_model.dart';
 import 'package:sketch_flow/sketch_model.dart';
 
 void main() {
-  group('SketchController', () {
-    late SketchController controller;
+  group('SketchViewModel', () {
+    late SketchViewModel viewModel;
     
     setUp(() {
-      controller = SketchController();
+      viewModel = SketchViewModel();
     });
     
     test('Initial status screen', () {
-      expect(controller.contents, isEmpty);
-      expect(controller.currentSketchConfig.toolType, SketchToolType.pencil);
-      expect(controller.canUndoNotifier.value, isFalse);
-      expect(controller.canRedoNotifier.value, isFalse);
+      expect(viewModel.contents, isEmpty);
+      expect(viewModel.currentSketchConfig.toolType, SketchToolType.pencil);
+      expect(viewModel.canUndoNotifier.value, isFalse);
+      expect(viewModel.canRedoNotifier.value, isFalse);
     });
     
     test('startNewLine to start a new line', () {
       final offset = Offset(10, 10);
-      controller.startNewLine(offset);
-      controller.addPoint(Offset(11, 11));
-      controller.endLine();
+      viewModel.startNewLine(offset);
+      viewModel.addPoint(Offset(11, 11));
+      viewModel.endLine();
 
-      expect(controller.contents.length, 1);
-      expect(controller.contents.first.offsets.first, offset);
+      expect(viewModel.contents.length, 1);
+      expect(viewModel.contents.first.offsets.first, offset);
     });
     
     test('Delete all content with clear', () {
-      controller.startNewLine(Offset(10, 10));
-      controller.addPoint(Offset(20, 20));
-      controller.endLine();
+      viewModel.startNewLine(Offset(10, 10));
+      viewModel.addPoint(Offset(20, 20));
+      viewModel.endLine();
 
-      controller.clear();
+      viewModel.clear();
 
-      expect(controller.contents, isEmpty);
-      expect(controller.canUndoNotifier.value, isTrue);
+      expect(viewModel.contents, isEmpty);
+      expect(viewModel.canUndoNotifier.value, isTrue);
     });
     
     test('Undo functional test', () {
-      controller.startNewLine(Offset(10, 10));
-      controller.addPoint(Offset(20, 20));
-      controller.endLine();
+      viewModel.startNewLine(Offset(10, 10));
+      viewModel.addPoint(Offset(20, 20));
+      viewModel.endLine();
 
-      controller.undo();
+      viewModel.undo();
 
-      expect(controller.contents, isEmpty);
-      expect(controller.canRedoNotifier.value, isTrue);
+      expect(viewModel.contents, isEmpty);
+      expect(viewModel.canRedoNotifier.value, isTrue);
     });
     
     test('Redo functional test', () {
-      controller.startNewLine(Offset(10, 10));
-      controller.addPoint(Offset(20, 20));
-      controller.endLine();
+      viewModel.startNewLine(Offset(10, 10));
+      viewModel.addPoint(Offset(20, 20));
+      viewModel.endLine();
       
-      controller.undo();
-      controller.redo();
+      viewModel.undo();
+      viewModel.redo();
       
-      expect(controller.contents.length, 1);
-      expect(controller.canUndoNotifier.value, isTrue);
-      expect(controller.canRedoNotifier.value, isFalse);
+      expect(viewModel.contents.length, 1);
+      expect(viewModel.canUndoNotifier.value, isTrue);
+      expect(viewModel.canRedoNotifier.value, isFalse);
     });
     
     test('ValueNotifier is reflected when toolType is changed', () {
-      controller.updateConfig(SketchConfig(toolType: SketchToolType.eraser));
-      expect(controller.toolTypeNotifier.value, SketchToolType.eraser);
+      viewModel.updateConfig(SketchConfig(toolType: SketchToolType.eraser));
+      expect(viewModel.toolTypeNotifier.value, SketchToolType.eraser);
     });
 
     test('Verify deduplication on consecutive input of the same offset', () {
       final offset = Offset(10, 10);
-      controller.startNewLine(offset);
-      controller.addPoint(offset);
-      controller.endLine();
+      viewModel.startNewLine(offset);
+      viewModel.addPoint(offset);
+      viewModel.endLine();
 
-      final content = controller.contents.first;
+      final content = viewModel.contents.first;
       expect(content.offsets.length, 1);
     });
 
     test('Check if there are any deleted content', () {
       // drawing
-      controller.startNewLine(Offset(10, 10));
-      controller.addPoint(Offset(20, 20));
-      controller.addPoint(Offset(30, 30));
-      controller.endLine();
+      viewModel.startNewLine(Offset(10, 10));
+      viewModel.addPoint(Offset(20, 20));
+      viewModel.addPoint(Offset(30, 30));
+      viewModel.endLine();
 
-      controller.updateConfig(SketchConfig(toolType: SketchToolType.eraser, eraserMode: EraserMode.area));
+      viewModel.updateConfig(SketchConfig(toolType: SketchToolType.eraser, eraserMode: EraserMode.area));
 
       // clear
-      controller.startNewLine(Offset(15, 15));
-      controller.addPoint(Offset(20, 20));
-      controller.addPoint(Offset(25, 25));
+      viewModel.startNewLine(Offset(15, 15));
+      viewModel.addPoint(Offset(20, 20));
+      viewModel.addPoint(Offset(25, 25));
 
-      expect(controller.hasErasedContent, isTrue);
+      expect(viewModel.hasErasedContent, isTrue);
     });
     
     test('Verification of stroke erasing motion', () {
       // drawing
-      controller.startNewLine(Offset(10, 10));
-      controller.addPoint(Offset(20, 20));
-      controller.addPoint(Offset(30, 30));
-      controller.endLine();
+      viewModel.startNewLine(Offset(10, 10));
+      viewModel.addPoint(Offset(20, 20));
+      viewModel.addPoint(Offset(30, 30));
+      viewModel.endLine();
 
-      controller.updateConfig(SketchConfig(toolType: SketchToolType.eraser, eraserMode: EraserMode.stroke));
+      viewModel.updateConfig(SketchConfig(toolType: SketchToolType.eraser, eraserMode: EraserMode.stroke));
 
       // erasing
-      controller.startNewLine(Offset(15, 15));
-      controller.addPoint(Offset(20, 20));
-      controller.addPoint(Offset(30, 30));
-      controller.endLine();
+      viewModel.startNewLine(Offset(15, 15));
+      viewModel.addPoint(Offset(20, 20));
+      viewModel.addPoint(Offset(30, 30));
+      viewModel.endLine();
 
-      expect(controller.contents, isEmpty);
+      expect(viewModel.contents, isEmpty);
     });
 
     test('Verification of JSON converter', () {
       // drawing
-      controller.startNewLine(Offset(10, 10));
-      controller.addPoint(Offset(20, 20));
-      controller.addPoint(Offset(30, 30));
-      controller.endLine();
+      viewModel.startNewLine(Offset(10, 10));
+      viewModel.addPoint(Offset(20, 20));
+      viewModel.addPoint(Offset(30, 30));
+      viewModel.endLine();
 
       // JSON serialization
-      final List<Map<String, dynamic>> json = controller.toJson();
+      final List<Map<String, dynamic>> json = viewModel.toJson();
 
       // clear
-      controller.clear();
+      viewModel.clear();
 
       // Json deserialization
-      controller.fromJson(json: json);
+      viewModel.fromJson(json: json);
 
-      expect(controller.contents, isNotEmpty);
+      expect(viewModel.contents, isNotEmpty);
     });
 
     test('Verifying that only erased coordinates remain', () {
       // drawing
-      controller.startNewLine(Offset(10, 10));
-      controller.addPoint(Offset(20, 20));
-      controller.addPoint(Offset(30, 30));
-      controller.addPoint(Offset(40, 40));
-      controller.endLine();
+      viewModel.startNewLine(Offset(10, 10));
+      viewModel.addPoint(Offset(20, 20));
+      viewModel.addPoint(Offset(30, 30));
+      viewModel.addPoint(Offset(40, 40));
+      viewModel.endLine();
 
-      controller.updateConfig(SketchConfig(toolType: SketchToolType.eraser, eraserMode: EraserMode.area));
+      viewModel.updateConfig(SketchConfig(toolType: SketchToolType.eraser, eraserMode: EraserMode.area));
 
       // erasing
-      controller.startNewLine(Offset(30, 30));
-      controller.addPoint(Offset(40, 40));
-      controller.addPoint(Offset(55, 55));
-      controller.endLine();
+      viewModel.startNewLine(Offset(30, 30));
+      viewModel.addPoint(Offset(40, 40));
+      viewModel.addPoint(Offset(55, 55));
+      viewModel.endLine();
 
-      expect(controller.contents[1].offsets.length, 2);
+      expect(viewModel.contents[1].offsets.length, 2);
     });
 
   });

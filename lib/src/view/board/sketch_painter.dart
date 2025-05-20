@@ -1,30 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:sketch_flow/sketch_model.dart';
-import 'package:sketch_flow/sketch_controller.dart';
+import 'package:sketch_flow/sketch_view_model.dart';
 
 class SketchPainter extends CustomPainter {
-  final SketchController controller;
+  final SketchViewModel viewModel;
 
-  SketchPainter(this.controller);
+  SketchPainter(this.viewModel);
 
   @override
   void paint(Canvas canvas, Size size) {
     canvas.saveLayer(null, Paint());
 
-    for (final content in controller.contents) {
+    for (final content in viewModel.contents) {
       content.draw(canvas);
     }
 
-    final currentContent = controller.createCurrentContent();
+    final currentContent = viewModel.createCurrentContent();
     currentContent?.draw(canvas);
 
-    if (controller.toolTypeNotifier.value == SketchToolType.eraser && controller.eraserCirclePosition != null
-        && controller.currentSketchConfig.showEraserEffect) {
+    if (viewModel.toolTypeNotifier.value == SketchToolType.eraser && viewModel.eraserCirclePosition != null
+        && viewModel.currentSketchConfig.showEraserEffect) {
       final eraserPaint = Paint()
         ..color = Colors.grey
         ..style = PaintingStyle.stroke;
 
-      canvas.drawCircle(controller.eraserCirclePosition!, (controller.currentSketchConfig.eraserRadius), eraserPaint);
+      canvas.drawCircle(viewModel.eraserCirclePosition!, (viewModel.currentSketchConfig.eraserRadius), eraserPaint);
     }
 
     canvas.restore();
@@ -32,7 +32,7 @@ class SketchPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(SketchPainter oldDelegate) {
-    return controller.contents != oldDelegate.controller.contents;
+    return viewModel.contents != oldDelegate.viewModel.contents;
   }
 
 }
