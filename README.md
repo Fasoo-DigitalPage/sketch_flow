@@ -5,7 +5,7 @@ Easily build drawing applications with elegant UI and comprehensive export featu
 
 
 
-## 🚀 Features
+## Features
 
 #### Easy-to-use SketchController  
   - Integrate sketching functionality with just a few lines using `SketchController`. Manage tools, undo/redo, and export effortlessly.
@@ -19,26 +19,30 @@ Easily build drawing applications with elegant UI and comprehensive export featu
 - Comes with ready-made top/bottom bars that offer a **clean, user-friendly design**.
 - Use directly without extra customization for quick prototyping.
 
-## 🖼️ Preview  
+## Preview  
 Test it live!: [Try it](https://junyeong0314.github.io/sketch_flow/)  
 View example code: [main.dart](https://github.com/JunYeong0314/sketch_flow/blob/main/example/lib/main.dart)
 
 <p align="center">
 <img width = "24%" src='https://github.com/user-attachments/assets/d9dcbc12-3d7b-4b3d-a047-34608f89452a' border='0'>
 <img width = "24%" src='https://github.com/user-attachments/assets/9f5f8d92-d02e-4768-ae37-bba670bae995' border='0'>
-<img width = "24%" src='https://github.com/user-attachments/assets/1416e050-d1fe-4a60-a733-5c392ecf2581' border='0'>
+<img width = "24%" src='https://github.com/user-attachments/assets/a97e3f3d-9ac4-4da1-8e7f-d3c7bd937682' border='0'>
 <img width = "24%" src='https://github.com/user-attachments/assets/2eb33ff3-3fa4-4c9a-871a-c81320369860' border='0'>
 </p>
 
-## 📒 Core components at a glance
+## Core components at a glance
 | Components                              | Description                                                        |
 | ---------------------------------- | --------------------------------------------------------- |
 | `SketchController`                 | **(Required)** Key controller that manages drawing status and can be extracted in various formats such as JSON/SVG/PNG |
 | `SketchBoard`                      | **(Required)** Main canvas widget to handle user input (draw/er, etc.)                         |
 | `SketchTopBar` / `SketchBottomBar` | **(Optional)** Preferred UI components                             |
 
+## Architecture
+<p align="center">
+<img width = "70%" src='https://github.com/user-attachments/assets/bd3e5e2f-147b-4965-a65d-fe7daadfcf34' border='0'>
+</p>
 
-## ✍️ How to Use `sketch_flow`
+## How to Use `sketch_flow`
 #### Install the package
 - Add this to your `pubspec.yaml`:
 ```dart
@@ -78,7 +82,7 @@ Scaffold(
 > 💡 Of course, you can freely configure the UI.  
 > If you connect the Sketch Controller properly, you can design the UI any way you want without the top and bottom bars.
 
-## ✨ Export & Import Drawings
+## Export & Import Drawings
 #### JSON (Serialization / Deserialization)
 - You can easily **serialize (export)** your sketch data to JSON and **deserialize (import)** it back using the controller:
 ```dart
@@ -105,7 +109,7 @@ final String svgCode = await _controller.extractSVG(
 );
 ```
 
-## 🔍 Tools Overview
+## Tools Overview
 | Tool Type   | Description                                                                                      |
 | ----------- | ------------------------------------------------------------------------------------------------ |
 | **Move**    | Enables panning and zooming of the canvas without affecting the drawings.                        |

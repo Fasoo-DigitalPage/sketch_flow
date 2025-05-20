@@ -5,7 +5,7 @@
 
 
 
-## 🚀 주요기능
+## 주요기능
 
 #### 간편한 `SketchController`  
   - 단 몇 줄의 코드로 그리기 기능을 앱에 추가 가능
@@ -20,26 +20,30 @@
 - 기본 제공되는 상단/하단 바는 깔끔하고 직관적인 디자인
 - 별도 커스터마이징 없이 바로 사용 가능
 
-## 🖼️ 미리보기  
+## 미리보기  
 웹에서 테스트 해보기: [바로가기](https://junyeong0314.github.io/sketch_flow/)  
 예제 코드 보기: [main.dart](https://github.com/JunYeong0314/sketch_flow/blob/main/example/lib/main.dart)
 
 <p align="center">
 <img width = "24%" src='https://github.com/user-attachments/assets/d9dcbc12-3d7b-4b3d-a047-34608f89452a' border='0'>
 <img width = "24%" src='https://github.com/user-attachments/assets/9f5f8d92-d02e-4768-ae37-bba670bae995' border='0'>
-<img width = "24%" src='https://github.com/user-attachments/assets/1416e050-d1fe-4a60-a733-5c392ecf2581' border='0'>
+<img width = "24%" src='https://github.com/user-attachments/assets/a97e3f3d-9ac4-4da1-8e7f-d3c7bd937682' border='0'>
 <img width = "24%" src='https://github.com/user-attachments/assets/2eb33ff3-3fa4-4c9a-871a-c81320369860' border='0'>
 </p>
 
-## 📒 핵심 구성 요소
+## 핵심 구성 요소
 | Components                              | Description                                                        |
 | ---------------------------------- | --------------------------------------------------------- |
 | `SketchController`                 | **(필수)** 그리기 상태를 관리하는 핵심 컨트롤러. PNG/SVG/JSON으로 데이터 추출 가능 |
 | `SketchBoard`                      | **(필수)** 사용자 입력(드로잉, 지우기 등)을 처리하는 메인 캔버스 위젯                         |
 | `SketchTopBar` / `SketchBottomBar` | **(선택)** 기본 제공되는 상단/하단 도구바 UI 구성요소                             |
 
+## 아키텍처
+<p align="center">
+<img width = "70%" src='https://github.com/user-attachments/assets/bd3e5e2f-147b-4965-a65d-fe7daadfcf34' border='0'>
+</p>
 
-## ✍️ 사용방법
+## 사용방법
 #### 패키지 설치
 - `pubspec.yaml`에 추가:
 ```dart
@@ -79,7 +83,7 @@ Scaffold(
 > 💡 물론 UI를 자유롭게 구성할 수 있습니다.  
 > `SketchController`를 제대로 연결하면 상/하단바 없이 원하는 방식으로 UI를 디자인 할 수 있습니다.
 
-## ✨ 내보내기 & 불러오기
+## 내보내기 & 불러오기
 #### JSON (직렬화 / 역직렬화)
 - `SketchController`를 사용해 그린 데이터를 JSON에 쉽게 직렬화/역직렬화를 할 수 있습니다.:
 ```dart
@@ -106,7 +110,7 @@ final String svgCode = await _controller.extractSVG(
 );
 ```
 
-## 🔍 도구 개요
+## 도구 개요
 | 도구 유형   | 설명                                                                                      |
 | ----------- | ------------------------------------------------------------------------------------------------ |
 | **Move**    | 도면에 영향을 주지 않고 확대/축소 및 스크롤 할 수 있습니다.                        |
