@@ -43,7 +43,7 @@
 <img width = "70%" src='https://github.com/user-attachments/assets/bd3e5e2f-147b-4965-a65d-fe7daadfcf34' border='0'>
 </p>
 
-## ✍사용방법
+## 사용방법
 #### 패키지 설치
 - `pubspec.yaml`에 추가:
 ```dart
