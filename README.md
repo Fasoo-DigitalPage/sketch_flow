@@ -20,8 +20,8 @@ Easily build drawing applications with elegant UI and comprehensive export featu
 - Use directly without extra customization for quick prototyping.
 
 ## Preview  
-Test it live!: [Try it](https://junyeong0314.github.io/sketch_flow/)  
-View example code: [main.dart](https://github.com/JunYeong0314/sketch_flow/blob/main/example/lib/main.dart)
+Test it live!: [Try it](https://fasoo-digitalpage.github.io/sketch_flow/)  
+View example code: [main.dart](https://github.com/fasoo-digitalpage/sketch_flow/blob/main/example/lib/main.dart)
 
 <p align="center">
 <img width = "24%" src='https://github.com/user-attachments/assets/d9dcbc12-3d7b-4b3d-a047-34608f89452a' border='0'>
