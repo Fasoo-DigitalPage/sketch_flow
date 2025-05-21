@@ -25,6 +25,13 @@ class SketchDataConverter {
               .whereType<Offset>()
               .toList();
 
+      final toolType = switch(type) {
+        'pencil' => SketchToolType.pencil,
+        'brush' => SketchToolType.brush,
+        'eraser' => SketchToolType.eraser,
+        _ => SketchToolType.pencil
+      };
+
       final pencilConfig = SketchToolConfig(
         opacity: content['pencilOpacity'] ?? 1.0,
         color: Color(content['pencilColor'] ?? 0xFF000000),
@@ -38,6 +45,7 @@ class SketchDataConverter {
       );
 
       final sketchConfig = SketchConfig(
+        toolType: toolType,
         pencilConfig: pencilConfig,
         brushConfig: brushConfig,
         eraserRadius: content['eraserRadius'] ?? 1.0,
