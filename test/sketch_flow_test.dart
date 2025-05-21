@@ -149,6 +149,5 @@ void main() {
 
       expect(viewModel.contents[1].offsets.length, 2);
     });
-
   });
 }

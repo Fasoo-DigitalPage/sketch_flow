@@ -32,12 +32,8 @@ class SketchSvgExporter {
           final p = content.offsets[i];
           pathData.write('L ${p.dx} ${p.dy} ');
         }
-
-        final SketchToolConfig effectiveConfig = switch(content.sketchConfig.toolType) {
-          SketchToolType.pencil => content.sketchConfig.pencilConfig,
-          SketchToolType.brush => content.sketchConfig.brushConfig,
-          _ => content.sketchConfig.pencilConfig,
-        };
+        
+        final effectiveConfig = content.sketchConfig.effectiveConfig;
 
         final color = '#${effectiveConfig.color.toARGB32().toRadixString(16).padLeft(8, '0').substring(2)}';
         final opacity = effectiveConfig.opacity;

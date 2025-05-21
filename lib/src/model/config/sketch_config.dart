@@ -105,8 +105,10 @@ class SketchConfig {
         return brushConfig;
       case SketchToolType.highlighter:
         return highlighterConfig;
-      default:
-        return pencilConfig;
+      case SketchToolType.move:
+      case SketchToolType.palette:
+      case SketchToolType.eraser:
+        return SketchToolConfig();
     }
   }
 
