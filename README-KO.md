@@ -21,8 +21,8 @@
 - 별도 커스터마이징 없이 바로 사용 가능
 
 ## 미리보기  
-웹에서 테스트 해보기: [바로가기](https://junyeong0314.github.io/sketch_flow/)  
-예제 코드 보기: [main.dart](https://github.com/JunYeong0314/sketch_flow/blob/main/example/lib/main.dart)
+웹에서 테스트 해보기: [바로가기](https://fasoo-digitalpage.github.io/sketch_flow/)  
+예제 코드 보기: [main.dart](https://github.com/fasoo-digitalpage/sketch_flow/blob/main/example/lib/main.dart)
 
 <p align="center">
 <img width = "24%" src='https://github.com/user-attachments/assets/d9dcbc12-3d7b-4b3d-a047-34608f89452a' border='0'>
