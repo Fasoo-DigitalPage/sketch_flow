@@ -10,7 +10,9 @@ import 'package:sketch_flow/src/model/config/sketch_tool_config.dart';
 /// [palette] Color palette for selecting drawing colors
 ///
 /// [move] Screen move tool
-enum SketchToolType { pencil, eraser, palette, move, brush }
+///
+/// [highlighter] Highlighter tool
+enum SketchToolType { pencil, eraser, palette, move, brush, highlighter }
 
 enum EraserMode { area, stroke }
 
@@ -28,9 +30,11 @@ class SketchConfig {
   ///
   /// [colorList] List of color
   ///
-  /// [pencil] The tool config of pencil (see [SketchToolConfig])
+  /// [pencilConfig] The tool config of pencil (see [SketchToolConfig])
   ///
-  /// [brush] The tool config of brush (see [SketchToolConfig])
+  /// [brushConfig] The tool config of brush (see [SketchToolConfig])
+  ///
+  /// [highlighterConfig] The tool config of highlighter (see [SketchToolConfig])
   ///
   /// [eraserRadius] The radius of the eraser
   ///
@@ -54,7 +58,18 @@ class SketchConfig {
       Colors.green,
     ],
     this.pencilConfig = const SketchToolConfig(),
-    this.brushConfig = const SketchToolConfig(strokeThickness: 10.0, strokeThicknessList: [10.0, 15.0, 20.0, 25.0, 30.0]),
+    this.brushConfig = const SketchToolConfig(
+        strokeThickness: 5.0,
+        strokeThicknessList: [5.0, 7.5, 10.0, 12.5, 15.0],
+    ),
+    this.highlighterConfig = const SketchToolConfig(
+      color: Colors.deepPurpleAccent,
+      strokeThickness: 8.0,
+      strokeThicknessList: [8.0, 11.5, 15.5, 19.0, 22.5],
+      opacity: 0.6,
+      opacityMin: 0.0,
+      opacityMax: 0.8
+    ),
     this.eraserRadius = 10,
     this.eraserRadiusMax = 100,
     this.eraserRadiusMin = 10,
@@ -72,6 +87,7 @@ class SketchConfig {
 
   final SketchToolConfig pencilConfig;
   final SketchToolConfig brushConfig;
+  final SketchToolConfig highlighterConfig;
 
   final double eraserRadius;
   final double eraserRadiusMax;
@@ -87,6 +103,8 @@ class SketchConfig {
         return pencilConfig;
       case SketchToolType.brush:
         return brushConfig;
+      case SketchToolType.highlighter:
+        return highlighterConfig;
       default:
         return pencilConfig;
     }
@@ -112,6 +130,7 @@ class SketchConfig {
     double? lastUsedOpacity,
     SketchToolConfig? pencilConfig,
     SketchToolConfig? brushConfig,
+    SketchToolConfig? highlighterConfig,
     List<Color>? colorList,
     double? eraserRadius,
     double? eraserRadiusMax,
@@ -124,9 +143,9 @@ class SketchConfig {
     // Automatically applies latest common options to the selected tool's config.
     SketchToolConfig updatedToolConfig(SketchToolConfig current) {
       return current.copyWith(
-        color: lastUsedColor,
-        strokeThickness: lastUsedStrokeThickness,
-        opacity: lastUsedOpacity,
+        color: lastUsedColor ?? current.color,
+        strokeThickness: lastUsedStrokeThickness ?? current.strokeThickness,
+        opacity: lastUsedOpacity ?? current.opacity,
       );
     }
 
@@ -143,6 +162,10 @@ class SketchConfig {
           newToolType == SketchToolType.brush
               ? updatedToolConfig(brushConfig ?? this.brushConfig)
               : brushConfig ?? this.brushConfig,
+      highlighterConfig:
+          newToolType == SketchToolType.highlighter
+              ? updatedToolConfig(highlighterConfig ?? this.highlighterConfig)
+              : highlighterConfig ?? this.highlighterConfig,
       colorList: colorList ?? this.colorList,
       eraserRadius: eraserRadius ?? this.eraserRadius,
       eraserRadiusMax: eraserRadiusMax ?? this.eraserRadiusMax,

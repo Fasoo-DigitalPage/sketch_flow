@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:sketch_flow/sketch_model.dart';
 import 'package:sketch_flow/src/model/config/sketch_tool_config.dart';
+import 'package:sketch_flow/src/model/content/highlighter.dart';
 
 class SketchDataConverter {
   static List<Map<String, dynamic>> toJson(List<SketchContent> contents) {
@@ -29,6 +30,7 @@ class SketchDataConverter {
         'pencil' => SketchToolType.pencil,
         'brush' => SketchToolType.brush,
         'eraser' => SketchToolType.eraser,
+        'highlighter' => SketchToolType.highlighter,
         _ => SketchToolType.pencil
       };
 
@@ -44,10 +46,17 @@ class SketchDataConverter {
         strokeThickness: content['brushStrokeThickness'] ?? 1.0,
       );
 
+      final highlighterConfig = SketchToolConfig(
+        opacity: content['highlighterOpacity'] ?? 1.0,
+        color: Color(content['highlighterColor'] ?? 0xFF000000),
+        strokeThickness: content['highlighterStrokeThickness'] ?? 1.0,
+      );
+
       final sketchConfig = SketchConfig(
         toolType: toolType,
         pencilConfig: pencilConfig,
         brushConfig: brushConfig,
+        highlighterConfig: highlighterConfig,
         eraserRadius: content['eraserRadius'] ?? 1.0,
       );
 
@@ -61,6 +70,8 @@ class SketchDataConverter {
         case 'eraser':
           result.add(Eraser(offsets: offsets, sketchConfig: sketchConfig));
           break;
+        case 'highlighter':
+          result.add(Highlighter(offsets: offsets, sketchConfig: sketchConfig));
       }
     }
 

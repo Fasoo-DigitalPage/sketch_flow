@@ -16,11 +16,13 @@ class SketchBottomBar extends StatefulWidget {
   ///
   /// [bottomBarColor] The background color of the bottom bar.
   ///
-  /// [moveIcon] Move icon (see SketchToolIcon)
+  /// [moveIcon] Move icon (see [SketchToolIcon])
   ///
-  /// [pencilIcon] Pencil icon (see SketchToolIcon)
+  /// [pencilIcon] Pencil icon (see [SketchToolIcon])
   ///
-  /// [brushIcon] Brush Icon (see SketchToolIcon)
+  /// [brushIcon] Brush Icon (see [SketchToolIcon])
+  /// 
+  /// [highlighterIcon] Highlighter Icon (see [SketchToolIcon])
   ///
   /// [eraserIcon] Eraser Icon (see SketchToolIcon)
   ///
@@ -50,6 +52,7 @@ class SketchBottomBar extends StatefulWidget {
     this.pencilIcon,
     this.eraserIcon,
     this.brushIcon,
+    this.highlighterIcon,
     this.clearIcon,
     this.paletteIcon,
     this.eraserRadioButtonColor = Colors.black,
@@ -70,6 +73,7 @@ class SketchBottomBar extends StatefulWidget {
   final SketchToolIcon? moveIcon;
   final SketchToolIcon? pencilIcon;
   final SketchToolIcon? brushIcon;
+  final SketchToolIcon? highlighterIcon;
   final SketchToolIcon? eraserIcon;
   final Widget? paletteIcon;
   final Widget? clearIcon;
@@ -178,6 +182,7 @@ class _SketchBottomBarState extends State<SketchBottomBar>
     final applyWidget = switch (toolType) {
       SketchToolType.pencil => _drawingConfigWidget(),
       SketchToolType.brush => _drawingConfigWidget(),
+      SketchToolType.highlighter => _drawingConfigWidget(),
       SketchToolType.eraser => _eraserConfigWidget(),
       SketchToolType.palette => _paletteConfigWidget(colorList: colorList),
       SketchToolType.move => SizedBox.shrink(),
@@ -359,7 +364,26 @@ class _SketchBottomBarState extends State<SketchBottomBar>
                   selectedToolType: _selectedToolType,
                   onClickToolButton: () => _onToolTap(toolType: SketchToolType.brush),
                 ),
-
+                
+                /// highlighter tool
+                _toolButtonWidget(
+                    toolType: SketchToolType.highlighter,
+                    icon: SketchToolIcon(
+                        enableIcon: widget.highlighterIcon?.enableIcon ??
+                            Icon(
+                                Icons.colorize_rounded,
+                                color: _viewModel.currentSketchConfig.highlighterConfig.color,
+                            ),
+                        disableIcon: widget.highlighterIcon?.disableIcon ??
+                            Icon(
+                              Icons.colorize_outlined,
+                              color: _viewModel.currentSketchConfig.highlighterConfig.color,
+                            )
+                    ),
+                    selectedToolType: _selectedToolType,
+                    onClickToolButton: () => _onToolTap(toolType: SketchToolType.highlighter),
+                ),
+                
                 /// Eraser tool
                 _toolButtonWidget(
                   toolType: SketchToolType.eraser,
@@ -396,9 +420,9 @@ class _SketchBottomBarState extends State<SketchBottomBar>
 
   Widget _toolButtonWidget({
     required SketchToolType toolType,
+    required SketchToolIcon icon,
     required SketchToolType selectedToolType,
     required Function() onClickToolButton,
-    required SketchToolIcon icon,
   }) {
     final bool isActive = toolType == selectedToolType;
     final double targetSize = isActive ? icon.size * 1.5 : icon.size;
@@ -513,8 +537,6 @@ class _SketchBottomBarState extends State<SketchBottomBar>
 
   /// Builds the color palette selection widget.
   Widget _paletteConfigWidget({required List<Color> colorList}) {
-    final effectiveConfig = _viewModel.currentSketchConfig.effectiveConfig;
-
     return Center(
       child: Column(
         children: [

@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:sketch_flow/sketch_model.dart';
+import 'package:sketch_flow/src/model/content/highlighter.dart';
 
 class SketchViewModel extends ChangeNotifier {
   /// A viewModel that manages the user's sketching state on the canvas.
@@ -54,6 +55,11 @@ class SketchViewModel extends ChangeNotifier {
         );
       case SketchToolType.brush:
         return Brush(
+            offsets: List.from(_currentOffsets),
+            sketchConfig: _sketchConfig
+        );
+      case SketchToolType.highlighter:
+        return Highlighter(
             offsets: List.from(_currentOffsets),
             sketchConfig: _sketchConfig
         );
