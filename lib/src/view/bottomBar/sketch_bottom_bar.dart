@@ -4,6 +4,9 @@ import 'package:sketch_flow/sketch_view.dart';
 import 'package:sketch_flow/sketch_model.dart';
 import 'package:sketch_flow/src/widgets/color_picker_slider_shape.dart';
 
+/// Number of ColorPicker representation colors
+const int _colorStepsCounts = 1792;
+
 class SketchBottomBar extends StatefulWidget {
   /// A bottom bar that provides tools for handwriting or sketching.
   ///
@@ -102,15 +105,8 @@ class _SketchBottomBarState extends State<SketchBottomBar>
   /// The currently selected eraser mode (stroke or area).
   EraserMode _selectedEraserType = EraserMode.area;
 
-  late double _eraserRadius =
-      widget.viewModel.currentSketchConfig.eraserRadius;
-  late double _penOpacity = widget.viewModel.currentSketchConfig.opacity;
-
   /// ColorPicker color value list
   late List<Color> _rgbGradientColors;
-
-  /// Number of ColorPicker representation colors
-  final int _colorStepsCounts = 1792;
 
   late int _selectedColorIndex;
 
@@ -135,7 +131,7 @@ class _SketchBottomBarState extends State<SketchBottomBar>
     if (widget.showColorPickerSliderBar) {
       _generateRGBGradientColors(colorStepCounts: _colorStepsCounts);
 
-      _selectedColorIndex = _findClosestColorIndex(target: _viewModel.currentSketchConfig.color);
+      _selectedColorIndex = _findClosestColorIndex(target: _viewModel.currentSketchConfig.lastUsedColor);
     }
   }
 
@@ -148,18 +144,24 @@ class _SketchBottomBarState extends State<SketchBottomBar>
   /// Handles tool selection.
   /// Call _showToolConfig if the tabs currently pressed are the same
   void _onToolTap({required SketchToolType toolType}) {
+    final updateConfig = _viewModel.currentSketchConfig.copyWith(toolType: toolType);
+
     if (toolType == _selectedToolType || toolType == SketchToolType.palette) {
       _showToolConfig(toolType: toolType);
       _viewModel.disableDrawing();
     }
 
     if (toolType != SketchToolType.palette) {
+      if (toolType != _viewModel.currentSketchConfig.toolType) {
+        setState(() {
+          _selectedColorIndex = _findClosestColorIndex(target: updateConfig.effectiveConfig.color);
+        });
+      }
+
       setState(() {
         _selectedToolType = toolType;
       });
-      _viewModel.updateConfig(
-        _viewModel.currentSketchConfig.copyWith(toolType: toolType),
-      );
+      _viewModel.updateConfig(updateConfig);
     }
   }
 
@@ -171,17 +173,11 @@ class _SketchBottomBarState extends State<SketchBottomBar>
     _toolConfigOverlay?.remove();
     _toolConfigOverlay = null;
 
-    final strokeThicknessList =
-        _viewModel.currentSketchConfig.strokeThicknessList;
     final colorList = _viewModel.currentSketchConfig.colorList;
 
     final applyWidget = switch (toolType) {
-      SketchToolType.pencil => _drawingConfigWidget(
-        strokeThicknessList: strokeThicknessList,
-      ),
-      SketchToolType.brush => _drawingConfigWidget(
-        strokeThicknessList: strokeThicknessList,
-      ),
+      SketchToolType.pencil => _drawingConfigWidget(),
+      SketchToolType.brush => _drawingConfigWidget(),
       SketchToolType.eraser => _eraserConfigWidget(),
       SketchToolType.palette => _paletteConfigWidget(colorList: colorList),
       SketchToolType.move => SizedBox.shrink(),
@@ -252,7 +248,7 @@ class _SketchBottomBarState extends State<SketchBottomBar>
     _fadeAnimationController.reverse().then((_) async {
       _viewModel.updateConfig(
         _viewModel.currentSketchConfig.copyWith(
-          strokeThickness: strokeThickness,
+          lastUsedStrokeThickness: strokeThickness,
         ),
       );
       _viewModel.enableDrawing();
@@ -271,14 +267,14 @@ class _SketchBottomBarState extends State<SketchBottomBar>
   void _onColorSelected({required Color color}) {
     _fadeAnimationController.reverse().then((_) async {
       _viewModel.updateConfig(
-        _viewModel.currentSketchConfig.copyWith(color: color),
+        _viewModel.currentSketchConfig.copyWith(lastUsedColor: color),
       );
       _viewModel.enableDrawing();
 
       // Update ColorPicker thumbBar value
       if (widget.showColorPickerSliderBar) {
         setState(() {
-          _selectedColorIndex = _findClosestColorIndex(target: _viewModel.currentSketchConfig.color);
+          _selectedColorIndex = _findClosestColorIndex(target: color);
         });
       }
 
@@ -329,8 +325,16 @@ class _SketchBottomBarState extends State<SketchBottomBar>
                 _toolButtonWidget(
                   toolType: SketchToolType.pencil,
                   icon: SketchToolIcon(
-                      enableIcon: widget.pencilIcon?.enableIcon ?? Icon(Icons.mode_edit_outline),
-                      disableIcon: widget.pencilIcon?.disableIcon ?? Icon(Icons.mode_edit_outline_outlined)
+                      enableIcon: widget.pencilIcon?.enableIcon ??
+                          Icon(
+                              Icons.mode_edit_outline,
+                              color: _viewModel.currentSketchConfig.pencilConfig.color
+                          ),
+                      disableIcon: widget.pencilIcon?.disableIcon ??
+                          Icon(
+                              Icons.mode_edit_outline_outlined,
+                              color: _viewModel.currentSketchConfig.pencilConfig.color
+                          )
                   ),
                   selectedToolType: _selectedToolType,
                   onClickToolButton:
@@ -341,8 +345,16 @@ class _SketchBottomBarState extends State<SketchBottomBar>
                 _toolButtonWidget(
                   toolType: SketchToolType.brush,
                   icon: SketchToolIcon(
-                    enableIcon: widget.brushIcon?.enableIcon ?? Icon(Icons.brush_rounded),
-                    disableIcon: widget.brushIcon?.disableIcon ?? Icon(Icons.brush_outlined),
+                    enableIcon: widget.brushIcon?.enableIcon ??
+                        Icon(
+                            Icons.brush_rounded,
+                            color: _viewModel.currentSketchConfig.brushConfig.color,
+                        ),
+                    disableIcon: widget.brushIcon?.disableIcon ??
+                        Icon(
+                            Icons.brush_outlined,
+                            color: _viewModel.currentSketchConfig.brushConfig.color,
+                        ),
                   ),
                   selectedToolType: _selectedToolType,
                   onClickToolButton: () => _onToolTap(toolType: SketchToolType.brush),
@@ -422,32 +434,35 @@ class _SketchBottomBarState extends State<SketchBottomBar>
   }
 
   /// Build the stroke thickness selection widget for drawing tools.
-  Widget _drawingConfigWidget({required List<double> strokeThicknessList}) {
+  Widget _drawingConfigWidget() {
+    final effectiveConfig = _viewModel.currentSketchConfig.effectiveConfig;
+
     return Column(
       children: [
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: List.generate(strokeThicknessList.length, (index) {
+            children: List.generate(effectiveConfig.strokeThicknessList.length, (index) {
               return BaseThickness(
                 radius: 17.5,
-                thickness: strokeThicknessList[index],
-                isSelected:
-                    _viewModel.currentSketchConfig.strokeThickness ==
-                    strokeThicknessList[index],
-                color: _viewModel.currentSketchConfig.color,
+                index: index,
+                isSelected: effectiveConfig.strokeThickness == effectiveConfig.strokeThicknessList[index],
+                color: effectiveConfig.color,
                 onClickThickness:
                     () => _onThicknessSelected(
-                      strokeThickness: strokeThicknessList[index],
+                      strokeThickness: effectiveConfig.strokeThicknessList[index],
                     ),
               );
             }),
           ),
         ),
         SizedBox(height: 4.0),
-        StatefulBuilder(
-          builder: (context, setModalState) {
+        AnimatedBuilder(
+          animation: _viewModel,
+          builder: (context, _) {
+            final effectiveConfig = _viewModel.currentSketchConfig.effectiveConfig;
+
             return Material(
               color: widget.overlayBackgroundColor,
               child: SizedBox(
@@ -463,40 +478,28 @@ class _SketchBottomBarState extends State<SketchBottomBar>
                           trackHeight: 8.0,
                           gradient: LinearGradient(
                             colors: [
-                              _viewModel.currentSketchConfig.color.withValues(
-                                alpha: 0.0,
-                              ),
-                              _viewModel.currentSketchConfig.color.withValues(
-                                alpha: 1.0,
-                              ),
+                              effectiveConfig.color.withValues(alpha: 0.0,),
+                              effectiveConfig.color.withValues(alpha: 1.0,),
                             ],
                           ),
                         ),
-                        inactiveTickMarkColor:
-                            _viewModel.currentSketchConfig.color,
-                        thumbColor: _viewModel.currentSketchConfig.color,
-                        overlayColor: _viewModel.currentSketchConfig.color
-                            .withValues(alpha: 0.05),
+                        inactiveTickMarkColor: effectiveConfig.color,
+                        thumbColor: effectiveConfig.color,
+                        overlayColor: effectiveConfig.color.withValues(alpha: 0.05),
                         thumbShape: RoundSliderThumbShape(
                           enabledThumbRadius: 10,
                         ),
                       ),
                   child: Slider(
-                    value: _penOpacity,
+                    value: effectiveConfig.opacity,
                     min: 0.0,
                     max: 1.0,
                     onChanged: (opacity) {
                       _viewModel.updateConfig(
                         _viewModel.currentSketchConfig.copyWith(
-                          opacity: opacity,
+                          lastUsedOpacity: opacity,
                         ),
                       );
-                      setState(() {
-                        _penOpacity = opacity;
-                      });
-
-                      // Call to show UI immediately reflect slider value in overlay inner widget.
-                      setModalState(() {});
                     },
                   ),
                 ),
@@ -510,6 +513,8 @@ class _SketchBottomBarState extends State<SketchBottomBar>
 
   /// Builds the color palette selection widget.
   Widget _paletteConfigWidget({required List<Color> colorList}) {
+    final effectiveConfig = _viewModel.currentSketchConfig.effectiveConfig;
+
     return Center(
       child: Column(
         children: [
@@ -527,7 +532,9 @@ class _SketchBottomBarState extends State<SketchBottomBar>
             ),
           ),
           if (widget.showColorPickerSliderBar)
-            StatefulBuilder(builder: (context, setModalState) {
+            AnimatedBuilder(animation: _viewModel, builder: (context, _) {
+              final effectiveConfig = _viewModel.currentSketchConfig.effectiveConfig;
+
               return Material(
                 color: widget.overlayBackgroundColor,
                 child: SizedBox(
@@ -542,10 +549,9 @@ class _SketchBottomBarState extends State<SketchBottomBar>
                           colorStepCount: _colorStepsCounts,
                           colors: _rgbGradientColors
                       ),
-                      inactiveTickMarkColor: _viewModel.currentSketchConfig.color,
-                      thumbColor: _viewModel.currentSketchConfig.color,
-                      overlayColor: _viewModel.currentSketchConfig.color
-                          .withValues(alpha: 0.05),
+                      inactiveTickMarkColor: effectiveConfig.color,
+                      thumbColor: effectiveConfig.color,
+                      overlayColor: effectiveConfig.color.withValues(alpha: 0.05),
                       thumbShape: RoundSliderThumbShape(
                         enabledThumbRadius: 10,
                       ),
@@ -558,11 +564,9 @@ class _SketchBottomBarState extends State<SketchBottomBar>
                         setState(() {
                           _selectedColorIndex = value.round();
                           _viewModel.updateConfig(
-                              _viewModel.currentSketchConfig.copyWith(color: _rgbGradientColors[_selectedColorIndex])
+                              _viewModel.currentSketchConfig.copyWith(lastUsedColor: _rgbGradientColors[_selectedColorIndex])
                           );
                         });
-
-                        setModalState(() {});
                       },
                     ),
                   ),
@@ -577,9 +581,11 @@ class _SketchBottomBarState extends State<SketchBottomBar>
   /// Build the eraser configuration widget.
   /// Allows users to choose between area erasing and stroke erasing.
   Widget _eraserConfigWidget({Text? areaEraserText, Text? strokeEraserText}) {
-    return StatefulBuilder(
-      builder: (context, setModalState) {
+    return AnimatedBuilder(
+      animation: _viewModel,
+      builder: (context, _) {
         final config = _viewModel.currentSketchConfig;
+
         return Material(
           color: widget.overlayBackgroundColor,
           child: Column(
@@ -596,13 +602,8 @@ class _SketchBottomBarState extends State<SketchBottomBar>
                     _selectedEraserType = value!;
                   });
                   _viewModel.updateConfig(
-                    _viewModel.currentSketchConfig.copyWith(eraserMode: value),
+                    _viewModel.currentSketchConfig.copyWith(eraserMode: EraserMode.area),
                   );
-
-                  // Used to induce rebuild in the Stateful Builder inside the overlay.
-                  // Invoking only the outer setState does not update the overlay widget itself
-                  // The setModalState must also be invoked to immediately reflect changes in the internal widget.
-                  setModalState(() {});
                 },
               ),
               RadioListTile<EraserMode>(
@@ -619,16 +620,13 @@ class _SketchBottomBarState extends State<SketchBottomBar>
                   _viewModel.updateConfig(
                     _viewModel.currentSketchConfig.copyWith(eraserMode: value),
                   );
-
-                  // Call to show UI immediately reflect radio button value in overlay inner widget.
-                  setModalState(() {});
                 },
               ),
               SizedBox(height: 12),
               Column(
                 children: [
                   Text(
-                    "${(_eraserRadius % 1 >= 0.75) ? _eraserRadius.ceil() : _eraserRadius.floor()}",
+                    "${(config.eraserRadius % 1 >= 0.75) ? config.eraserRadius.ceil() : config.eraserRadius.floor()}",
                     style:
                         widget.eraserThicknessTextStyle ??
                         TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
@@ -653,7 +651,7 @@ class _SketchBottomBarState extends State<SketchBottomBar>
                           ),
                         ),
                     child: Slider(
-                      value: _eraserRadius,
+                      value: config.eraserRadius,
                       min: config.eraserRadiusMin,
                       max: config.eraserRadiusMax,
                       divisions: 9,
@@ -663,12 +661,6 @@ class _SketchBottomBarState extends State<SketchBottomBar>
                             eraserRadius: eraserRadius,
                           ),
                         );
-                        setState(() {
-                          _eraserRadius = eraserRadius;
-                        });
-
-                        // Call to show UI immediately reflect slider value in overlay inner widget.
-                        setModalState(() {});
                       },
                     ),
                   ),

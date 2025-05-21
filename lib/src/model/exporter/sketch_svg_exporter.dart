@@ -1,4 +1,5 @@
 import 'package:sketch_flow/sketch_model.dart';
+import 'package:sketch_flow/src/model/config/sketch_tool_config.dart';
 
 class SketchSvgExporter {
   static String extractSVG({
@@ -32,9 +33,15 @@ class SketchSvgExporter {
           pathData.write('L ${p.dx} ${p.dy} ');
         }
 
-        final color = '#${content.sketchConfig.color.toARGB32().toRadixString(16).padLeft(8, '0').substring(2)}';
-        final opacity = content.sketchConfig.opacity;
-        final strokeWidth = content.sketchConfig.strokeThickness;
+        final SketchToolConfig effectiveConfig = switch(content.sketchConfig.toolType) {
+          SketchToolType.pencil => content.sketchConfig.pencilConfig,
+          SketchToolType.brush => content.sketchConfig.brushConfig,
+          _ => content.sketchConfig.pencilConfig,
+        };
+
+        final color = '#${effectiveConfig.color.toARGB32().toRadixString(16).padLeft(8, '0').substring(2)}';
+        final opacity = effectiveConfig.opacity;
+        final strokeWidth = effectiveConfig.strokeThickness;
 
         pathBuffer.writeln(
           '<path d="$pathData" stroke="$color" stroke-width="$strokeWidth" '

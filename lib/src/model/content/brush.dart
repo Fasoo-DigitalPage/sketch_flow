@@ -16,8 +16,8 @@ class Brush extends SketchContent {
       final distance = (p2 - p1).distance;
       final speed = distance;
 
-      double minThickness = sketchConfig.strokeThickness * 0.45;
-      double maxThickness = sketchConfig.strokeThickness;
+      double minThickness = sketchConfig.brushConfig.strokeThickness * 0.45;
+      double maxThickness = sketchConfig.brushConfig.strokeThickness;
 
       // If draw it quickly, it becomes thinner
       double thickness = maxThickness - (speed * 0.5);
@@ -26,7 +26,7 @@ class Brush extends SketchContent {
       thickness = thickness.clamp(minThickness, maxThickness);
 
       final paint = Paint()
-        ..color = sketchConfig.color.withValues(alpha: sketchConfig.opacity)
+        ..color = sketchConfig.brushConfig.color.withValues(alpha: sketchConfig.brushConfig.opacity)
         ..strokeWidth = thickness
         ..style = PaintingStyle.stroke
         ..strokeCap = StrokeCap.round;
@@ -40,8 +40,9 @@ class Brush extends SketchContent {
     return {
       'type': 'brush',
       'offsets': offsets.map((e) => {'dx': e.dx, 'dy': e.dy}).toList(),
-      'color': sketchConfig.color.toARGB32(),
-      'strokeThickness': sketchConfig.strokeThickness
+      'brushColor': sketchConfig.brushConfig.color.toARGB32(),
+      'brushStrokeThickness': sketchConfig.brushConfig.strokeThickness,
+      'brushOpacity': sketchConfig.brushConfig.opacity,
     };
   }
 

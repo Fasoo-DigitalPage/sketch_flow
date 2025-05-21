@@ -8,4 +8,4 @@ export 'src/model/content/eraser.dart';
 export 'src/model/exporter/sketch_png_exporter.dart';
 export 'src/model/exporter/sketch_svg_exporter.dart';
 
-export 'src/model/sketch_config.dart';
+export 'src/model/config/sketch_config.dart';

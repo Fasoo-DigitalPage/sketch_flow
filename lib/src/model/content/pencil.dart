@@ -14,8 +14,8 @@ class Pencil extends SketchContent {
     }
 
     final paint = Paint()
-      ..color = sketchConfig.color.withValues(alpha: sketchConfig.opacity)
-      ..strokeWidth = sketchConfig.strokeThickness
+      ..color = sketchConfig.pencilConfig.color.withValues(alpha: sketchConfig.pencilConfig.opacity)
+      ..strokeWidth = sketchConfig.pencilConfig.strokeThickness
       ..style = PaintingStyle.stroke;
 
     canvas.drawPath(path, paint);
@@ -26,8 +26,9 @@ class Pencil extends SketchContent {
     return {
       'type': 'pencil',
       'offsets': offsets.map((e) => {'dx': e.dx, 'dy': e.dy}).toList(),
-      'color': sketchConfig.color.toARGB32(),
-      'strokeThickness': sketchConfig.strokeThickness,
+      'pencilColor': sketchConfig.pencilConfig.color.toARGB32(),
+      'pencilStrokeThickness': sketchConfig.pencilConfig.strokeThickness,
+      'pencilOpacity': sketchConfig.pencilConfig.opacity,
     };
   }
 }

@@ -4,14 +4,14 @@ class BaseThickness extends StatelessWidget {
   const BaseThickness({
     super.key,
     required this.radius,
-    required this.thickness,
+    required this.index,
     required this.isSelected,
     required this.color,
     required this.onClickThickness
   });
 
   final double radius;
-  final double thickness;
+  final int index;
   final bool isSelected;
   final Color color;
   final Function() onClickThickness;
@@ -25,7 +25,7 @@ class BaseThickness extends StatelessWidget {
           child: CustomPaint(
             painter: BaseThicknessPainter(
                 radius: radius,
-                thickness: thickness,
+                index: index,
                 isSelected: isSelected,
                 color: color
             ),
@@ -38,12 +38,12 @@ class BaseThickness extends StatelessWidget {
 }
 
 class BaseThicknessPainter extends CustomPainter {
-  BaseThicknessPainter({required this.thickness, required this.radius, required this.isSelected, required this.color});
+  BaseThicknessPainter({required this.index, required this.radius, required this.isSelected, required this.color});
 
   final double radius;
-  final double thickness;
   final bool isSelected;
   final Color color;
+  final int index;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -60,7 +60,7 @@ class BaseThicknessPainter extends CustomPainter {
 
     final thicknessPaint = Paint()
       ..color = isSelected ? Colors.white : color
-      ..strokeWidth = thickness
+      ..strokeWidth = index * 1.5
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
 
