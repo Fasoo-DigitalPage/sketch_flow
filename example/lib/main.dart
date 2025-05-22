@@ -41,6 +41,10 @@ class _DemoPageState extends State<DemoPage> {
       appBar: SketchTopBar(
         viewModel: _sketchViewModel,
         showJsonDialogIcon: true,
+        exportSVGIcon: Image.asset('assets/images/svg.png'),
+        exportPNGIcon: Image.asset('assets/images/png.png'),
+        exportJSONIcon: Image.asset('assets/images/json.png'),
+        exportTestDataIcon: Image.asset('assets/images/import.png'),
         onClickToJsonButton: () {
           final json = _sketchViewModel.toJson();
           _showJsonDialog(json: json);

@@ -35,21 +35,21 @@ class SketchDataConverter {
       };
 
       final pencilConfig = SketchToolConfig(
-        opacity: content['pencilOpacity'] ?? 1.0,
+        opacity: content['pencilOpacity']?.toDouble() ?? 1.0,
         color: Color(content['pencilColor'] ?? 0xFF000000),
-        strokeThickness: content['pencilStrokeThickness'] ?? 1.0,
+        strokeThickness: content['pencilStrokeThickness']?.toDouble() ?? 1.0,
       );
 
       final brushConfig = SketchToolConfig(
-        opacity: content['brushOpacity'] ?? 1.0,
+        opacity: content['brushOpacity']?.toDouble() ?? 1.0,
         color: Color(content['brushColor'] ?? 0xFF000000),
-        strokeThickness: content['brushStrokeThickness'] ?? 1.0,
+        strokeThickness: content['brushStrokeThickness']?.toDouble() ?? 1.0,
       );
 
       final highlighterConfig = SketchToolConfig(
-        opacity: content['highlighterOpacity'] ?? 1.0,
+        opacity: content['highlighterOpacity']?.toDouble() ?? 1.0,
         color: Color(content['highlighterColor'] ?? 0xFF000000),
-        strokeThickness: content['highlighterStrokeThickness'] ?? 1.0,
+        strokeThickness: content['highlighterStrokeThickness']?.toDouble() ?? 1.0,
       );
 
       final sketchConfig = SketchConfig(
@@ -57,7 +57,7 @@ class SketchDataConverter {
         pencilConfig: pencilConfig,
         brushConfig: brushConfig,
         highlighterConfig: highlighterConfig,
-        eraserRadius: content['eraserRadius'] ?? 1.0,
+        eraserRadius: content['eraserRadius']?.toDouble() ?? 1.0,
       );
 
       switch (type) {

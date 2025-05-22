@@ -1,7 +1,17 @@
 import 'package:sketch_flow/sketch_model.dart';
-import 'package:sketch_flow/src/model/config/sketch_tool_config.dart';
 
 class SketchSvgExporter {
+  /// [extractSVG] generates an SVG string based on the given list of [SketchContent].
+  ///
+  /// **Note**:
+  /// - This function only supports contents that are based on path or offset data.
+  /// - Contents attached as PNG images do **not** contain vector data (e.g., Offset),
+  ///   so they **cannot be exported** to SVG format.
+  /// - PNG attachments are for display purposes within the SketchBoard only
+  ///   and are **ignored** during SVG export.
+  ///
+  /// [contents]: The list of drawing contents to be exported
+  /// [width], [height]: Dimensions for the SVG viewBox and size
   static String extractSVG({
     required List<SketchContent> contents,
     required double width,

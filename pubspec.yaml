@@ -30,7 +30,7 @@ flutter:
   # For details regarding assets in packages, see
   # https://flutter.dev/to/asset-from-package
   #
-  # An image asset can refer to one or more resolution-specific "variants", see
+  # An images asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 
   # To add custom fonts to your package, add a fonts section here,

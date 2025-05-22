@@ -17,9 +17,17 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
   ///
   /// [onClickBackButton] Callback function invoked when the back button
   ///
-  /// [undoIcon] Undo icon (see SketchToolIcon)
+  /// [undoIcon] Undo icon (see [SketchToolIcon])
   ///
-  /// [redoIcon] Redo icon (see SketchToolIcon)
+  /// [redoIcon] Redo icon (see [SketchToolIcon])
+  ///
+  /// [exportSVGIcon] Export SVG Icon
+  ///
+  /// [exportPNGIcon] Export PNG Icon
+  ///
+  /// [exportJSONIcon] Export JSON Icon
+  ///
+  /// [exportTestDataIcon] Export test data Icon
   ///
   /// [showJsonDialogIcon] JSON dialog view settings (default false)
   ///
@@ -39,6 +47,10 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
     this.onClickBackButton,
     this.undoIcon,
     this.redoIcon,
+    this.exportSVGIcon,
+    this.exportPNGIcon,
+    this.exportJSONIcon,
+    this.exportTestDataIcon,
     this.showJsonDialogIcon,
     this.onClickToJsonButton,
     this.showInputTestDataIcon,
@@ -59,6 +71,11 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
   final SketchToolIcon? undoIcon;
 
   final SketchToolIcon? redoIcon;
+
+  final Widget? exportSVGIcon;
+  final Widget? exportPNGIcon;
+  final Widget? exportJSONIcon;
+  final Widget? exportTestDataIcon;
 
   final bool? showJsonDialogIcon;
   final Function()? onClickToJsonButton;
@@ -135,7 +152,7 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
                             onClickExtractSVG!(offsets);
                           }
                         },
-                        icon: Icon(Icons.file_open_outlined)
+                        icon: exportSVGIcon ?? Icon(Icons.file_open_outlined)
                     ),
 
                     IconButton(
@@ -144,19 +161,23 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
                             onClickExtractPNG!();
                           }
                         },
-                        icon: Icon(Icons.image)
+                        icon: exportPNGIcon ?? Icon(Icons.image)
                     ),
 
                     /// Button for JSON data debugging
                     if(showJsonDialogIcon ?? false)
                       IconButton(
-                        icon: Icon(Icons.javascript),
-                        onPressed: onClickToJsonButton
+                        icon: exportJSONIcon ?? Icon(Icons.javascript),
+                        onPressed: () {
+                          if(onClickToJsonButton != null) {
+                            onClickToJsonButton!();
+                          }
+                        }
                       ),
 
                     if(showInputTestDataIcon ?? false)
                       IconButton(
-                          icon: Icon(Icons.input),
+                          icon: exportTestDataIcon ?? Icon(Icons.input),
                           onPressed: ()  {
                             if (onClickInputTestButton != null) {
                               onClickInputTestButton!();
