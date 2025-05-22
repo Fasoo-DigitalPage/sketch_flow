@@ -711,7 +711,7 @@ class _SketchBottomBarState extends State<SketchBottomBar>
     _rgbGradientColors = [];
 
     int segments = rgbStops.length - 1;
-    int stepsPerSegment = (1792 / segments).floor();
+    int stepsPerSegment = (_colorStepsCounts / segments).floor();
 
     for (int i = 0; i < segments; i++) {
       List<int> start = rgbStops[i];
@@ -727,7 +727,7 @@ class _SketchBottomBarState extends State<SketchBottomBar>
     }
 
     // Add remaining colors
-    while (_rgbGradientColors.length < 1792) {
+    while (_rgbGradientColors.length < _colorStepsCounts) {
       _rgbGradientColors.add(Color.fromARGB(255, 0, 0, 0));
     }
   }

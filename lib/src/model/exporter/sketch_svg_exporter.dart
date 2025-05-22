@@ -35,7 +35,36 @@ class SketchSvgExporter {
             '<circle cx="${point.dx}" cy="${point.dy}" r="$radius" fill="black"/>',
           );
         }
-      } else {
+      }
+      else if (content is Brush) {
+        for (int i=0; i<content.offsets.length-1; i++) {
+          final p1 = content.offsets[i];
+          final p2 = content.offsets[i + 1];
+
+          final config = content.sketchConfig.brushConfig;
+
+          final baseThickness = config.strokeThickness;
+          if (baseThickness <= 0) continue;
+
+          final minThickness = baseThickness * 0.45;
+          final maxThickness = baseThickness;
+
+          final distance = (p2 - p1).distance;
+          final speed = distance;
+
+          double rawThickness = maxThickness - (speed * 0.5);
+          double thickness = rawThickness.clamp(minThickness, maxThickness);
+
+          final color = '#${config.color.toARGB32().toRadixString(16).padLeft(8, '0').substring(2)}';
+          final opacity = config.opacity;
+
+          pathBuffer.writeln(
+            '<line x1="${p1.dx}" y1="${p1.dy}" x2="${p2.dx}" y2="${p2.dy}" '
+                'stroke="$color" stroke-width="$thickness" stroke-linecap="round" stroke-opacity="$opacity"/>',
+          );
+        }
+      }
+      else {
         final pathData = StringBuffer();
         pathData.write('M ${content.offsets.first.dx} ${content.offsets.first.dy} ');
         for (var i = 1; i < content.offsets.length; i++) {
