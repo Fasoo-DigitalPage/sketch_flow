@@ -10,4 +10,6 @@ abstract class SketchContent {
   void draw(Canvas canvas);
 
   Map<String, dynamic> toJson();
+
+  String? toSvg();
 }

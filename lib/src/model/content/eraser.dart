@@ -32,4 +32,13 @@ class Eraser extends SketchContent {
       'eraserRadius': sketchConfig.eraserRadius
     };
   }
+
+  @override
+  String? toSvg() {
+    final radius = sketchConfig.eraserRadius;
+
+    return offsets.map((point) {
+      return '<circle cx="${point.dx}" cy="${point.dy}" r="$radius" fill="black"/>';
+    }).join('\n');
+  }
 }

@@ -46,4 +46,28 @@ class Brush extends SketchContent {
     };
   }
 
+  @override
+  String? toSvg() {
+    final config = sketchConfig.brushConfig;
+
+    final baseThickness = config.strokeThickness;
+    final minThickness = baseThickness * 0.45;
+    final maxThickness = baseThickness;
+    final color = '#${config.color.toARGB32().toRadixString(16).padLeft(8, '0').substring(2)}';
+    final opacity = config.opacity;
+
+    final buffer = StringBuffer();
+    for (int i = 0; i < offsets.length - 1; i++) {
+      final p1 = offsets[i];
+      final p2 = offsets[i + 1];
+      final speed = (p2 - p1).distance;
+      final thickness = (maxThickness - (speed * 0.5)).clamp(minThickness, maxThickness);
+      buffer.writeln(
+        '<line x1="${p1.dx}" y1="${p1.dy}" x2="${p2.dx}" y2="${p2.dy}" '
+            'stroke="$color" stroke-width="$thickness" stroke-linecap="round" stroke-opacity="$opacity"/>',
+      );
+    }
+    return buffer.toString();
+  }
+
 }

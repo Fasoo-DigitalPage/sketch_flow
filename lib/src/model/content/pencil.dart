@@ -31,4 +31,21 @@ class Pencil extends SketchContent {
       'pencilOpacity': sketchConfig.pencilConfig.opacity,
     };
   }
+
+  @override
+  String? toSvg() {
+    final pathData = StringBuffer();
+
+    pathData.write('M ${offsets.first.dx} ${offsets.first.dy} ');
+    for (int i = 1; i < offsets.length; i++) {
+      final p = offsets[i];
+      pathData.write('L ${p.dx} ${p.dy} ');
+    }
+
+    final color = '#${sketchConfig.pencilConfig.color.toARGB32().toRadixString(16).padLeft(8, '0').substring(2)}';
+    final opacity = sketchConfig.pencilConfig.opacity;
+    final strokeWidth = sketchConfig.pencilConfig.strokeThickness;
+
+    return '<path d="$pathData" stroke="$color" stroke-width="$strokeWidth" fill="none" stroke-opacity="$opacity"/>';
+  }
 }
