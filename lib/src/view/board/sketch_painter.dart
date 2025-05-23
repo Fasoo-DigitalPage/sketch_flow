@@ -15,8 +15,8 @@ class SketchPainter extends CustomPainter {
       content.draw(canvas);
     }
 
-    final currentContent = viewModel.createCurrentContent();
-    currentContent?.draw(canvas);
+    final currentContent = SketchContent.create(offsets: viewModel.currentOffsets, sketchConfig: viewModel.currentSketchConfig);
+    currentContent.draw(canvas);
 
     if (viewModel.toolTypeNotifier.value == SketchToolType.eraser && viewModel.eraserCirclePosition != null
         && viewModel.currentSketchConfig.showEraserEffect) {

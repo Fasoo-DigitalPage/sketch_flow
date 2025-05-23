@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:sketch_flow/sketch_model.dart';
-import 'package:sketch_flow/src/model/content/highlighter.dart';
 
 class SketchViewModel extends ChangeNotifier {
   /// A viewModel that manages the user's sketching state on the canvas.
@@ -28,6 +27,7 @@ class SketchViewModel extends ChangeNotifier {
 
   /// The offset currently being drawn
   List<Offset> _currentOffsets = [];
+  List<Offset> get currentOffsets => _currentOffsets;
 
   /// Indicates whether sketching is enabled.
   bool _isEnabled = true;
@@ -41,35 +41,6 @@ class SketchViewModel extends ChangeNotifier {
 
   Offset? _eraserCirclePosition;
   Offset? get eraserCirclePosition => _eraserCirclePosition;
-
-  /// Creates a new sketch content based on the current configuration and path.
-  SketchContent? createCurrentContent() {
-    switch(_sketchConfig.toolType) {
-      case SketchToolType.palette:
-      case SketchToolType.move:
-         return null;
-      case SketchToolType.pencil:
-        return Pencil(
-            offsets: List.from(_currentOffsets),
-            sketchConfig: _sketchConfig
-        );
-      case SketchToolType.brush:
-        return Brush(
-            offsets: List.from(_currentOffsets),
-            sketchConfig: _sketchConfig
-        );
-      case SketchToolType.highlighter:
-        return Highlighter(
-            offsets: List.from(_currentOffsets),
-            sketchConfig: _sketchConfig
-        );
-      case SketchToolType.eraser:
-        return Eraser(
-            offsets: List.from(_currentOffsets),
-            sketchConfig: _sketchConfig
-        );
-    }
-  }
 
   /// Disables sketching functionality
   void disableDrawing() {
@@ -114,26 +85,24 @@ class SketchViewModel extends ChangeNotifier {
   void endLine() {
     if (!_isEnabled) return;
 
-    final content = createCurrentContent();
+    final content = SketchContent.create(offsets: _currentOffsets, sketchConfig: _sketchConfig);
 
-    if(content != null) {
-      if (_sketchConfig.toolType == SketchToolType.eraser) {
-        _eraserCirclePosition = null;
-      }
-
-      final isEraser = _sketchConfig.toolType == SketchToolType.eraser;
-      final isAreaEraseWithEffect = isEraser && _sketchConfig.eraserMode == EraserMode.area && _hasErasedContent;
-
-      // Save only when something is erased
-      if (!isEraser || isAreaEraseWithEffect) {
-        _saveToUndoStack();
-        _contents.add(content);
-      }
-
-      _hasErasedContent = false;
-      _currentOffsets.clear();
-      notifyListeners();
+    if (_sketchConfig.toolType == SketchToolType.eraser) {
+      _eraserCirclePosition = null;
     }
+
+    final isEraser = _sketchConfig.toolType == SketchToolType.eraser;
+    final isAreaEraseWithEffect = isEraser && _sketchConfig.eraserMode == EraserMode.area && _hasErasedContent;
+
+    // Save only when something is erased
+    if (!isEraser || isAreaEraseWithEffect) {
+      _saveToUndoStack();
+      _contents.add(content);
+    }
+
+    _hasErasedContent = false;
+    _currentOffsets.clear();
+    notifyListeners();
   }
 
   /// Clears all sketch contents from the canvas
