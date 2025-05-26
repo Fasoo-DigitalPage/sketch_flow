@@ -52,6 +52,8 @@ class SketchConfig {
   ///
   /// [rectangleConfig] The tool config of rectangle (see [SketchToolConfig])
   ///
+  /// [triangleConfig] The tool config of triangle (see [SketchToolConfig])
+  ///
   /// [eraserRadius] The radius of the eraser
   ///
   /// [eraserRadiusMax] The maximum thickness the eraser can be set to
@@ -106,6 +108,7 @@ class SketchConfig {
   final SketchToolConfig pencilConfig;
   final SketchToolConfig brushConfig;
   final SketchToolConfig highlighterConfig;
+
   final SketchToolConfig lineConfig;
   final SketchToolConfig rectangleConfig;
 
@@ -161,6 +164,7 @@ class SketchConfig {
     SketchToolConfig? highlighterConfig,
     SketchToolConfig? lineConfig,
     SketchToolConfig? rectangleConfig,
+    SketchToolConfig? triangleConfig,
     List<Color>? colorList,
     double? eraserRadius,
     double? eraserRadiusMax,

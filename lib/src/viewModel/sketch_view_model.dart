@@ -217,17 +217,21 @@ class SketchViewModel extends ChangeNotifier {
 
   /// Determining if there is anything erased
   bool _checkErasedContent({required Offset center}) {
+    bool result = false;
+
     for (final content in _contents) {
       if (content.sketchConfig.toolType == SketchToolType.eraser) {
         continue;
       }
       for (final point in content.offsets) {
         if (content.sketchConfig.isShapeTool) {
-          return _checkShapeErased(
+          if (!result) {
+            result = _checkShapeErased(
               toolType: content.sketchConfig.toolType,
               content: content,
               eraserCenter: center
-          );
+            );
+          }
         }else {
           if (_isOffsetInsideCircle(offset: point, center: center)) {
             return true;
@@ -235,7 +239,7 @@ class SketchViewModel extends ChangeNotifier {
         }
       }
     }
-    return false;
+    return result;
   }
 
   /// Verify sure it's inside the eraser area
@@ -282,10 +286,12 @@ class SketchViewModel extends ChangeNotifier {
   }) {
     final result = switch(toolType) {
       SketchToolType.rectangle => content.isErasedRectangleByEraser(
+          offsets: content.offsets,
           eraserCenter: eraserCenter,
           eraserRadius: _sketchConfig.eraserRadius
       ),
       SketchToolType.line => content.isErasedLineByEraser(
+          offsets: content.offsets,
           eraserCenter: eraserCenter,
           eraserRadius: _sketchConfig.eraserRadius
       ),

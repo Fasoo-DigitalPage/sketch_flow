@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:sketch_flow/sketch_view_model.dart';
 import 'package:sketch_flow/sketch_view.dart';
 import 'package:sketch_flow/sketch_model.dart';
+import 'package:sketch_flow/src/model/content/extension/config/sketch_tool_type_extension.dart';
 import 'package:sketch_flow/src/widgets/color_picker_slider_shape.dart';
 
 /// Number of ColorPicker representation colors
@@ -82,6 +83,7 @@ class SketchBottomBar extends StatefulWidget {
   final SketchToolIcon? brushIcon;
   final SketchToolIcon? highlighterIcon;
   final SketchToolIcon? eraserIcon;
+  
   final SketchToolIcon? lineIcon;
   final SketchToolIcon? rectangleIcon;
   
@@ -189,15 +191,17 @@ class _SketchBottomBarState extends State<SketchBottomBar>
 
     final colorList = _viewModel.currentSketchConfig.colorList;
 
-    final applyWidget = switch (toolType) {
-      SketchToolType.pencil || SketchToolType.brush ||
-      SketchToolType.highlighter || SketchToolType.line ||
-      SketchToolType.rectangle =>
-          _drawingConfigWidget(),
-      SketchToolType.eraser => _eraserConfigWidget(),
-      SketchToolType.palette => _paletteConfigWidget(colorList: colorList),
-      SketchToolType.move => SizedBox.shrink(),
-    };
+    Widget applyWidget = SizedBox.shrink();
+    
+    if (toolType.isUsedConfig) {
+      applyWidget = _drawingConfigWidget();
+    }else {
+      applyWidget = switch(toolType) {
+        SketchToolType.eraser => _eraserConfigWidget(),
+        SketchToolType.palette => _paletteConfigWidget(colorList: colorList),
+        _ => SizedBox.shrink()
+      };
+    }
 
     _toolConfigOverlay = OverlayEntry(
       builder:

@@ -12,4 +12,15 @@ extension SketchToolTypeExtension on SketchToolType {
         return false;
     }
   }
+
+  bool get isUsedConfig {
+    switch (this) {
+      case SketchToolType.palette:
+      case SketchToolType.eraser:
+      case SketchToolType.move:
+        return false;
+      default:
+        return true;
+    }
+  }
 }

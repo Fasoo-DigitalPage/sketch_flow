@@ -18,11 +18,15 @@ extension ShapeEraseExtension on SketchContent {
   /// - If the sketch content has fewer than 2 offsets, it cannot form a rectangle, so returns false immediately.
   ///
   /// This method is suitable for rectangular shapes and may not work correctly for arbitrary or complex paths.
-  bool isErasedRectangleByEraser({required Offset eraserCenter, required double eraserRadius}) {
+  bool isErasedRectangleByEraser({
+    required List<Offset> offsets,
+    required Offset eraserCenter,
+    required double eraserRadius
+  }) {
     if (offsets.length < 2) return false;
 
     final start = offsets.first;
-    final end = offsets.last;
+    final end = this.offsets.last;
 
     final topLeft = Offset(
       start.dx < end.dx ? start.dx : end.dx,
@@ -61,7 +65,11 @@ extension ShapeEraseExtension on SketchContent {
   /// Returns true if the shortest distance between the eraser center and the line segment
   /// connecting the first and last offsets is less than or equal to the eraser radius.
   /// Returns false if fewer than 2 offsets exist (no line).
-  bool isErasedLineByEraser({required Offset eraserCenter, required double eraserRadius}) {
+  bool isErasedLineByEraser({
+    required List<Offset> offsets,
+    required Offset eraserCenter,
+    required double eraserRadius
+  }) {
     if (offsets.length < 2) return false;
 
     final start = offsets.first;
