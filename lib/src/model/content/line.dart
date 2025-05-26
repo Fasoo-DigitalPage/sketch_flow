@@ -37,12 +37,15 @@ class Line extends SketchContent {
     return '<line x1="${start.dx}" y1="${start.dy}" x2="${end.dx}" y2="${end.dy}" stroke="$color" stroke-width="$strokeWidth" stroke-opacity="$opacity" />';
   }
 
-  List<Offset> interpolateLine({required int segments}) {
+  List<Offset> interpolateLine({required double spacing}) {
     if (offsets.length < 2) return List.from(offsets);
 
     final List<Offset> interpolated = [];
     final start = offsets.first;
     final end = offsets.last;
+
+    final distance = (start - end).distance;
+    final segments = (distance / spacing).ceil();
 
     for (int i = 0; i <= segments; i++) {
       double t = i / segments;

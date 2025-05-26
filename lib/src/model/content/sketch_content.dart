@@ -24,7 +24,7 @@ abstract class SketchContent {
         return Eraser(offsets: List.from(offsets), sketchConfig: sketchConfig);
       case SketchToolType.line:
         final line = Line(offsets: List.from(offsets), sketchConfig: sketchConfig);
-        final interpolateLine = line.interpolateLine(segments: 15);
+        final interpolateLine = line.interpolateLine(spacing: 0.1);
 
         return Line(offsets: List.from(interpolateLine), sketchConfig: sketchConfig);
       default:
