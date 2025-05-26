@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sketch_flow/sketch_view_model.dart';
 import 'package:sketch_flow/sketch_view.dart';
@@ -27,6 +28,8 @@ class SketchBottomBar extends StatefulWidget {
   /// [eraserIcon] Eraser Icon (see [SketchToolIcon])
   /// 
   /// [lineIcon] Line Icon (see [SketchToolIcon])
+  /// 
+  /// [rectangleIcon] Rectangle Icon (see [SketchToolIcon])
   ///
   /// [clearIcon] Icon used for the "clear all" function.
   ///
@@ -58,6 +61,7 @@ class SketchBottomBar extends StatefulWidget {
     this.highlighterIcon,
     this.clearIcon,
     this.paletteIcon,
+    this.rectangleIcon,
     this.eraserRadioButtonColor = Colors.black,
     this.eraserThicknessTextStyle,
     this.eraserThicknessSliderThemeData,
@@ -79,6 +83,7 @@ class SketchBottomBar extends StatefulWidget {
   final SketchToolIcon? highlighterIcon;
   final SketchToolIcon? eraserIcon;
   final SketchToolIcon? lineIcon;
+  final SketchToolIcon? rectangleIcon;
   
   final Widget? paletteIcon;
   final Widget? clearIcon;
@@ -185,12 +190,12 @@ class _SketchBottomBarState extends State<SketchBottomBar>
     final colorList = _viewModel.currentSketchConfig.colorList;
 
     final applyWidget = switch (toolType) {
-      SketchToolType.pencil => _drawingConfigWidget(),
-      SketchToolType.brush => _drawingConfigWidget(),
-      SketchToolType.highlighter => _drawingConfigWidget(),
+      SketchToolType.pencil || SketchToolType.brush ||
+      SketchToolType.highlighter || SketchToolType.line ||
+      SketchToolType.rectangle =>
+          _drawingConfigWidget(),
       SketchToolType.eraser => _eraserConfigWidget(),
       SketchToolType.palette => _paletteConfigWidget(colorList: colorList),
-      SketchToolType.line => _drawingConfigWidget(),
       SketchToolType.move => SizedBox.shrink(),
     };
 
@@ -327,7 +332,6 @@ class _SketchBottomBarState extends State<SketchBottomBar>
                       enableIcon: widget.moveIcon?.enableIcon ?? Icon(Icons.pinch),
                       disableIcon: widget.moveIcon?.disableIcon ?? Icon(Icons.pinch_outlined)
                   ),
-                  selectedToolType: _selectedToolType,
                   onClickToolButton:
                       () => _onToolTap(toolType: SketchToolType.move),
                 ),
@@ -347,7 +351,6 @@ class _SketchBottomBarState extends State<SketchBottomBar>
                               color: _viewModel.currentSketchConfig.pencilConfig.color
                           )
                   ),
-                  selectedToolType: _selectedToolType,
                   onClickToolButton:
                       () => _onToolTap(toolType: SketchToolType.pencil),
                 ),
@@ -367,7 +370,6 @@ class _SketchBottomBarState extends State<SketchBottomBar>
                             color: _viewModel.currentSketchConfig.brushConfig.color,
                         ),
                   ),
-                  selectedToolType: _selectedToolType,
                   onClickToolButton: () => _onToolTap(toolType: SketchToolType.brush),
                 ),
                 
@@ -386,7 +388,6 @@ class _SketchBottomBarState extends State<SketchBottomBar>
                               color: _viewModel.currentSketchConfig.highlighterConfig.color,
                             )
                     ),
-                    selectedToolType: _selectedToolType,
                     onClickToolButton: () => _onToolTap(toolType: SketchToolType.highlighter),
                 ),
                 
@@ -394,10 +395,9 @@ class _SketchBottomBarState extends State<SketchBottomBar>
                 _toolButtonWidget(
                   toolType: SketchToolType.eraser,
                   icon: SketchToolIcon(
-                    enableIcon: widget.eraserIcon?.enableIcon ?? Icon(Icons.square_rounded),
-                    disableIcon: widget.eraserIcon?.disableIcon ?? Icon(Icons.square_outlined),
+                    enableIcon: widget.eraserIcon?.enableIcon ?? Icon(CupertinoIcons.bandage_fill),
+                    disableIcon: widget.eraserIcon?.disableIcon ?? Icon(CupertinoIcons.bandage),
                   ),
-                  selectedToolType: _selectedToolType,
                   onClickToolButton: () => _onToolTap(toolType: SketchToolType.eraser),
                 ),
                
@@ -415,9 +415,26 @@ class _SketchBottomBarState extends State<SketchBottomBar>
                                 Icons.show_chart_outlined,
                                 color: _viewModel.currentSketchConfig.lineConfig.color,
                             )
-                    ), 
-                    selectedToolType: _selectedToolType, 
+                    ),
                     onClickToolButton: () => _onToolTap(toolType: SketchToolType.line)
+                ),
+                
+                /// Rectangle tool
+                _toolButtonWidget(
+                    toolType: SketchToolType.rectangle, 
+                    icon: SketchToolIcon(
+                        enableIcon: widget.rectangleIcon?.enableIcon ?? 
+                            Icon(
+                                Icons.rectangle, 
+                                color: _viewModel.currentSketchConfig.rectangleConfig.color
+                            ), 
+                        disableIcon: widget.rectangleIcon?.disableIcon ?? 
+                            Icon(
+                              Icons.rectangle_outlined,
+                              color: _viewModel.currentSketchConfig.rectangleConfig.color,
+                            )
+                    ),
+                    onClickToolButton: () => _onToolTap(toolType: SketchToolType.rectangle)
                 ),
 
                 /// Color palette
@@ -446,10 +463,9 @@ class _SketchBottomBarState extends State<SketchBottomBar>
   Widget _toolButtonWidget({
     required SketchToolType toolType,
     required SketchToolIcon icon,
-    required SketchToolType selectedToolType,
     required Function() onClickToolButton,
   }) {
-    final bool isActive = toolType == selectedToolType;
+    final bool isActive = toolType == _selectedToolType;
     final double targetSize = isActive ? icon.size * 1.5 : icon.size;
 
     final Widget selectedWidget = isActive ? icon.enableIcon : icon.disableIcon;

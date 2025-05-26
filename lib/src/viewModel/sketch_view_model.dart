@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:sketch_flow/sketch_model.dart';
+import 'package:sketch_flow/src/model/content/extension/shape/rect_erase_extension.dart';
 
 class SketchViewModel extends ChangeNotifier {
   /// A viewModel that manages the user's sketching state on the canvas.
@@ -143,12 +144,12 @@ class SketchViewModel extends ChangeNotifier {
   void fromJson({required List<Map<String, dynamic>> json}) {
     final data = SketchDataConverter.fromJson(json);
 
-    _contents.addAll(data);
+    _contents..clear()..addAll(data);
     notifyListeners();
   }
 
   Future<Uint8List?> extractPNG({required GlobalKey repaintKey, double? pixelRatio}) async {
-    final image = await SketchPngExporter.extractPNG(repaintKey: repaintKey);
+    final image = await SketchPngExporter.extractPNG(repaintKey: repaintKey, pixelRatio: pixelRatio);
 
     return image;
   }
@@ -182,9 +183,21 @@ class SketchViewModel extends ChangeNotifier {
     _contents.removeWhere((content) {
       if (content is !Eraser) {
         for (final offset in content.offsets) {
-          if (_isOffsetInsideCircle(offset: offset, center: center)) {
-            removedContents.add(content);
-            return true;
+          if (content.sketchConfig.isShapeTool) {
+            if (_checkShapeErased(
+                toolType: content.sketchConfig.toolType,
+                content: content,
+                eraserCenter: center
+            )) {
+              removedContents.add(content);
+              return true;
+            }
+
+          }else {
+            if (_isOffsetInsideCircle(offset: offset, center: center)) {
+              removedContents.add(content);
+              return true;
+            }
           }
         }
       }
@@ -209,8 +222,16 @@ class SketchViewModel extends ChangeNotifier {
         continue;
       }
       for (final point in content.offsets) {
-        if (_isOffsetInsideCircle(offset: point, center: center)) {
-          return true;
+        if (content.sketchConfig.isShapeTool) {
+          return _checkShapeErased(
+              toolType: content.sketchConfig.toolType,
+              content: content,
+              eraserCenter: center
+          );
+        }else {
+          if (_isOffsetInsideCircle(offset: point, center: center)) {
+            return true;
+          }
         }
       }
     }
@@ -247,6 +268,24 @@ class SketchViewModel extends ChangeNotifier {
       if (!_hasErasedContent) _hasErasedContent = true;
       _currentOffsets.add(offset);
     }
+  }
+
+  /// Determines whether a given shape has been actually erased by the eraser tool.
+  ///
+  /// This function checks if the eraser area (defined by [eraserCenter] and the current eraser radius)
+  /// overlaps or intersects with the shape represented by [content], depending on the [toolType].
+  /// Returns `true` if the shape is considered erased, otherwise `false`.
+  bool _checkShapeErased({
+    required SketchToolType toolType,
+    required SketchContent content,
+    required Offset eraserCenter
+  }) {
+    final result = switch(toolType) {
+      SketchToolType.rectangle => content.isErasedByEraser(eraserCenter: eraserCenter, eraserRadius: _sketchConfig.eraserRadius),
+      _ => false
+    };
+
+    return result;
   }
   
 }

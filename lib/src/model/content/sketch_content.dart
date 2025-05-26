@@ -1,7 +1,8 @@
 import 'dart:ui';
 import 'package:sketch_flow/sketch_model.dart';
 import 'package:sketch_flow/src/model/content/blank.dart';
-import 'package:sketch_flow/src/model/content/line.dart';
+import 'package:sketch_flow/src/model/content/draw/line.dart';
+import 'package:sketch_flow/src/model/content/shape/rectangle.dart';
 
 abstract class SketchContent {
   final List<Offset> offsets;
@@ -23,10 +24,9 @@ abstract class SketchContent {
       case SketchToolType.eraser:
         return Eraser(offsets: List.from(offsets), sketchConfig: sketchConfig);
       case SketchToolType.line:
-        final line = Line(offsets: List.from(offsets), sketchConfig: sketchConfig);
-        final interpolateLine = line.interpolateLine(spacing: 0.1);
-
-        return Line(offsets: List.from(interpolateLine), sketchConfig: sketchConfig);
+        return Line(offsets: List.from(offsets), sketchConfig: sketchConfig);
+      case SketchToolType.rectangle:
+        return Rectangle(offsets: List.from(offsets), sketchConfig: sketchConfig);
       default:
         return Blank(offsets: [], sketchConfig: sketchConfig);
     }

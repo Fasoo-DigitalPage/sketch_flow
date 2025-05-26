@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sketch_flow/src/model/config/sketch_tool_config.dart';
+import 'package:sketch_flow/src/model/content/extension/config/sketch_tool_type_extension.dart';
 
 /// Defines the type of sketch tool available.
 ///
@@ -14,7 +15,16 @@ import 'package:sketch_flow/src/model/config/sketch_tool_config.dart';
 /// [highlighter] Highlighter tool
 ///
 /// [line] Line tool
-enum SketchToolType { pencil, eraser, palette, move, brush, highlighter, line }
+enum SketchToolType {
+  pencil,
+  eraser,
+  palette,
+  move,
+  brush,
+  highlighter,
+  line,
+  rectangle
+}
 
 enum EraserMode { area, stroke }
 
@@ -39,6 +49,8 @@ class SketchConfig {
   /// [highlighterConfig] The tool config of highlighter (see [SketchToolConfig])
   ///
   /// [lineConfig] The tool config of line (see [SketchToolConfig])
+  ///
+  /// [rectangleConfig] The tool config of rectangle (see [SketchToolConfig])
   ///
   /// [eraserRadius] The radius of the eraser
   ///
@@ -75,6 +87,7 @@ class SketchConfig {
       opacityMax: 0.8
     ),
     this.lineConfig = const SketchToolConfig(),
+    this.rectangleConfig = const SketchToolConfig(),
     this.eraserRadius = 10,
     this.eraserRadiusMax = 100,
     this.eraserRadiusMin = 10,
@@ -94,6 +107,7 @@ class SketchConfig {
   final SketchToolConfig brushConfig;
   final SketchToolConfig highlighterConfig;
   final SketchToolConfig lineConfig;
+  final SketchToolConfig rectangleConfig;
 
   final double eraserRadius;
   final double eraserRadiusMax;
@@ -102,6 +116,8 @@ class SketchConfig {
   final EraserMode eraserMode;
 
   final bool showEraserEffect;
+
+  bool get isShapeTool => toolType.isShape;
 
   SketchToolConfig get effectiveConfig {
     switch (toolType) {
@@ -113,6 +129,8 @@ class SketchConfig {
         return highlighterConfig;
       case SketchToolType.line:
         return lineConfig;
+      case SketchToolType.rectangle:
+        return rectangleConfig;
       case SketchToolType.move:
       case SketchToolType.palette:
       case SketchToolType.eraser:
@@ -142,6 +160,7 @@ class SketchConfig {
     SketchToolConfig? brushConfig,
     SketchToolConfig? highlighterConfig,
     SketchToolConfig? lineConfig,
+    SketchToolConfig? rectangleConfig,
     List<Color>? colorList,
     double? eraserRadius,
     double? eraserRadiusMax,
@@ -181,6 +200,10 @@ class SketchConfig {
           newToolType == SketchToolType.line
               ? updatedToolConfig(lineConfig ?? this.lineConfig)
               : lineConfig ?? this.lineConfig,
+      rectangleConfig:
+          newToolType == SketchToolType.rectangle
+              ? updatedToolConfig(rectangleConfig ?? this.rectangleConfig)
+              : rectangleConfig ?? this.rectangleConfig,
       colorList: colorList ?? this.colorList,
       eraserRadius: eraserRadius ?? this.eraserRadius,
       eraserRadiusMax: eraserRadiusMax ?? this.eraserRadiusMax,

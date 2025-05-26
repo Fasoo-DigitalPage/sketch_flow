@@ -14,8 +14,13 @@ class Line extends SketchContent {
       ..strokeWidth = sketchConfig.lineConfig.strokeThickness
       ..style = PaintingStyle.stroke;
 
-    canvas.drawLine(offsets.first, offsets.last, paint);
+    final interpolatedOffsets = interpolateLine();
+
+    for (int i = 0; i < interpolatedOffsets.length - 1; i++) {
+      canvas.drawLine(interpolatedOffsets[i], interpolatedOffsets[i + 1], paint);
+    }
   }
+
 
   @override
   Map<String, dynamic> toJson() => {
@@ -37,7 +42,7 @@ class Line extends SketchContent {
     return '<line x1="${start.dx}" y1="${start.dy}" x2="${end.dx}" y2="${end.dy}" stroke="$color" stroke-width="$strokeWidth" stroke-opacity="$opacity" />';
   }
 
-  List<Offset> interpolateLine({required double spacing}) {
+  List<Offset> interpolateLine({double spacing = 0.1}) {
     if (offsets.length < 2) return List.from(offsets);
 
     final List<Offset> interpolated = [];

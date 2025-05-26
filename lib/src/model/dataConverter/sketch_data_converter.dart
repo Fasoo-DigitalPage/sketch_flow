@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:sketch_flow/sketch_model.dart';
 import 'package:sketch_flow/src/model/config/sketch_tool_config.dart';
-import 'package:sketch_flow/src/model/content/highlighter.dart';
+import 'package:sketch_flow/src/model/content/draw/highlighter.dart';
 
 class SketchDataConverter {
   static List<Map<String, dynamic>> toJson(List<SketchContent> contents) {

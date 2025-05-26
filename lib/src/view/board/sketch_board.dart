@@ -101,16 +101,21 @@ class _SketchBoardState extends State<SketchBoard> {
       color: widget.boardColor ?? Colors.white,
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height,
-      child: RepaintBoundary(
-        key: widget.repaintKey,
-        child: Stack(
-          children: [
-            if (widget.overlayWidgets != null) ...?widget.overlayWidgets,
-            CustomPaint(
-              painter: SketchPainter(widget.viewModel),
-            )
-          ],
-        ),
+      child: AnimatedBuilder(
+          animation: widget.viewModel,
+          builder: (context, _) {
+            return RepaintBoundary(
+              key: widget.repaintKey,
+              child: Stack(
+                children: [
+                  if (widget.overlayWidgets != null) ...?widget.overlayWidgets,
+                  CustomPaint(
+                    painter: SketchPainter(widget.viewModel),
+                  )
+                ],
+              ),
+            );
+          }
       ),
     );
 
