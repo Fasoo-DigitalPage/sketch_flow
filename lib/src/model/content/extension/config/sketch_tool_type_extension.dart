@@ -6,6 +6,7 @@ extension SketchToolTypeExtension on SketchToolType {
   bool get isShape {
     switch (this) {
       case SketchToolType.rectangle:
+      case SketchToolType.line:
         return true;
       default:
         return false;

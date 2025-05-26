@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:sketch_flow/sketch_model.dart';
 import 'package:sketch_flow/src/model/content/blank.dart';
-import 'package:sketch_flow/src/model/content/draw/line.dart';
+import 'package:sketch_flow/src/model/content/shape/line.dart';
 import 'package:sketch_flow/src/model/content/shape/rectangle.dart';
 
 abstract class SketchContent {

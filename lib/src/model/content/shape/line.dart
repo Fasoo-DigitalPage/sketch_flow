@@ -14,11 +14,7 @@ class Line extends SketchContent {
       ..strokeWidth = sketchConfig.lineConfig.strokeThickness
       ..style = PaintingStyle.stroke;
 
-    final interpolatedOffsets = interpolateLine();
-
-    for (int i = 0; i < interpolatedOffsets.length - 1; i++) {
-      canvas.drawLine(interpolatedOffsets[i], interpolatedOffsets[i + 1], paint);
-    }
+    canvas.drawLine(offsets.first, offsets.last, paint);
   }
 
 

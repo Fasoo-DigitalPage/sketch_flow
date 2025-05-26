@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:sketch_flow/sketch_model.dart';
-import 'package:sketch_flow/src/model/content/extension/shape/rect_erase_extension.dart';
+import 'package:sketch_flow/src/model/content/extension/shape/shape_erase_extension.dart';
 
 class SketchViewModel extends ChangeNotifier {
   /// A viewModel that manages the user's sketching state on the canvas.
@@ -281,7 +281,14 @@ class SketchViewModel extends ChangeNotifier {
     required Offset eraserCenter
   }) {
     final result = switch(toolType) {
-      SketchToolType.rectangle => content.isErasedByEraser(eraserCenter: eraserCenter, eraserRadius: _sketchConfig.eraserRadius),
+      SketchToolType.rectangle => content.isErasedRectangleByEraser(
+          eraserCenter: eraserCenter,
+          eraserRadius: _sketchConfig.eraserRadius
+      ),
+      SketchToolType.line => content.isErasedLineByEraser(
+          eraserCenter: eraserCenter,
+          eraserRadius: _sketchConfig.eraserRadius
+      ),
       _ => false
     };
 

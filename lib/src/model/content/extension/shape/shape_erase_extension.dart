@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:sketch_flow/sketch_model.dart';
 
-extension RectEraseExtension on SketchContent {
+extension ShapeEraseExtension on SketchContent {
   /// Checks whether the eraser touches this sketch content based on rectangular boundary logic.
   ///
   /// This method assumes the sketch content represents a rectangle defined by at least two offsets:
@@ -18,7 +18,7 @@ extension RectEraseExtension on SketchContent {
   /// - If the sketch content has fewer than 2 offsets, it cannot form a rectangle, so returns false immediately.
   ///
   /// This method is suitable for rectangular shapes and may not work correctly for arbitrary or complex paths.
-  bool isErasedByEraser({required Offset eraserCenter, required double eraserRadius}) {
+  bool isErasedRectangleByEraser({required Offset eraserCenter, required double eraserRadius}) {
     if (offsets.length < 2) return false;
 
     final start = offsets.first;
@@ -54,6 +54,21 @@ extension RectEraseExtension on SketchContent {
     }
 
     return false;
+  }
+
+  /// Checks whether the eraser circle touches the line defined by the first and last offsets.
+  ///
+  /// Returns true if the shortest distance between the eraser center and the line segment
+  /// connecting the first and last offsets is less than or equal to the eraser radius.
+  /// Returns false if fewer than 2 offsets exist (no line).
+  bool isErasedLineByEraser({required Offset eraserCenter, required double eraserRadius}) {
+    if (offsets.length < 2) return false;
+
+    final start = offsets.first;
+    final end = offsets.last;
+
+    final distance = _distanceToSegment(start, end, eraserCenter);
+    return distance <= eraserRadius;
   }
 
   /// Calculates the shortest distance from point `p` to the line segment defined by points `a` and `b`.
