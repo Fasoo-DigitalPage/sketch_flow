@@ -1,5 +1,7 @@
 import 'dart:ui';
 import 'package:sketch_flow/sketch_model.dart';
+import 'package:sketch_flow/src/model/content/blank.dart';
+import 'package:sketch_flow/src/model/content/line.dart';
 
 abstract class SketchContent {
   final List<Offset> offsets;
@@ -20,10 +22,13 @@ abstract class SketchContent {
         return Highlighter(offsets: List.from(offsets), sketchConfig: sketchConfig);
       case SketchToolType.eraser:
         return Eraser(offsets: List.from(offsets), sketchConfig: sketchConfig);
+      case SketchToolType.line:
+        final line = Line(offsets: List.from(offsets), sketchConfig: sketchConfig);
+        final interpolateLine = line.interpolateLine(segments: 15);
+
+        return Line(offsets: List.from(interpolateLine), sketchConfig: sketchConfig);
       default:
-        throw UnimplementedError(
-          'Unsupported toolType: ${sketchConfig.toolType}',
-        );
+        return Blank(offsets: [], sketchConfig: sketchConfig);
     }
   }
 

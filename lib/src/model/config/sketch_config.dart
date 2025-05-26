@@ -12,7 +12,9 @@ import 'package:sketch_flow/src/model/config/sketch_tool_config.dart';
 /// [move] Screen move tool
 ///
 /// [highlighter] Highlighter tool
-enum SketchToolType { pencil, eraser, palette, move, brush, highlighter }
+///
+/// [line] Line tool
+enum SketchToolType { pencil, eraser, palette, move, brush, highlighter, line }
 
 enum EraserMode { area, stroke }
 
@@ -35,6 +37,8 @@ class SketchConfig {
   /// [brushConfig] The tool config of brush (see [SketchToolConfig])
   ///
   /// [highlighterConfig] The tool config of highlighter (see [SketchToolConfig])
+  ///
+  /// [lineConfig] The tool config of line (see [SketchToolConfig])
   ///
   /// [eraserRadius] The radius of the eraser
   ///
@@ -70,6 +74,7 @@ class SketchConfig {
       opacityMin: 0.0,
       opacityMax: 0.8
     ),
+    this.lineConfig = const SketchToolConfig(),
     this.eraserRadius = 10,
     this.eraserRadiusMax = 100,
     this.eraserRadiusMin = 10,
@@ -88,6 +93,7 @@ class SketchConfig {
   final SketchToolConfig pencilConfig;
   final SketchToolConfig brushConfig;
   final SketchToolConfig highlighterConfig;
+  final SketchToolConfig lineConfig;
 
   final double eraserRadius;
   final double eraserRadiusMax;
@@ -105,6 +111,8 @@ class SketchConfig {
         return brushConfig;
       case SketchToolType.highlighter:
         return highlighterConfig;
+      case SketchToolType.line:
+        return lineConfig;
       case SketchToolType.move:
       case SketchToolType.palette:
       case SketchToolType.eraser:
@@ -133,6 +141,7 @@ class SketchConfig {
     SketchToolConfig? pencilConfig,
     SketchToolConfig? brushConfig,
     SketchToolConfig? highlighterConfig,
+    SketchToolConfig? lineConfig,
     List<Color>? colorList,
     double? eraserRadius,
     double? eraserRadiusMax,
@@ -168,6 +177,10 @@ class SketchConfig {
           newToolType == SketchToolType.highlighter
               ? updatedToolConfig(highlighterConfig ?? this.highlighterConfig)
               : highlighterConfig ?? this.highlighterConfig,
+      lineConfig:
+          newToolType == SketchToolType.line
+              ? updatedToolConfig(lineConfig ?? this.lineConfig)
+              : lineConfig ?? this.lineConfig,
       colorList: colorList ?? this.colorList,
       eraserRadius: eraserRadius ?? this.eraserRadius,
       eraserRadiusMax: eraserRadiusMax ?? this.eraserRadiusMax,

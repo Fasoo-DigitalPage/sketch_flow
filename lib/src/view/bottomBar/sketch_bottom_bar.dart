@@ -24,7 +24,9 @@ class SketchBottomBar extends StatefulWidget {
   /// 
   /// [highlighterIcon] Highlighter Icon (see [SketchToolIcon])
   ///
-  /// [eraserIcon] Eraser Icon (see SketchToolIcon)
+  /// [eraserIcon] Eraser Icon (see [SketchToolIcon])
+  /// 
+  /// [lineIcon] Line Icon (see [SketchToolIcon])
   ///
   /// [clearIcon] Icon used for the "clear all" function.
   ///
@@ -51,6 +53,7 @@ class SketchBottomBar extends StatefulWidget {
     this.moveIcon,
     this.pencilIcon,
     this.eraserIcon,
+    this.lineIcon,
     this.brushIcon,
     this.highlighterIcon,
     this.clearIcon,
@@ -75,6 +78,8 @@ class SketchBottomBar extends StatefulWidget {
   final SketchToolIcon? brushIcon;
   final SketchToolIcon? highlighterIcon;
   final SketchToolIcon? eraserIcon;
+  final SketchToolIcon? lineIcon;
+  
   final Widget? paletteIcon;
   final Widget? clearIcon;
 
@@ -185,6 +190,7 @@ class _SketchBottomBarState extends State<SketchBottomBar>
       SketchToolType.highlighter => _drawingConfigWidget(),
       SketchToolType.eraser => _eraserConfigWidget(),
       SketchToolType.palette => _paletteConfigWidget(colorList: colorList),
+      SketchToolType.line => _drawingConfigWidget(),
       SketchToolType.move => SizedBox.shrink(),
     };
 
@@ -318,8 +324,8 @@ class _SketchBottomBarState extends State<SketchBottomBar>
                 _toolButtonWidget(
                   toolType: SketchToolType.move,
                   icon: SketchToolIcon(
-                      enableIcon: widget.moveIcon?.enableIcon ?? Icon(Icons.mouse),
-                      disableIcon: widget.moveIcon?.disableIcon ?? Icon(Icons.mouse_outlined)
+                      enableIcon: widget.moveIcon?.enableIcon ?? Icon(Icons.pinch),
+                      disableIcon: widget.moveIcon?.disableIcon ?? Icon(Icons.pinch_outlined)
                   ),
                   selectedToolType: _selectedToolType,
                   onClickToolButton:
@@ -393,6 +399,25 @@ class _SketchBottomBarState extends State<SketchBottomBar>
                   ),
                   selectedToolType: _selectedToolType,
                   onClickToolButton: () => _onToolTap(toolType: SketchToolType.eraser),
+                ),
+               
+                /// Line tool
+                _toolButtonWidget(
+                    toolType: SketchToolType.line, 
+                    icon: SketchToolIcon(
+                        enableIcon: widget.lineIcon?.enableIcon ??
+                            Icon(
+                                Icons.show_chart_rounded,
+                                color: _viewModel.currentSketchConfig.lineConfig.color,
+                            ),
+                        disableIcon: widget.lineIcon?.disableIcon ??
+                            Icon(
+                                Icons.show_chart_outlined,
+                                color: _viewModel.currentSketchConfig.lineConfig.color,
+                            )
+                    ), 
+                    selectedToolType: _selectedToolType, 
+                    onClickToolButton: () => _onToolTap(toolType: SketchToolType.line)
                 ),
 
                 /// Color palette
