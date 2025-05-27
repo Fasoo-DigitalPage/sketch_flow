@@ -24,10 +24,11 @@ Test it live!: [Try it](https://fasoo-digitalpage.github.io/sketch_flow/)
 View example code: [main.dart](https://github.com/fasoo-digitalpage/sketch_flow/blob/main/example/lib/main.dart)
 
 <p align="center">
-<img width = "24%" src='https://github.com/user-attachments/assets/d9dcbc12-3d7b-4b3d-a047-34608f89452a' border='0'>
-<img width = "24%" src='https://github.com/user-attachments/assets/9f5f8d92-d02e-4768-ae37-bba670bae995' border='0'>
-<img width = "24%" src='https://github.com/user-attachments/assets/a97e3f3d-9ac4-4da1-8e7f-d3c7bd937682' border='0'>
-<img width = "24%" src='https://github.com/user-attachments/assets/2eb33ff3-3fa4-4c9a-871a-c81320369860' border='0'>
+
+<img width = "24%" src='https://github.com/user-attachments/assets/92eff9fe-c1f0-435a-970a-b0bf78f24b34' border='0'>
+<img width = "24%" src='https://github.com/user-attachments/assets/22cbdbbd-86e8-47a7-9880-2d48bbdb0e0f' border='0'>
+<img width = "24%" src='https://github.com/user-attachments/assets/d455aa41-d42c-456f-9011-fdc03e279aa7' border='0'>
+<img width = "24%" src='https://github.com/user-attachments/assets/81e68979-80dc-4b7e-88b2-12fe60c66435' border='0'>
 </p>
 
 ## Core components at a glance
@@ -115,8 +116,13 @@ final String svgCode = await _controller.extractSVG(
 | **Move**    | Enables panning and zooming of the canvas without affecting the drawings.                        |
 | **Pencil**  | Draws a continuous line based on user input. Configurable stroke thickness, color, and opacity.  |
 | **Brush**   | Simulates a brush-like stroke with smooth edges. Supports color and thickness customization.     |
+| **Highlighter**  | 	Draws semi-transparent strokes resembling a highlighter. Comes with predefined low opacity and medium thickness to simulate real highlighter effects.  |
 | **Palette** | Allows users to select colors for drawing tools. |
 | **Eraser**  | Erases drawings either by stroke or by area.    |
+| **Line**  |   Draws a straight line between the first and last touch point. Line color and thickness are customizable.  |
+| **Rectangle**  |  Draws a rectangle defined by the first and last touch points. Configurable stroke/fill options.   |
+| **Circle**  | 	Draws a circle or ellipse bounded by the first and last touch points. Supports stroke and fill customization. |
+
 
 
 
