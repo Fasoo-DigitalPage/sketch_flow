@@ -39,8 +39,9 @@ View example code: [main.dart](https://github.com/fasoo-digitalpage/sketch_flow/
 | `SketchTopBar` / `SketchBottomBar` | **(Optional)** Preferred UI components                             |
 
 ## Architecture
+
 <p align="center">
-<img width = "70%" src='https://github.com/user-attachments/assets/bd3e5e2f-147b-4965-a65d-fe7daadfcf34' border='0'>
+<img width = "70%" src='https://github.com/user-attachments/assets/4ccdaae5-d56d-4b1d-978d-24c7b879c6b8' border='0'>
 </p>
 
 ## How to Use `sketch_flow`
