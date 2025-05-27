@@ -25,10 +25,11 @@
 예제 코드 보기: [main.dart](https://github.com/fasoo-digitalpage/sketch_flow/blob/main/example/lib/main.dart)
 
 <p align="center">
-<img width = "24%" src='https://github.com/user-attachments/assets/d9dcbc12-3d7b-4b3d-a047-34608f89452a' border='0'>
-<img width = "24%" src='https://github.com/user-attachments/assets/9f5f8d92-d02e-4768-ae37-bba670bae995' border='0'>
-<img width = "24%" src='https://github.com/user-attachments/assets/a97e3f3d-9ac4-4da1-8e7f-d3c7bd937682' border='0'>
-<img width = "24%" src='https://github.com/user-attachments/assets/2eb33ff3-3fa4-4c9a-871a-c81320369860' border='0'>
+
+<img width = "24%" src='https://github.com/user-attachments/assets/92eff9fe-c1f0-435a-970a-b0bf78f24b34' border='0'>
+<img width = "24%" src='https://github.com/user-attachments/assets/22cbdbbd-86e8-47a7-9880-2d48bbdb0e0f' border='0'>
+<img width = "24%" src='https://github.com/user-attachments/assets/d455aa41-d42c-456f-9011-fdc03e279aa7' border='0'>
+<img width = "24%" src='https://github.com/user-attachments/assets/81e68979-80dc-4b7e-88b2-12fe60c66435' border='0'>
 </p>
 
 ## 핵심 구성 요소
@@ -116,8 +117,12 @@ final String svgCode = await _controller.extractSVG(
 | **Move**    | 도면에 영향을 주지 않고 확대/축소 및 스크롤 할 수 있습니다.                        |
 | **Pencil**  | 사용자 입력에 따라 선을 그립니다. 획의 두께, 색상, 불투명도를 설정 할 수 있습니다.  |
 | **Brush**   | 부드러운 붓 효과가 적용된 선을 그립니다. 획의 두께, 색상, 불투명도를 설정 할 수 있습니다.     |
+| **Highlighter**  | 형광펜과 유사한 반투명 선을 그립니다. 실제 평광펜 효과를 적용하기 위해 사전에 정의된 낮은 불투명도와 중간두께를 제공합니다.    |
 | **Palette** | 사용자가 그림 도구의 색상을 선택 할 수 있습니다. |
 | **Eraser**  | 획 지우개, 영역 지우개를 선택 할 수 있으며 그림을 지웁니다.    |
+| **Line**  | 획 지우개, 영역 지우개를 선택 할 수 있으며 그림을 지웁니다.    |
+| **Rectangle**  | 첫 번째 및 마지막 터치 포인트로 정의된 직사각형을 그립니다.    |
+| **Circle**  | 첫 번째 터치와 마지막 터치 포인트로 경계가 있는 원을 그립니다.    |
 
 
 
