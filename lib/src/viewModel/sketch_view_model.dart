@@ -295,6 +295,11 @@ class SketchViewModel extends ChangeNotifier {
           eraserCenter: eraserCenter,
           eraserRadius: _sketchConfig.eraserRadius
       ),
+      SketchToolType.circle => content.isErasedCircleByEraser(
+          offsets: content.offsets,
+          eraserCenter: eraserCenter,
+          eraserRadius: _sketchConfig.eraserRadius
+      ),
       _ => false
     };
 

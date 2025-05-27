@@ -79,6 +79,37 @@ extension ShapeEraseExtension on SketchContent {
     return distance <= eraserRadius;
   }
 
+  /// Checks whether the eraser circle touches the circular SketchContent (like a circle shape).
+  ///
+  /// It assumes that the shape is a circle defined by two offsets: the start and end points
+  /// used to calculate the center and radius of the drawn circle.
+  ///
+  /// Returns true if the distance between the centers is less than or equal to the sum of
+  /// the two radii (drawn circle and eraser).
+  bool isErasedCircleByEraser({
+    required List<Offset> offsets,
+    required Offset eraserCenter,
+    required double eraserRadius,
+  }) {
+    if (offsets.length < 2) return false;
+
+    final start = offsets.first;
+    final end = offsets.last;
+
+    final circleCenter = Offset(
+      (start.dx + end.dx) / 2,
+      (start.dy + end.dy) / 2,
+    );
+
+    final radius = ((end.dx - start.dx).abs() / 2)
+        .clamp(0, double.infinity)
+        .toDouble();
+
+    final distance = (circleCenter - eraserCenter).distance;
+
+    return distance <= radius + eraserRadius;
+  }
+
   /// Calculates the shortest distance from point `p` to the line segment defined by points `a` and `b`.
   ///
   /// This helper function projects point `p` onto the segment `ab` and returns the distance

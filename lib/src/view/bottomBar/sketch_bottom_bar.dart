@@ -32,6 +32,8 @@ class SketchBottomBar extends StatefulWidget {
   /// 
   /// [rectangleIcon] Rectangle Icon (see [SketchToolIcon])
   ///
+  /// [circleIcon] Circle Icon (see [SketchToolIcon])
+  ///
   /// [clearIcon] Icon used for the "clear all" function.
   ///
   /// [paletteIcon] Icon for opening the color palette.
@@ -63,6 +65,7 @@ class SketchBottomBar extends StatefulWidget {
     this.clearIcon,
     this.paletteIcon,
     this.rectangleIcon,
+    this.circleIcon,
     this.eraserRadioButtonColor = Colors.black,
     this.eraserThicknessTextStyle,
     this.eraserThicknessSliderThemeData,
@@ -86,6 +89,7 @@ class SketchBottomBar extends StatefulWidget {
   
   final SketchToolIcon? lineIcon;
   final SketchToolIcon? rectangleIcon;
+  final SketchToolIcon? circleIcon;
   
   final Widget? paletteIcon;
   final Widget? clearIcon;
@@ -439,6 +443,24 @@ class _SketchBottomBarState extends State<SketchBottomBar>
                             )
                     ),
                     onClickToolButton: () => _onToolTap(toolType: SketchToolType.rectangle)
+                ),
+
+                /// Circle tool
+                _toolButtonWidget(
+                    toolType: SketchToolType.circle,
+                    icon: SketchToolIcon(
+                        enableIcon: widget.circleIcon?.enableIcon ??
+                            Icon(
+                              Icons.circle_rounded,
+                              color: _viewModel.currentSketchConfig.circleConfig.color
+                            ),
+                        disableIcon: widget.circleIcon?.disableIcon ??
+                            Icon(
+                              Icons.circle_outlined,
+                              color: _viewModel.currentSketchConfig.circleConfig.color,
+                            )
+                    ),
+                    onClickToolButton: () => _onToolTap(toolType: SketchToolType.circle)
                 ),
 
                 /// Color palette

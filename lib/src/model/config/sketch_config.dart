@@ -15,6 +15,8 @@ import 'package:sketch_flow/src/model/content/extension/config/sketch_tool_type_
 /// [highlighter] Highlighter tool
 ///
 /// [line] Line tool
+///
+/// [circle] Circle tool
 enum SketchToolType {
   pencil,
   eraser,
@@ -23,7 +25,8 @@ enum SketchToolType {
   brush,
   highlighter,
   line,
-  rectangle
+  rectangle,
+  circle
 }
 
 enum EraserMode { area, stroke }
@@ -53,6 +56,8 @@ class SketchConfig {
   /// [rectangleConfig] The tool config of rectangle (see [SketchToolConfig])
   ///
   /// [triangleConfig] The tool config of triangle (see [SketchToolConfig])
+  ///
+  /// [circleConfig] The tool config of circle (see [SketchToolConfig])
   ///
   /// [eraserRadius] The radius of the eraser
   ///
@@ -90,6 +95,7 @@ class SketchConfig {
     ),
     this.lineConfig = const SketchToolConfig(),
     this.rectangleConfig = const SketchToolConfig(),
+    this.circleConfig = const SketchToolConfig(),
     this.eraserRadius = 10,
     this.eraserRadiusMax = 100,
     this.eraserRadiusMin = 10,
@@ -111,6 +117,7 @@ class SketchConfig {
 
   final SketchToolConfig lineConfig;
   final SketchToolConfig rectangleConfig;
+  final SketchToolConfig circleConfig;
 
   final double eraserRadius;
   final double eraserRadiusMax;
@@ -134,6 +141,8 @@ class SketchConfig {
         return lineConfig;
       case SketchToolType.rectangle:
         return rectangleConfig;
+      case SketchToolType.circle:
+        return circleConfig;
       case SketchToolType.move:
       case SketchToolType.palette:
       case SketchToolType.eraser:
@@ -165,6 +174,7 @@ class SketchConfig {
     SketchToolConfig? lineConfig,
     SketchToolConfig? rectangleConfig,
     SketchToolConfig? triangleConfig,
+    SketchToolConfig? circleConfig,
     List<Color>? colorList,
     double? eraserRadius,
     double? eraserRadiusMax,
@@ -208,6 +218,10 @@ class SketchConfig {
           newToolType == SketchToolType.rectangle
               ? updatedToolConfig(rectangleConfig ?? this.rectangleConfig)
               : rectangleConfig ?? this.rectangleConfig,
+      circleConfig:
+          newToolType == SketchToolType.circle
+              ? updatedToolConfig(circleConfig ?? this.circleConfig)
+              : circleConfig ?? this.circleConfig,
       colorList: colorList ?? this.colorList,
       eraserRadius: eraserRadius ?? this.eraserRadius,
       eraserRadiusMax: eraserRadiusMax ?? this.eraserRadiusMax,

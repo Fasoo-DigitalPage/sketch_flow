@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:sketch_flow/sketch_model.dart';
 import 'package:sketch_flow/src/model/content/blank.dart';
+import 'package:sketch_flow/src/model/content/shape/circle.dart';
 import 'package:sketch_flow/src/model/content/shape/line.dart';
 import 'package:sketch_flow/src/model/content/shape/rectangle.dart';
 
@@ -27,6 +28,8 @@ abstract class SketchContent {
         return Line(offsets: List.from(offsets), sketchConfig: sketchConfig);
       case SketchToolType.rectangle:
         return Rectangle(offsets: List.from(offsets), sketchConfig: sketchConfig);
+      case SketchToolType.circle:
+        return Circle(offsets: List.from(offsets), sketchConfig: sketchConfig);
       default:
         return Blank(offsets: [], sketchConfig: sketchConfig);
     }

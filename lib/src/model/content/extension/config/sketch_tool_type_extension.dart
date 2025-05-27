@@ -7,6 +7,7 @@ extension SketchToolTypeExtension on SketchToolType {
     switch (this) {
       case SketchToolType.rectangle:
       case SketchToolType.line:
+      case SketchToolType.circle:
         return true;
       default:
         return false;

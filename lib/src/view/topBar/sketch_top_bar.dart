@@ -106,7 +106,7 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
               children: [
                 IconButton(
                     icon: backButtonIcon ?? Icon(Icons.arrow_back_ios, color: Colors.black,),
-                    onPressed: onClickBackButton,
+                    onPressed: () => onClickBackButton,
                 ),
                 Row(
                   children: [
