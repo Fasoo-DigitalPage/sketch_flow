@@ -1,7 +1,7 @@
 name: sketch_flow
-description: "A new Flutter package project."
-version: 0.0.1
-homepage:
+description: "A powerful and flexible Flutter sketching plugin. Easily build drawing applications with elegant UI and comprehensive export features."
+version: 0.1.0
+homepage: "https://github.com/Fasoo-DigitalPage/sketch_flow"
 
 environment:
   sdk: ^3.7.2
