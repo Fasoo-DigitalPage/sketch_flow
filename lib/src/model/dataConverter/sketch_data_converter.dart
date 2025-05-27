@@ -1,7 +1,9 @@
 import 'dart:ui';
 import 'package:sketch_flow/sketch_model.dart';
 import 'package:sketch_flow/src/model/config/sketch_tool_config.dart';
-import 'package:sketch_flow/src/model/content/draw/highlighter.dart';
+import 'package:sketch_flow/src/model/content/shape/circle.dart';
+import 'package:sketch_flow/src/model/content/shape/line.dart';
+import 'package:sketch_flow/src/model/content/shape/rectangle.dart';
 
 class SketchDataConverter {
   static List<Map<String, dynamic>> toJson(List<SketchContent> contents) {
@@ -31,6 +33,8 @@ class SketchDataConverter {
         'brush' => SketchToolType.brush,
         'eraser' => SketchToolType.eraser,
         'highlighter' => SketchToolType.highlighter,
+        'line' => SketchToolType.line,
+        'rectangle' => SketchToolType.rectangle,
         _ => SketchToolType.pencil
       };
 
@@ -52,11 +56,32 @@ class SketchDataConverter {
         strokeThickness: content['highlighterStrokeThickness']?.toDouble() ?? 1.0,
       );
 
+      final lineConfig = SketchToolConfig(
+        opacity: content['lineOpacity']?.toDouble() ?? 1.0,
+        color: Color(content['lineColor'] ?? 0xFF000000),
+        strokeThickness: content['lineStrokeThickness']?.toDouble() ?? 1.0
+      );
+
+      final rectangleConfig = SketchToolConfig(
+        opacity: content['rectangleOpacity']?.toDouble() ?? 1.0,
+        color: Color(content['rectangleColor'] ?? 0xFF000000),
+        strokeThickness: content['rectangleThickness']?.toDouble() ?? 1.0
+      );
+
+      final circleConfig = SketchToolConfig(
+        opacity: content['circleOpacity']?.toDouble() ?? 1.0,
+        color: Color(content['circleColor'] ?? 0xFF000000),
+        strokeThickness: content['circleStrokeThickness']?.toDouble() ?? 1.0
+      );
+
       final sketchConfig = SketchConfig(
         toolType: toolType,
         pencilConfig: pencilConfig,
         brushConfig: brushConfig,
         highlighterConfig: highlighterConfig,
+        lineConfig: lineConfig,
+        rectangleConfig: rectangleConfig,
+        circleConfig: circleConfig,
         eraserRadius: content['eraserRadius']?.toDouble() ?? 1.0,
       );
 
@@ -72,6 +97,12 @@ class SketchDataConverter {
           break;
         case 'highlighter':
           result.add(Highlighter(offsets: offsets, sketchConfig: sketchConfig));
+        case 'line':
+          result.add(Line(offsets: offsets, sketchConfig: sketchConfig));
+        case 'rectangle':
+          result.add(Rectangle(offsets: offsets, sketchConfig: sketchConfig));
+        case 'circle':
+          result.add(Circle(offsets: offsets, sketchConfig: sketchConfig));
       }
     }
 
