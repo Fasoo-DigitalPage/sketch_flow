@@ -120,8 +120,8 @@ final String svgCode = await _controller.extractSVG(
 | **Palette** | Allows users to select colors for drawing tools. |
 | **Eraser**  | Erases drawings either by stroke or by area.    |
 | **Line**  |   Draws a straight line between the first and last touch point. Line color and thickness are customizable.  |
-| **Rectangle**  |  Draws a rectangle defined by the first and last touch points. Configurable stroke/fill options.   |
-| **Circle**  | 	Draws a circle or ellipse bounded by the first and last touch points. Supports stroke and fill customization. |
+| **Rectangle**  |  Draws a rectangle defined by the first and last touch points.   |
+| **Circle**  | 	Draws a circle or ellipse bounded by the first and last touch points. |
 
 
 
