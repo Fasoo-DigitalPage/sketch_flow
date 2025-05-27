@@ -1,7 +1,16 @@
 import 'dart:ui';
+import 'package:sketch_flow/sketch_model.dart';
 
-import '../../../../sketch_model.dart';
-
+/// Represents a circle drawing tool.
+///
+/// The **Circle** tool allows users to draw circular outlines by specifying two points:
+/// the starting point and the ending point. These two points define the diameter
+/// of the circle (drawn horizontally).
+///
+/// ### Key Features:
+/// - Draws a stroked circle (no fill)
+/// - Circle is centered between the first and last offset points
+/// - Radius is calculated as half the horizontal distance between two points
 class Circle extends SketchContent {
   Circle({required super.offsets, required super.sketchConfig});
 

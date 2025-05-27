@@ -1,5 +1,4 @@
 import 'dart:ui';
-
 import 'package:sketch_flow/sketch_model.dart';
 
 extension ShapeEraseExtension on SketchContent {

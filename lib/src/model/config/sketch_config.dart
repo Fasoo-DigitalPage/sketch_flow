@@ -230,16 +230,4 @@ class SketchConfig {
       showEraserEffect: showEraserEffect ?? this.showEraserEffect,
     );
   }
-
-  @override
-  String toString() {
-    return 'SketchConfig('
-        'toolType: ${toolType.name}, '
-        'lastUsedColor: $lastUsedColor, '
-        'lastUsedStrokeThickness: $lastUsedStrokeThickness, '
-        'pencil: ${pencilConfig.toString()}, '
-        'brush: ${brushConfig.toString()}, '
-        'colorList: $colorList, '
-        ')';
-  }
 }

@@ -1,7 +1,10 @@
 import 'dart:ui';
-
 import 'package:sketch_flow/sketch_model.dart';
 
+/// Represents a rectangular shape drawing tool.
+///
+/// The **Rectangle** tool allows users to draw a rectangular outline
+/// defined by two diagonal corner points: [offsets.first] and [offsets.last].
 class Rectangle extends SketchContent {
   Rectangle({required super.offsets, required super.sketchConfig});
 

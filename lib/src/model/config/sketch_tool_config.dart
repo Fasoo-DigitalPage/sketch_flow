@@ -48,9 +48,4 @@ class SketchToolConfig {
         strokeThicknessList: strokeThicknessList ?? this.strokeThicknessList
     );
   }
-
-  @override
-  String toString() {
-    return 'SketchToolConfig(opacity: $opacity, strokeThickness: $strokeThickness, color: $color strokeThicknessList: $strokeThicknessList)';
-  }
 }

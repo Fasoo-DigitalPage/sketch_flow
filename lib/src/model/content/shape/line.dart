@@ -1,7 +1,14 @@
 import 'dart:ui';
-
 import 'package:sketch_flow/sketch_model.dart';
 
+/// Represents a straight line drawing tool.
+///
+/// The **Line** tool connects two points (start and end) with a straight stroke.
+/// Only the first and last offsets in the list are used to render the line.
+///
+/// ### Key Features:
+/// - Draws a single straight line segment
+/// - Style is configurable (color, thickness, opacity)
 class Line extends SketchContent {
   Line({required super.offsets, required super.sketchConfig});
 

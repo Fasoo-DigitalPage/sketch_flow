@@ -1,6 +1,11 @@
 import 'dart:ui';
 import 'package:sketch_flow/sketch_model.dart';
 
+
+/// Represents a pencil tool for freehand drawing.
+///
+/// The **Pencil** tool allows users to draw continuous free-form lines
+/// by tracking finger or stylus movement.
 class Pencil extends SketchContent {
   Pencil({required super.offsets, required super.sketchConfig});
 

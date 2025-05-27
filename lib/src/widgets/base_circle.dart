@@ -41,12 +41,10 @@ class BaseCirclePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
 
-    // 채운 원
     final fillPaint = Paint()
       ..color = color
       ..style = PaintingStyle.fill;
 
-    // 테두리 원
     final strokePaint = Paint()
       ..color = Color(0xCFCFCFCF)
       ..style = PaintingStyle.stroke

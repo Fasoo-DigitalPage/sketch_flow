@@ -1,22 +1,26 @@
 import 'dart:ui';
 import 'package:sketch_flow/sketch_model.dart';
 import 'package:sketch_flow/src/model/config/sketch_tool_config.dart';
-import 'package:sketch_flow/src/model/content/shape/circle.dart';
-import 'package:sketch_flow/src/model/content/shape/line.dart';
-import 'package:sketch_flow/src/model/content/shape/rectangle.dart';
 
+/// A utility class responsible for converting sketch data to and from JSON format.
 class SketchDataConverter {
+  /// Converts a list of [SketchContent] objects into a list of JSON maps.
   static List<Map<String, dynamic>> toJson(List<SketchContent> contents) {
     return contents.map((c) => c.toJson()).toList();
   }
 
+  /// Converts a list of JSON maps into a list of [SketchContent] objects.
+  ///
+  /// Each JSON entry should specify a `type`, list of `offsets`, and tool-specific
+  /// configuration data. If a tool type is unrecognized, it defaults to pencil.
   static List<SketchContent> fromJson(List<Map<String, dynamic>> contents) {
     final result = <SketchContent>[];
 
     for (final content in contents) {
       final type = content['type'];
-      final offsets =
-          (content['offsets'] as List)
+
+      // Convert raw offset data to List<Offset>
+      final offsets = (content['offsets'] as List)
               .map((e) {
                 final dx = e['dx'];
                 final dy = e['dy'];
@@ -28,6 +32,7 @@ class SketchDataConverter {
               .whereType<Offset>()
               .toList();
 
+      // Determine the tool type
       final toolType = switch(type) {
         'pencil' => SketchToolType.pencil,
         'brush' => SketchToolType.brush,
@@ -74,6 +79,7 @@ class SketchDataConverter {
         strokeThickness: content['circleStrokeThickness']?.toDouble() ?? 1.0
       );
 
+      // Combine tool configs into a full sketch configuration
       final sketchConfig = SketchConfig(
         toolType: toolType,
         pencilConfig: pencilConfig,
@@ -85,6 +91,7 @@ class SketchDataConverter {
         eraserRadius: content['eraserRadius']?.toDouble() ?? 1.0,
       );
 
+      // Reconstruct the proper content object
       switch (type) {
         case 'pencil':
           result.add(Pencil(offsets: offsets, sketchConfig: sketchConfig));
@@ -97,12 +104,16 @@ class SketchDataConverter {
           break;
         case 'highlighter':
           result.add(Highlighter(offsets: offsets, sketchConfig: sketchConfig));
+          break;
         case 'line':
           result.add(Line(offsets: offsets, sketchConfig: sketchConfig));
+          break;
         case 'rectangle':
           result.add(Rectangle(offsets: offsets, sketchConfig: sketchConfig));
+          break;
         case 'circle':
           result.add(Circle(offsets: offsets, sketchConfig: sketchConfig));
+          break;
       }
     }
 

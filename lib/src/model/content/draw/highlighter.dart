@@ -1,7 +1,11 @@
 import 'dart:ui';
-
 import 'package:sketch_flow/sketch_model.dart';
 
+/// Represents a highlighter tool for drawing semi-transparent strokes.
+///
+/// The **Highlighter** simulates the behavior of a real-world marker by:
+/// - Using a **low opacity** for see-through strokes.
+/// - Applying a **thicker stroke width** to resemble the broad tip of a highlighter.
 class Highlighter extends SketchContent {
   Highlighter({required super.offsets, required super.sketchConfig});
 
