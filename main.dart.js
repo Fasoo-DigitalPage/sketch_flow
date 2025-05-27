@@ -80819,9 +80819,7 @@ return this.pI(a,s,s,s,s,s)},
 agJ(a){var s=null
 return this.pI(s,s,s,a,s,s)},
 agK(a){var s=null
-return this.pI(s,s,s,s,a,s)},
-k(a){var s=this
-return"SketchConfig(toolType: "+s.a.b+", lastUsedColor: "+s.b.k(0)+", lastUsedStrokeThickness: "+A.l(s.c)+", pencil: "+s.f.k(0)+", brush: "+s.r.k(0)+", colorList: "+A.l(s.e)+", )"}}
+return this.pI(s,s,s,s,a,s)}}
 A.acd.prototype={
 $1(a){var s,r,q=this.a
 if(q==null)q=a.d
@@ -80831,9 +80829,7 @@ r=this.c
 if(r==null)r=a.a
 return new A.eh(r,a.b,a.c,q,s,a.f)},
 $S:494}
-A.eh.prototype={
-k(a){var s=this
-return"SketchToolConfig(opacity: "+A.l(s.a)+", strokeThickness: "+A.l(s.e)+", color: "+s.d.k(0)+" strokeThicknessList: "+A.l(s.f)+")"}}
+A.eh.prototype={}
 A.G9.prototype={
 h3(a){},
 ee(){return A.x(t.N,t.z)},
