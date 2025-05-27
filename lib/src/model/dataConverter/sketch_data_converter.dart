@@ -20,7 +20,8 @@ class SketchDataConverter {
       final type = content['type'];
 
       // Convert raw offset data to List<Offset>
-      final offsets = (content['offsets'] as List)
+      final offsets =
+          (content['offsets'] as List)
               .map((e) {
                 final dx = e['dx'];
                 final dy = e['dy'];
@@ -33,14 +34,14 @@ class SketchDataConverter {
               .toList();
 
       // Determine the tool type
-      final toolType = switch(type) {
+      final toolType = switch (type) {
         'pencil' => SketchToolType.pencil,
         'brush' => SketchToolType.brush,
         'eraser' => SketchToolType.eraser,
         'highlighter' => SketchToolType.highlighter,
         'line' => SketchToolType.line,
         'rectangle' => SketchToolType.rectangle,
-        _ => SketchToolType.pencil
+        _ => SketchToolType.pencil,
       };
 
       final pencilConfig = SketchToolConfig(
@@ -58,25 +59,26 @@ class SketchDataConverter {
       final highlighterConfig = SketchToolConfig(
         opacity: content['highlighterOpacity']?.toDouble() ?? 1.0,
         color: Color(content['highlighterColor'] ?? 0xFF000000),
-        strokeThickness: content['highlighterStrokeThickness']?.toDouble() ?? 1.0,
+        strokeThickness:
+            content['highlighterStrokeThickness']?.toDouble() ?? 1.0,
       );
 
       final lineConfig = SketchToolConfig(
         opacity: content['lineOpacity']?.toDouble() ?? 1.0,
         color: Color(content['lineColor'] ?? 0xFF000000),
-        strokeThickness: content['lineStrokeThickness']?.toDouble() ?? 1.0
+        strokeThickness: content['lineStrokeThickness']?.toDouble() ?? 1.0,
       );
 
       final rectangleConfig = SketchToolConfig(
         opacity: content['rectangleOpacity']?.toDouble() ?? 1.0,
         color: Color(content['rectangleColor'] ?? 0xFF000000),
-        strokeThickness: content['rectangleThickness']?.toDouble() ?? 1.0
+        strokeThickness: content['rectangleThickness']?.toDouble() ?? 1.0,
       );
 
       final circleConfig = SketchToolConfig(
         opacity: content['circleOpacity']?.toDouble() ?? 1.0,
         color: Color(content['circleColor'] ?? 0xFF000000),
-        strokeThickness: content['circleStrokeThickness']?.toDouble() ?? 1.0
+        strokeThickness: content['circleStrokeThickness']?.toDouble() ?? 1.0,
       );
 
       // Combine tool configs into a full sketch configuration

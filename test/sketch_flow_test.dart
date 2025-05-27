@@ -5,18 +5,18 @@ import 'package:sketch_flow/sketch_model.dart';
 void main() {
   group('SketchViewModel', () {
     late SketchViewModel viewModel;
-    
+
     setUp(() {
       viewModel = SketchViewModel();
     });
-    
+
     test('Initial status screen', () {
       expect(viewModel.contents, isEmpty);
       expect(viewModel.currentSketchConfig.toolType, SketchToolType.pencil);
       expect(viewModel.canUndoNotifier.value, isFalse);
       expect(viewModel.canRedoNotifier.value, isFalse);
     });
-    
+
     test('startNewLine to start a new line', () {
       final offset = Offset(10, 10);
       viewModel.startNewLine(offset);
@@ -26,7 +26,7 @@ void main() {
       expect(viewModel.contents.length, 1);
       expect(viewModel.contents.first.offsets.first, offset);
     });
-    
+
     test('Delete all content with clear', () {
       viewModel.startNewLine(Offset(10, 10));
       viewModel.addPoint(Offset(20, 20));
@@ -37,7 +37,7 @@ void main() {
       expect(viewModel.contents, isEmpty);
       expect(viewModel.canUndoNotifier.value, isTrue);
     });
-    
+
     test('Undo functional test', () {
       viewModel.startNewLine(Offset(10, 10));
       viewModel.addPoint(Offset(20, 20));
@@ -48,20 +48,20 @@ void main() {
       expect(viewModel.contents, isEmpty);
       expect(viewModel.canRedoNotifier.value, isTrue);
     });
-    
+
     test('Redo functional test', () {
       viewModel.startNewLine(Offset(10, 10));
       viewModel.addPoint(Offset(20, 20));
       viewModel.endLine();
-      
+
       viewModel.undo();
       viewModel.redo();
-      
+
       expect(viewModel.contents.length, 1);
       expect(viewModel.canUndoNotifier.value, isTrue);
       expect(viewModel.canRedoNotifier.value, isFalse);
     });
-    
+
     test('ValueNotifier is reflected when toolType is changed', () {
       viewModel.updateConfig(SketchConfig(toolType: SketchToolType.eraser));
       expect(viewModel.toolTypeNotifier.value, SketchToolType.eraser);
@@ -84,7 +84,12 @@ void main() {
       viewModel.addPoint(Offset(30, 30));
       viewModel.endLine();
 
-      viewModel.updateConfig(SketchConfig(toolType: SketchToolType.eraser, eraserMode: EraserMode.area));
+      viewModel.updateConfig(
+        SketchConfig(
+          toolType: SketchToolType.eraser,
+          eraserMode: EraserMode.area,
+        ),
+      );
 
       // clear
       viewModel.startNewLine(Offset(15, 15));
@@ -93,7 +98,7 @@ void main() {
 
       expect(viewModel.hasErasedContent, isTrue);
     });
-    
+
     test('Verification of stroke erasing motion', () {
       // drawing
       viewModel.startNewLine(Offset(10, 10));
@@ -101,7 +106,12 @@ void main() {
       viewModel.addPoint(Offset(30, 30));
       viewModel.endLine();
 
-      viewModel.updateConfig(SketchConfig(toolType: SketchToolType.eraser, eraserMode: EraserMode.stroke));
+      viewModel.updateConfig(
+        SketchConfig(
+          toolType: SketchToolType.eraser,
+          eraserMode: EraserMode.stroke,
+        ),
+      );
 
       // erasing
       viewModel.startNewLine(Offset(15, 15));
@@ -139,7 +149,12 @@ void main() {
       viewModel.addPoint(Offset(40, 40));
       viewModel.endLine();
 
-      viewModel.updateConfig(SketchConfig(toolType: SketchToolType.eraser, eraserMode: EraserMode.area));
+      viewModel.updateConfig(
+        SketchConfig(
+          toolType: SketchToolType.eraser,
+          eraserMode: EraserMode.area,
+        ),
+      );
 
       // erasing
       viewModel.startNewLine(Offset(30, 30));

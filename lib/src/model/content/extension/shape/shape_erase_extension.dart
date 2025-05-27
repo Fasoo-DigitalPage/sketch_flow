@@ -20,7 +20,7 @@ extension ShapeEraseExtension on SketchContent {
   bool isErasedRectangleByEraser({
     required List<Offset> offsets,
     required Offset eraserCenter,
-    required double eraserRadius
+    required double eraserRadius,
   }) {
     if (offsets.length < 2) return false;
 
@@ -67,7 +67,7 @@ extension ShapeEraseExtension on SketchContent {
   bool isErasedLineByEraser({
     required List<Offset> offsets,
     required Offset eraserCenter,
-    required double eraserRadius
+    required double eraserRadius,
   }) {
     if (offsets.length < 2) return false;
 
@@ -100,9 +100,8 @@ extension ShapeEraseExtension on SketchContent {
       (start.dy + end.dy) / 2,
     );
 
-    final radius = ((end.dx - start.dx).abs() / 2)
-        .clamp(0, double.infinity)
-        .toDouble();
+    final radius =
+        ((end.dx - start.dx).abs() / 2).clamp(0, double.infinity).toDouble();
 
     final distance = (circleCenter - eraserCenter).distance;
 

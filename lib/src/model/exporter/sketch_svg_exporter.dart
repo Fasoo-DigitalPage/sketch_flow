@@ -15,7 +15,7 @@ class SketchSvgExporter {
   static String extractSVG({
     required List<SketchContent> contents,
     required double width,
-    required double height
+    required double height,
   }) {
     final buffer = StringBuffer();
     final eraserBuffer = StringBuffer();
@@ -54,5 +54,4 @@ class SketchSvgExporter {
 
     return buffer.toString();
   }
-
 }

@@ -15,16 +15,18 @@ class SketchPngExporter {
   /// Throws an error if the capture process encounters any issues.
   static Future<Uint8List?> extractPNG({
     required GlobalKey repaintKey,
-    double? pixelRatio
+    double? pixelRatio,
   }) async {
     try {
-      final boundary = repaintKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+      final boundary =
+          repaintKey.currentContext!.findRenderObject()
+              as RenderRepaintBoundary;
       final image = await boundary.toImage(pixelRatio: pixelRatio ?? 3.0);
       final byteData = await image.toByteData(format: ImageByteFormat.png);
 
       return byteData?.buffer.asUint8List();
-    } catch(e) {
-      throw('Error capturing images: $e');
+    } catch (e) {
+      throw ('Error capturing images: $e');
     }
   }
 }

@@ -26,7 +26,7 @@ enum SketchToolType {
   highlighter,
   line,
   rectangle,
-  circle
+  circle,
 }
 
 enum EraserMode { area, stroke }
@@ -82,8 +82,8 @@ class SketchConfig {
     ],
     this.pencilConfig = const SketchToolConfig(),
     this.brushConfig = const SketchToolConfig(
-        strokeThickness: 5.0,
-        strokeThicknessList: [5.0, 7.5, 10.0, 12.5, 15.0],
+      strokeThickness: 5.0,
+      strokeThicknessList: [5.0, 7.5, 10.0, 12.5, 15.0],
     ),
     this.highlighterConfig = const SketchToolConfig(
       color: Colors.deepPurpleAccent,
@@ -91,7 +91,7 @@ class SketchConfig {
       strokeThicknessList: [8.0, 11.5, 15.5, 19.0, 22.5],
       opacity: 0.6,
       opacityMin: 0.0,
-      opacityMax: 0.8
+      opacityMax: 0.8,
     ),
     this.lineConfig = const SketchToolConfig(),
     this.rectangleConfig = const SketchToolConfig(),

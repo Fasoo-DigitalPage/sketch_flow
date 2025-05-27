@@ -14,14 +14,17 @@ class Highlighter extends SketchContent {
     if (offsets.length < 2) return;
     final path = Path()..moveTo(offsets.first.dx, offsets.first.dy);
 
-    for (int i=0; i<offsets.length-1; i++) {
+    for (int i = 0; i < offsets.length - 1; i++) {
       path.lineTo(offsets[i].dx, offsets[i].dy);
     }
 
-    final paint = Paint()
-      ..color = sketchConfig.highlighterConfig.color.withValues(alpha: sketchConfig.highlighterConfig.opacity)
-      ..strokeWidth = sketchConfig.highlighterConfig.strokeThickness
-      ..style = PaintingStyle.stroke;
+    final paint =
+        Paint()
+          ..color = sketchConfig.highlighterConfig.color.withValues(
+            alpha: sketchConfig.highlighterConfig.opacity,
+          )
+          ..strokeWidth = sketchConfig.highlighterConfig.strokeThickness
+          ..style = PaintingStyle.stroke;
 
     canvas.drawPath(path, paint);
   }
@@ -32,7 +35,8 @@ class Highlighter extends SketchContent {
       'type': 'highlighter',
       'offsets': offsets.map((e) => {'dx': e.dx, 'dy': e.dy}).toList(),
       'highlighterColor': sketchConfig.highlighterConfig.color.toARGB32(),
-      'highlighterStrokeThickness': sketchConfig.highlighterConfig.strokeThickness,
+      'highlighterStrokeThickness':
+          sketchConfig.highlighterConfig.strokeThickness,
       'highlighterOpacity': sketchConfig.highlighterConfig.opacity,
     };
   }
@@ -47,7 +51,8 @@ class Highlighter extends SketchContent {
       pathData.write('L ${p.dx} ${p.dy} ');
     }
 
-    final color = '#${sketchConfig.highlighterConfig.color.toARGB32().toRadixString(16).padLeft(8, '0').substring(2)}';
+    final color =
+        '#${sketchConfig.highlighterConfig.color.toARGB32().toRadixString(16).padLeft(8, '0').substring(2)}';
     final opacity = sketchConfig.highlighterConfig.opacity;
     final strokeWidth = sketchConfig.highlighterConfig.strokeThickness;
 

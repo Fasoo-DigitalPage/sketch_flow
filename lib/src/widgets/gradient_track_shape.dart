@@ -13,31 +13,37 @@ class GradientTrackShape extends SliderTrackShape {
 
   @override
   void paint(
-      PaintingContext context,
-      Offset offset, {
-        required Animation<double> enableAnimation,
-        required RenderBox parentBox,
-        Offset? secondaryOffset,
-        required SliderThemeData sliderTheme,
-        required TextDirection textDirection,
-        required Offset thumbCenter,
-        bool isEnabled = false,
-        bool isDiscrete = false,
-      }) {
+    PaintingContext context,
+    Offset offset, {
+    required Animation<double> enableAnimation,
+    required RenderBox parentBox,
+    Offset? secondaryOffset,
+    required SliderThemeData sliderTheme,
+    required TextDirection textDirection,
+    required Offset thumbCenter,
+    bool isEnabled = false,
+    bool isDiscrete = false,
+  }) {
     final double height = trackHeight;
     final double trackLeft = offset.dx + 8;
     final double trackTop = offset.dy + (parentBox.size.height - height) / 2;
     final double trackWidth = parentBox.size.width - 16;
 
-    final Rect trackRect = Rect.fromLTWH(trackLeft, trackTop, trackWidth, height);
+    final Rect trackRect = Rect.fromLTWH(
+      trackLeft,
+      trackTop,
+      trackWidth,
+      height,
+    );
 
     final Canvas canvas = context.canvas;
 
     _drawCheckerboard(canvas, trackRect);
 
-    final Paint paint = Paint()
-      ..shader = gradient.createShader(trackRect)
-      ..style = PaintingStyle.fill;
+    final Paint paint =
+        Paint()
+          ..shader = gradient.createShader(trackRect)
+          ..style = PaintingStyle.fill;
 
     canvas.drawRRect(
       RRect.fromRectAndRadius(trackRect, Radius.circular(height / 2)),

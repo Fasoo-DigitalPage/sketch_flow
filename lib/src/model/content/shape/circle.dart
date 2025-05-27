@@ -25,18 +25,21 @@ class Circle extends SketchContent {
       return;
     }
 
-    final paint = Paint()
-      ..color = sketchConfig.circleConfig.color.withValues(alpha: sketchConfig.circleConfig.opacity)
-      ..strokeWidth = sketchConfig.circleConfig.strokeThickness
-      ..style = PaintingStyle.stroke;
+    final paint =
+        Paint()
+          ..color = sketchConfig.circleConfig.color.withValues(
+            alpha: sketchConfig.circleConfig.opacity,
+          )
+          ..strokeWidth = sketchConfig.circleConfig.strokeThickness
+          ..style = PaintingStyle.stroke;
 
     final center = Offset((start.dx + end.dx) / 2, (start.dy + end.dy) / 2);
 
-    final radius = ((end.dx - start.dx).abs() / 2).clamp(0, double.infinity).toDouble();
+    final radius =
+        ((end.dx - start.dx).abs() / 2).clamp(0, double.infinity).toDouble();
 
     canvas.drawCircle(center, radius, paint);
   }
-
 
   @override
   Map<String, dynamic> toJson() => {
@@ -47,7 +50,6 @@ class Circle extends SketchContent {
     'circleOpacity': sketchConfig.circleConfig.opacity,
   };
 
-
   @override
   String? toSvg() {
     final start = offsets.first;
@@ -57,7 +59,8 @@ class Circle extends SketchContent {
     final cy = (start.dy + end.dy) / 2;
     final r = ((end.dx - start.dx).abs() / 2).toDouble();
 
-    final color = '#${sketchConfig.circleConfig.color.toARGB32().toRadixString(16).padLeft(8, '0').substring(2)}';
+    final color =
+        '#${sketchConfig.circleConfig.color.toARGB32().toRadixString(16).padLeft(8, '0').substring(2)}';
     final opacity = sketchConfig.circleConfig.opacity;
     final strokeWidth = sketchConfig.circleConfig.strokeThickness;
 

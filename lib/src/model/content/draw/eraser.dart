@@ -17,17 +17,18 @@ class Eraser extends SketchContent {
     if (offsets.length < 2) return;
     final path = Path()..moveTo(offsets.first.dx, offsets.first.dy);
 
-    for (int i=0; i<offsets.length-1; i++) {
+    for (int i = 0; i < offsets.length - 1; i++) {
       path.lineTo(offsets[i].dx, offsets[i].dy);
     }
 
-    final paint = Paint()
-      ..color = Colors.transparent
-      ..blendMode = BlendMode.clear
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round
-      ..strokeWidth = sketchConfig.eraserRadius * 2;
+    final paint =
+        Paint()
+          ..color = Colors.transparent
+          ..blendMode = BlendMode.clear
+          ..style = PaintingStyle.stroke
+          ..strokeCap = StrokeCap.round
+          ..strokeJoin = StrokeJoin.round
+          ..strokeWidth = sketchConfig.eraserRadius * 2;
 
     canvas.drawPath(path, paint);
   }
@@ -37,7 +38,7 @@ class Eraser extends SketchContent {
     return {
       'type': 'eraser',
       'offsets': offsets.map((e) => {'dx': e.dx, 'dy': e.dy}).toList(),
-      'eraserRadius': sketchConfig.eraserRadius
+      'eraserRadius': sketchConfig.eraserRadius,
     };
   }
 
@@ -45,8 +46,10 @@ class Eraser extends SketchContent {
   String? toSvg() {
     final radius = sketchConfig.eraserRadius;
 
-    return offsets.map((point) {
-      return '<circle cx="${point.dx}" cy="${point.dy}" r="$radius" fill="black"/>';
-    }).join('\n');
+    return offsets
+        .map((point) {
+          return '<circle cx="${point.dx}" cy="${point.dy}" r="$radius" fill="black"/>';
+        })
+        .join('\n');
   }
 }

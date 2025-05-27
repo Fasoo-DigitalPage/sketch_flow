@@ -17,9 +17,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: DemoPage(),
-    );
+    return MaterialApp(home: DemoPage());
   }
 }
 
@@ -31,7 +29,9 @@ class DemoPage extends StatefulWidget {
 }
 
 class _DemoPageState extends State<DemoPage> {
-  final SketchViewModel _sketchViewModel = SketchViewModel(sketchConfig: SketchConfig(showEraserEffect: true));
+  final SketchViewModel _sketchViewModel = SketchViewModel(
+    sketchConfig: SketchConfig(showEraserEffect: true),
+  );
   final GlobalKey _repaintKey = GlobalKey();
 
   @override
@@ -54,8 +54,10 @@ class _DemoPageState extends State<DemoPage> {
           _sketchViewModel.fromJson(json: testData);
         },
         onClickExtractPNG: () async {
-          final image = await _sketchViewModel.extractPNG(repaintKey: _repaintKey);
-          if(context.mounted && image != null) {
+          final image = await _sketchViewModel.extractPNG(
+            repaintKey: _repaintKey,
+          );
+          if (context.mounted && image != null) {
             _showPNGDialog(image: image);
           }
         },
@@ -63,8 +65,8 @@ class _DemoPageState extends State<DemoPage> {
           final width = MediaQuery.of(context).size.width;
           final height = MediaQuery.of(context).size.height;
           final svgCode = _sketchViewModel.extractSVG(
-              width: width,
-              height: height
+            width: width,
+            height: height,
           );
           final scalableImage = ScalableImage.fromSvgString(svgCode);
 
@@ -80,60 +82,57 @@ class _DemoPageState extends State<DemoPage> {
     final prettyJson = const JsonEncoder.withIndent('  ').convert(json);
 
     showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text("Sketch JSON"),
-          content: SingleChildScrollView(
-            child: SelectableText(
-              prettyJson,
-              style: const TextStyle(fontSize: 12),
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text("Sketch JSON"),
+            content: SingleChildScrollView(
+              child: SelectableText(
+                prettyJson,
+                style: const TextStyle(fontSize: 12),
+              ),
             ),
-          ),
-          actions: [
-            TextButton(
+            actions: [
+              TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text("Close")
-            )
-          ],
-        )
+                child: const Text("Close"),
+              ),
+            ],
+          ),
     );
   }
 
   void _showPNGDialog({required Uint8List image}) {
     showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text("Sketch PNG"),
-          content: SingleChildScrollView(
-            child: Image.memory(image),
-          ),
-          actions: [
-            TextButton(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text("Sketch PNG"),
+            content: SingleChildScrollView(child: Image.memory(image)),
+            actions: [
+              TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text("Close")
-            )
-          ],
-        ),
+                child: const Text("Close"),
+              ),
+            ],
+          ),
     );
   }
 
   void _showSVGDialog({required ScalableImage si}) {
-
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Sketch SVG"),
-        content: SingleChildScrollView(
-          child: ScalableImageWidget(si: si)
-        ),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text("Close")
-          )
-        ],
-      ),
+      builder:
+          (context) => AlertDialog(
+            title: const Text("Sketch SVG"),
+            content: SingleChildScrollView(child: ScalableImageWidget(si: si)),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text("Close"),
+              ),
+            ],
+          ),
     );
-    
   }
 }

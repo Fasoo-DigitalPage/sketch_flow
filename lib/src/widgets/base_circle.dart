@@ -15,17 +15,14 @@ class BaseCircle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-        icon: SizedBox(
-          width: radius,
-          height: radius,
-          child: CustomPaint(
-            painter: BaseCirclePainter(
-                radius: radius,
-                color: color
-            ),
-          ),
+      icon: SizedBox(
+        width: radius,
+        height: radius,
+        child: CustomPaint(
+          painter: BaseCirclePainter(radius: radius, color: color),
         ),
-        onPressed: onClickCircle
+      ),
+      onPressed: onClickCircle,
     );
   }
 }
@@ -36,19 +33,20 @@ class BaseCirclePainter extends CustomPainter {
   final double radius;
   final Color color;
 
-
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
 
-    final fillPaint = Paint()
-      ..color = color
-      ..style = PaintingStyle.fill;
+    final fillPaint =
+        Paint()
+          ..color = color
+          ..style = PaintingStyle.fill;
 
-    final strokePaint = Paint()
-      ..color = Color(0xCFCFCFCF)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 0.5;
+    final strokePaint =
+        Paint()
+          ..color = Color(0xCFCFCFCF)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 0.5;
 
     canvas.drawCircle(center, radius, fillPaint);
     canvas.drawCircle(center, radius, strokePaint);

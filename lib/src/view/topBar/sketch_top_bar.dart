@@ -56,7 +56,7 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
     this.showInputTestDataIcon,
     this.onClickInputTestButton,
     this.onClickExtractPNG,
-    this.onClickExtractSVG
+    this.onClickExtractSVG,
   });
   final SketchViewModel viewModel;
 
@@ -90,106 +90,119 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-        child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-            decoration: BoxDecoration(
-                color: topBarColor,
-                border: Border(
-                    bottom: BorderSide(
-                        color: topBarBorderColor,
-                        width: topBarBorderWidth ?? 0.5
-                    )
-                )
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+        decoration: BoxDecoration(
+          color: topBarColor,
+          border: Border(
+            bottom: BorderSide(
+              color: topBarBorderColor,
+              width: topBarBorderWidth ?? 0.5,
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+              icon:
+                  backButtonIcon ??
+                  Icon(Icons.arrow_back_ios, color: Colors.black),
+              onPressed: () => onClickBackButton,
+            ),
+            Row(
               children: [
-                IconButton(
-                    icon: backButtonIcon ?? Icon(Icons.arrow_back_ios, color: Colors.black,),
-                    onPressed: () => onClickBackButton,
-                ),
-                Row(
-                  children: [
-                    /// Undo Icon button
-                    ValueListenableBuilder<bool>(
-                        valueListenable: viewModel.canUndoNotifier,
-                        builder: (context, canUndo, _) {
-                          return IconButton(
-                              icon: canUndo
-                                  ? (undoIcon?.enableIcon ?? Icon(Icons.undo_rounded))
-                                  : (undoIcon?.disableIcon ?? Icon(Icons.undo_rounded)),
-                              onPressed: canUndo ? () {
+                /// Undo Icon button
+                ValueListenableBuilder<bool>(
+                  valueListenable: viewModel.canUndoNotifier,
+                  builder: (context, canUndo, _) {
+                    return IconButton(
+                      icon:
+                          canUndo
+                              ? (undoIcon?.enableIcon ??
+                                  Icon(Icons.undo_rounded))
+                              : (undoIcon?.disableIcon ??
+                                  Icon(Icons.undo_rounded)),
+                      onPressed:
+                          canUndo
+                              ? () {
                                 viewModel.undo();
-                              } : null
-                          );
-                        }
-                    ),
-
-                    /// Redo Icon button
-                    ValueListenableBuilder<bool>(
-                        valueListenable: viewModel.canRedoNotifier,
-                        builder: (context, canRedo, _) {
-                          return IconButton(
-                              icon: canRedo
-                                  ? (redoIcon?.enableIcon ?? Icon(Icons.redo_rounded))
-                                  : (redoIcon?.disableIcon ?? Icon(Icons.redo_rounded)),
-                              onPressed: canRedo ? () {
-                                viewModel.redo();
-                              } : null
-                          );
-                        }
-                    ),
-
-                    IconButton(
-                        onPressed: () {
-                          if(onClickExtractSVG != null) {
-                            List<Offset> offsets = [];
-
-                            for (final content in viewModel.contents) {
-                              offsets.addAll(content.offsets);
-                            }
-
-                            onClickExtractSVG!(offsets);
-                          }
-                        },
-                        icon: exportSVGIcon ?? Icon(Icons.file_open_outlined)
-                    ),
-
-                    IconButton(
-                        onPressed: () {
-                          if(onClickExtractPNG != null) {
-                            onClickExtractPNG!();
-                          }
-                        },
-                        icon: exportPNGIcon ?? Icon(Icons.image)
-                    ),
-
-                    /// Button for JSON data debugging
-                    if(showJsonDialogIcon ?? false)
-                      IconButton(
-                        icon: exportJSONIcon ?? Icon(Icons.javascript),
-                        onPressed: () {
-                          if(onClickToJsonButton != null) {
-                            onClickToJsonButton!();
-                          }
-                        }
-                      ),
-
-                    if(showInputTestDataIcon ?? false)
-                      IconButton(
-                          icon: exportTestDataIcon ?? Icon(Icons.input),
-                          onPressed: ()  {
-                            if (onClickInputTestButton != null) {
-                              onClickInputTestButton!();
-                            }
-                          },
-                      ),
-                  ],
+                              }
+                              : null,
+                    );
+                  },
                 ),
 
+                /// Redo Icon button
+                ValueListenableBuilder<bool>(
+                  valueListenable: viewModel.canRedoNotifier,
+                  builder: (context, canRedo, _) {
+                    return IconButton(
+                      icon:
+                          canRedo
+                              ? (redoIcon?.enableIcon ??
+                                  Icon(Icons.redo_rounded))
+                              : (redoIcon?.disableIcon ??
+                                  Icon(Icons.redo_rounded)),
+                      onPressed:
+                          canRedo
+                              ? () {
+                                viewModel.redo();
+                              }
+                              : null,
+                    );
+                  },
+                ),
+
+                IconButton(
+                  onPressed: () {
+                    if (onClickExtractSVG != null) {
+                      List<Offset> offsets = [];
+
+                      for (final content in viewModel.contents) {
+                        offsets.addAll(content.offsets);
+                      }
+
+                      onClickExtractSVG!(offsets);
+                    }
+                  },
+                  icon: exportSVGIcon ?? Icon(Icons.file_open_outlined),
+                ),
+
+                IconButton(
+                  onPressed: () {
+                    if (onClickExtractPNG != null) {
+                      onClickExtractPNG!();
+                    }
+                  },
+                  icon: exportPNGIcon ?? Icon(Icons.image),
+                ),
+
+                /// Button for JSON data debugging
+                if (showJsonDialogIcon ?? false)
+                  IconButton(
+                    icon: exportJSONIcon ?? Icon(Icons.javascript),
+                    onPressed: () {
+                      if (onClickToJsonButton != null) {
+                        onClickToJsonButton!();
+                      }
+                    },
+                  ),
+
+                if (showInputTestDataIcon ?? false)
+                  IconButton(
+                    icon: exportTestDataIcon ?? Icon(Icons.input),
+                    onPressed: () {
+                      if (onClickInputTestButton != null) {
+                        onClickInputTestButton!();
+                      }
+                    },
+                  ),
               ],
-            )
-        )
+            ),
+          ],
+        ),
+      ),
     );
   }
 

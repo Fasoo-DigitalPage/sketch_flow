@@ -15,16 +15,25 @@ class SketchPainter extends CustomPainter {
       content.draw(canvas);
     }
 
-    final currentContent = SketchContent.create(offsets: viewModel.currentOffsets, sketchConfig: viewModel.currentSketchConfig);
+    final currentContent = SketchContent.create(
+      offsets: viewModel.currentOffsets,
+      sketchConfig: viewModel.currentSketchConfig,
+    );
     currentContent.draw(canvas);
 
-    if (viewModel.toolTypeNotifier.value == SketchToolType.eraser && viewModel.eraserCirclePosition != null
-        && viewModel.currentSketchConfig.showEraserEffect) {
-      final eraserPaint = Paint()
-        ..color = Colors.grey
-        ..style = PaintingStyle.stroke;
+    if (viewModel.toolTypeNotifier.value == SketchToolType.eraser &&
+        viewModel.eraserCirclePosition != null &&
+        viewModel.currentSketchConfig.showEraserEffect) {
+      final eraserPaint =
+          Paint()
+            ..color = Colors.grey
+            ..style = PaintingStyle.stroke;
 
-      canvas.drawCircle(viewModel.eraserCirclePosition!, (viewModel.currentSketchConfig.eraserRadius), eraserPaint);
+      canvas.drawCircle(
+        viewModel.eraserCirclePosition!,
+        (viewModel.currentSketchConfig.eraserRadius),
+        eraserPaint,
+      );
     }
 
     canvas.restore();
@@ -34,5 +43,4 @@ class SketchPainter extends CustomPainter {
   bool shouldRepaint(SketchPainter oldDelegate) {
     return viewModel.contents != oldDelegate.viewModel.contents;
   }
-
 }

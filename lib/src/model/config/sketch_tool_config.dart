@@ -40,12 +40,12 @@ class SketchToolConfig {
     List<double>? strokeThicknessList,
   }) {
     return SketchToolConfig(
-        opacity: opacity ?? this.opacity,
-        opacityMin:  opacityMin ?? this.opacityMin,
-        opacityMax: opacityMax ?? this.opacityMax,
-        color: color ?? this.color,
-        strokeThickness: strokeThickness ?? this.strokeThickness,
-        strokeThicknessList: strokeThicknessList ?? this.strokeThicknessList
+      opacity: opacity ?? this.opacity,
+      opacityMin: opacityMin ?? this.opacityMin,
+      opacityMax: opacityMax ?? this.opacityMax,
+      color: color ?? this.color,
+      strokeThickness: strokeThickness ?? this.strokeThickness,
+      strokeThicknessList: strokeThicknessList ?? this.strokeThicknessList,
     );
   }
 }

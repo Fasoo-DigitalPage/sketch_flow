@@ -8,22 +8,22 @@ class ColorPickerSliderShape extends SliderTrackShape {
   ColorPickerSliderShape({
     this.trackHeight = 4.0,
     required this.colorStepCount,
-    required this.colors
+    required this.colors,
   });
 
   @override
   void paint(
-      PaintingContext context,
-      Offset offset, {
-        required RenderBox parentBox,
-        required SliderThemeData sliderTheme,
-        required Animation<double> enableAnimation,
-        required Offset thumbCenter,
-        Offset? secondaryOffset,
-        bool isEnabled = false,
-        bool isDiscrete = false,
-        required TextDirection textDirection,
-      }) {
+    PaintingContext context,
+    Offset offset, {
+    required RenderBox parentBox,
+    required SliderThemeData sliderTheme,
+    required Animation<double> enableAnimation,
+    required Offset thumbCenter,
+    Offset? secondaryOffset,
+    bool isEnabled = false,
+    bool isDiscrete = false,
+    required TextDirection textDirection,
+  }) {
     final double height = trackHeight;
     final double trackLeft = offset.dx + 8;
     final double trackTop = offset.dy + (parentBox.size.height - height) / 2;
@@ -32,8 +32,16 @@ class ColorPickerSliderShape extends SliderTrackShape {
     final Canvas canvas = context.canvas;
     final double rectWidth = trackWidth / colorStepCount;
 
-    final Rect trackRect = Rect.fromLTWH(trackLeft, trackTop, trackWidth, height);
-    final RRect roundedRect = RRect.fromRectAndRadius(trackRect, Radius.circular(height/2));
+    final Rect trackRect = Rect.fromLTWH(
+      trackLeft,
+      trackTop,
+      trackWidth,
+      height,
+    );
+    final RRect roundedRect = RRect.fromRectAndRadius(
+      trackRect,
+      Radius.circular(height / 2),
+    );
 
     canvas.save();
     canvas.clipRRect(roundedRect);
@@ -47,10 +55,11 @@ class ColorPickerSliderShape extends SliderTrackShape {
 
     canvas.restore();
 
-    final Paint borderPaint = Paint()
-      ..color = Colors.grey.withAlpha(80)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 0.7;
+    final Paint borderPaint =
+        Paint()
+          ..color = Colors.grey.withAlpha(80)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 0.7;
     canvas.drawRRect(roundedRect, borderPaint);
   }
 
@@ -63,7 +72,8 @@ class ColorPickerSliderShape extends SliderTrackShape {
     bool isDiscrete = false,
   }) {
     final double trackLeft = offset.dx + 8;
-    final double trackTop = offset.dy + (parentBox.size.height - trackHeight) / 2;
+    final double trackTop =
+        offset.dy + (parentBox.size.height - trackHeight) / 2;
     final double trackWidth = parentBox.size.width - 16;
 
     return Rect.fromLTWH(trackLeft, trackTop, trackWidth, trackHeight);

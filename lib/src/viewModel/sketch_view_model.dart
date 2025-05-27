@@ -5,16 +5,17 @@ import 'package:sketch_flow/src/model/content/extension/shape/shape_erase_extens
 
 class SketchViewModel extends ChangeNotifier {
   /// A viewModel that manages the user's sketching state on the canvas.
-  SketchViewModel({
-    SketchConfig? sketchConfig
-  }) : _sketchConfig = sketchConfig ?? SketchConfig();
+  SketchViewModel({SketchConfig? sketchConfig})
+    : _sketchConfig = sketchConfig ?? SketchConfig();
 
   /// The list of all accumulated sketch contents.
   final List<SketchContent> _contents = [];
   List<SketchContent> get contents => List.unmodifiable(_contents);
 
   /// Notifier for the current tool type (e.g., pencil, eraser).
-  final ValueNotifier<SketchToolType> toolTypeNotifier = ValueNotifier(SketchToolType.pencil);
+  final ValueNotifier<SketchToolType> toolTypeNotifier = ValueNotifier(
+    SketchToolType.pencil,
+  );
 
   /// Notifier for the undo
   final ValueNotifier<bool> canUndoNotifier = ValueNotifier(false);
@@ -75,7 +76,7 @@ class SketchViewModel extends ChangeNotifier {
 
     if (_sketchConfig.toolType == SketchToolType.eraser) {
       _handleEraser(offset: offset);
-    }else {
+    } else {
       _currentOffsets.add(offset);
     }
 
@@ -86,14 +87,20 @@ class SketchViewModel extends ChangeNotifier {
   void endLine() {
     if (!_isEnabled) return;
 
-    final content = SketchContent.create(offsets: _currentOffsets, sketchConfig: _sketchConfig);
+    final content = SketchContent.create(
+      offsets: _currentOffsets,
+      sketchConfig: _sketchConfig,
+    );
 
     if (_sketchConfig.toolType == SketchToolType.eraser) {
       _eraserCirclePosition = null;
     }
 
     final isEraser = _sketchConfig.toolType == SketchToolType.eraser;
-    final isAreaEraseWithEffect = isEraser && _sketchConfig.eraserMode == EraserMode.area && _hasErasedContent;
+    final isAreaEraseWithEffect =
+        isEraser &&
+        _sketchConfig.eraserMode == EraserMode.area &&
+        _hasErasedContent;
 
     // Save only when something is erased
     if (!isEraser || isAreaEraseWithEffect) {
@@ -116,10 +123,12 @@ class SketchViewModel extends ChangeNotifier {
   /// Reverts the canvas to the previous drawing state by popping from the undo stack.
   /// The current state is pushed onto the redo stack for possible reapplication.
   void undo() {
-    if(_undoStack.isEmpty) return;
+    if (_undoStack.isEmpty) return;
 
     _redoStack.add(List.from(_contents));
-    _contents..clear()..addAll(_undoStack.removeLast());
+    _contents
+      ..clear()
+      ..addAll(_undoStack.removeLast());
     _updateUndoRedoStatus();
 
     notifyListeners();
@@ -128,10 +137,12 @@ class SketchViewModel extends ChangeNotifier {
   /// Reapplies the most recently undone drawing state by popping from the redo stack.
   /// The current state is pushed back onto the undo stack.
   void redo() {
-    if(_redoStack.isEmpty) return;
+    if (_redoStack.isEmpty) return;
 
     _undoStack.add(List.from(_contents));
-    _contents..clear()..addAll(_redoStack.removeLast());
+    _contents
+      ..clear()
+      ..addAll(_redoStack.removeLast());
     _updateUndoRedoStatus();
 
     notifyListeners();
@@ -144,21 +155,29 @@ class SketchViewModel extends ChangeNotifier {
   void fromJson({required List<Map<String, dynamic>> json}) {
     final data = SketchDataConverter.fromJson(json);
 
-    _contents..clear()..addAll(data);
+    _contents
+      ..clear()
+      ..addAll(data);
     notifyListeners();
   }
 
-  Future<Uint8List?> extractPNG({required GlobalKey repaintKey, double? pixelRatio}) async {
-    final image = await SketchPngExporter.extractPNG(repaintKey: repaintKey, pixelRatio: pixelRatio);
+  Future<Uint8List?> extractPNG({
+    required GlobalKey repaintKey,
+    double? pixelRatio,
+  }) async {
+    final image = await SketchPngExporter.extractPNG(
+      repaintKey: repaintKey,
+      pixelRatio: pixelRatio,
+    );
 
     return image;
   }
 
   String extractSVG({required double width, required double height}) {
     return SketchSvgExporter.extractSVG(
-        contents: _contents,
-        width: width,
-        height: height
+      contents: _contents,
+      width: width,
+      height: height,
     );
   }
 
@@ -181,19 +200,18 @@ class SketchViewModel extends ChangeNotifier {
     // If any point of a stroke lies within the eraser circle, remove that stroke
     // and add it to the removedPoint list for undo tracking.
     _contents.removeWhere((content) {
-      if (content is !Eraser) {
+      if (content is! Eraser) {
         for (final offset in content.offsets) {
           if (content.sketchConfig.isShapeTool) {
             if (_checkShapeErased(
-                toolType: content.sketchConfig.toolType,
-                content: content,
-                eraserCenter: center
+              toolType: content.sketchConfig.toolType,
+              content: content,
+              eraserCenter: center,
             )) {
               removedContents.add(content);
               return true;
             }
-
-          }else {
+          } else {
             if (_isOffsetInsideCircle(offset: offset, center: center)) {
               removedContents.add(content);
               return true;
@@ -229,10 +247,10 @@ class SketchViewModel extends ChangeNotifier {
             result = _checkShapeErased(
               toolType: content.sketchConfig.toolType,
               content: content,
-              eraserCenter: center
+              eraserCenter: center,
             );
           }
-        }else {
+        } else {
           if (_isOffsetInsideCircle(offset: point, center: center)) {
             return true;
           }
@@ -243,15 +261,12 @@ class SketchViewModel extends ChangeNotifier {
   }
 
   /// Verify sure it's inside the eraser area
-  bool _isOffsetInsideCircle({
-    required Offset offset,
-    required Offset center
-  }) {
+  bool _isOffsetInsideCircle({required Offset offset, required Offset center}) {
     final radius = _sketchConfig.eraserRadius;
     final dx = offset.dx - center.dx;
     final dy = offset.dy - center.dy;
 
-    return dx*dx + dy*dy <= radius*radius;
+    return dx * dx + dy * dy <= radius * radius;
   }
 
   /// Verify that it is a duplicate offset
@@ -282,28 +297,27 @@ class SketchViewModel extends ChangeNotifier {
   bool _checkShapeErased({
     required SketchToolType toolType,
     required SketchContent content,
-    required Offset eraserCenter
+    required Offset eraserCenter,
   }) {
-    final result = switch(toolType) {
+    final result = switch (toolType) {
       SketchToolType.rectangle => content.isErasedRectangleByEraser(
-          offsets: content.offsets,
-          eraserCenter: eraserCenter,
-          eraserRadius: _sketchConfig.eraserRadius
+        offsets: content.offsets,
+        eraserCenter: eraserCenter,
+        eraserRadius: _sketchConfig.eraserRadius,
       ),
       SketchToolType.line => content.isErasedLineByEraser(
-          offsets: content.offsets,
-          eraserCenter: eraserCenter,
-          eraserRadius: _sketchConfig.eraserRadius
+        offsets: content.offsets,
+        eraserCenter: eraserCenter,
+        eraserRadius: _sketchConfig.eraserRadius,
       ),
       SketchToolType.circle => content.isErasedCircleByEraser(
-          offsets: content.offsets,
-          eraserCenter: eraserCenter,
-          eraserRadius: _sketchConfig.eraserRadius
+        offsets: content.offsets,
+        eraserCenter: eraserCenter,
+        eraserRadius: _sketchConfig.eraserRadius,
       ),
-      _ => false
+      _ => false,
     };
 
     return result;
   }
-  
 }

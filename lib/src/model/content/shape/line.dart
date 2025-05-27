@@ -16,14 +16,16 @@ class Line extends SketchContent {
   void draw(Canvas canvas) {
     if (offsets.length < 2) return;
 
-    final paint = Paint()
-      ..color = sketchConfig.lineConfig.color.withValues(alpha: sketchConfig.lineConfig.opacity)
-      ..strokeWidth = sketchConfig.lineConfig.strokeThickness
-      ..style = PaintingStyle.stroke;
+    final paint =
+        Paint()
+          ..color = sketchConfig.lineConfig.color.withValues(
+            alpha: sketchConfig.lineConfig.opacity,
+          )
+          ..strokeWidth = sketchConfig.lineConfig.strokeThickness
+          ..style = PaintingStyle.stroke;
 
     canvas.drawLine(offsets.first, offsets.last, paint);
   }
-
 
   @override
   Map<String, dynamic> toJson() => {
@@ -38,7 +40,8 @@ class Line extends SketchContent {
   String? toSvg() {
     final start = offsets.first;
     final end = offsets.last;
-    final color = '#${sketchConfig.lineConfig.color.toARGB32().toRadixString(16).padLeft(8, '0').substring(2)}';
+    final color =
+        '#${sketchConfig.lineConfig.color.toARGB32().toRadixString(16).padLeft(8, '0').substring(2)}';
     final opacity = sketchConfig.lineConfig.opacity;
     final strokeWidth = sketchConfig.lineConfig.strokeThickness;
 
@@ -64,5 +67,4 @@ class Line extends SketchContent {
 
     return interpolated;
   }
-
 }

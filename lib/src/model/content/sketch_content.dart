@@ -31,13 +31,19 @@ abstract class SketchContent {
       case SketchToolType.brush:
         return Brush(offsets: List.from(offsets), sketchConfig: sketchConfig);
       case SketchToolType.highlighter:
-        return Highlighter(offsets: List.from(offsets), sketchConfig: sketchConfig);
+        return Highlighter(
+          offsets: List.from(offsets),
+          sketchConfig: sketchConfig,
+        );
       case SketchToolType.eraser:
         return Eraser(offsets: List.from(offsets), sketchConfig: sketchConfig);
       case SketchToolType.line:
         return Line(offsets: List.from(offsets), sketchConfig: sketchConfig);
       case SketchToolType.rectangle:
-        return Rectangle(offsets: List.from(offsets), sketchConfig: sketchConfig);
+        return Rectangle(
+          offsets: List.from(offsets),
+          sketchConfig: sketchConfig,
+        );
       case SketchToolType.circle:
         return Circle(offsets: List.from(offsets), sketchConfig: sketchConfig);
       default:

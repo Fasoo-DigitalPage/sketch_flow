@@ -19,10 +19,13 @@ class Rectangle extends SketchContent {
       return;
     }
 
-    final paint = Paint()
-      ..color = sketchConfig.rectangleConfig.color.withValues(alpha: sketchConfig.rectangleConfig.opacity)
-      ..strokeWidth = sketchConfig.rectangleConfig.strokeThickness
-      ..style = PaintingStyle.stroke;
+    final paint =
+        Paint()
+          ..color = sketchConfig.rectangleConfig.color.withValues(
+            alpha: sketchConfig.rectangleConfig.opacity,
+          )
+          ..strokeWidth = sketchConfig.rectangleConfig.strokeThickness
+          ..style = PaintingStyle.stroke;
 
     final rect = Rect.fromPoints(start, end);
 
@@ -48,7 +51,8 @@ class Rectangle extends SketchContent {
     final width = (start.dx - end.dx).abs();
     final height = (start.dy - end.dy).abs();
 
-    final color = '#${sketchConfig.rectangleConfig.color.toARGB32().toRadixString(16).padLeft(8, '0').substring(2)}';
+    final color =
+        '#${sketchConfig.rectangleConfig.color.toARGB32().toRadixString(16).padLeft(8, '0').substring(2)}';
     final opacity = sketchConfig.rectangleConfig.opacity;
     final strokeWidth = sketchConfig.rectangleConfig.strokeThickness;
 

@@ -16,5 +16,4 @@ class Blank extends SketchContent {
   String? toSvg() {
     return null;
   }
-
 }

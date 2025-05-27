@@ -6,6 +6,9 @@ class SketchToolIcon {
   final Widget disableIcon;
   final double size;
 
-  SketchToolIcon({required this.enableIcon, required this.disableIcon, this.size = 24});
-
+  SketchToolIcon({
+    required this.enableIcon,
+    required this.disableIcon,
+    this.size = 24,
+  });
 }

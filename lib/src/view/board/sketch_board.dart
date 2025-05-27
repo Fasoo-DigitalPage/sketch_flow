@@ -70,7 +70,8 @@ class _SketchBoardState extends State<SketchBoard> {
   Widget build(BuildContext context) {
     // Drawing mode widget
     Widget drawingModeWidget = Listener(
-      onPointerDown: (event) => widget.viewModel.startNewLine(event.localPosition),
+      onPointerDown:
+          (event) => widget.viewModel.startNewLine(event.localPosition),
       onPointerMove: (event) => widget.viewModel.addPoint(event.localPosition),
       onPointerUp: (_) => widget.viewModel.endLine(),
       child: Container(
@@ -85,9 +86,7 @@ class _SketchBoardState extends State<SketchBoard> {
               child: Stack(
                 children: [
                   if (widget.overlayWidgets != null) ...?widget.overlayWidgets,
-                  CustomPaint(
-                    painter: SketchPainter(widget.viewModel),
-                  )
+                  CustomPaint(painter: SketchPainter(widget.viewModel)),
                 ],
               ),
             );
@@ -102,37 +101,34 @@ class _SketchBoardState extends State<SketchBoard> {
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height,
       child: AnimatedBuilder(
-          animation: widget.viewModel,
-          builder: (context, _) {
-            return RepaintBoundary(
-              key: widget.repaintKey,
-              child: Stack(
-                children: [
-                  if (widget.overlayWidgets != null) ...?widget.overlayWidgets,
-                  CustomPaint(
-                    painter: SketchPainter(widget.viewModel),
-                  )
-                ],
-              ),
-            );
-          }
+        animation: widget.viewModel,
+        builder: (context, _) {
+          return RepaintBoundary(
+            key: widget.repaintKey,
+            child: Stack(
+              children: [
+                if (widget.overlayWidgets != null) ...?widget.overlayWidgets,
+                CustomPaint(painter: SketchPainter(widget.viewModel)),
+              ],
+            ),
+          );
+        },
       ),
     );
 
     return ValueListenableBuilder<SketchToolType>(
-        valueListenable: widget.viewModel.toolTypeNotifier,
-        builder: (context, toolType, _) {
-          bool isMoveArea = toolType == SketchToolType.move;
+      valueListenable: widget.viewModel.toolTypeNotifier,
+      builder: (context, toolType, _) {
+        bool isMoveArea = toolType == SketchToolType.move;
 
-          return InteractiveViewer(
-            constrained: false,
-            panEnabled: isMoveArea,
-            maxScale: isMoveArea ? widget.boardMaxScale ?? 5.0 : 1.0,
-            minScale: isMoveArea ? widget.boardMinScale ?? 0.5 : 1.0,
-            child: isMoveArea ? viewerModeWidget : drawingModeWidget,
-          );
-        }
+        return InteractiveViewer(
+          constrained: false,
+          panEnabled: isMoveArea,
+          maxScale: isMoveArea ? widget.boardMaxScale ?? 5.0 : 1.0,
+          minScale: isMoveArea ? widget.boardMinScale ?? 0.5 : 1.0,
+          child: isMoveArea ? viewerModeWidget : drawingModeWidget,
+        );
+      },
     );
   }
-
 }
