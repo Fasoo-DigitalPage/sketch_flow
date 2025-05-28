@@ -46,7 +46,7 @@
 
 ## 사용방법
 #### 패키지 설치
-- `pubspec.yaml`에 추가:
+- `pubspec.yaml`에 추가: [최신 버전 확인](https://pub.dev/packages/sketch_flow/versions)
 ```dart
 dependencies:
   sketch_flow: ^latest_version
