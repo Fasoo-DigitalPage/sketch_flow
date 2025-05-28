@@ -46,7 +46,8 @@ View example code: [main.dart](https://github.com/fasoo-digitalpage/sketch_flow/
 
 ## How to Use `sketch_flow`
 #### Install the package
-- Add this to your `pubspec.yaml`:
+
+- Add this to your `pubspec.yaml`: [Check latest version](https://pub.dev/packages/sketch_flow/versions)
 ```dart
 dependencies:
   sketch_flow: ^latest_version
