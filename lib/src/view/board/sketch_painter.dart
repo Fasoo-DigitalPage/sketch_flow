@@ -1,37 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:sketch_flow/sketch_model.dart';
-import 'package:sketch_flow/sketch_view_model.dart';
+import 'package:sketch_flow/sketch_controller.dart';
 
 class SketchPainter extends CustomPainter {
-  final SketchViewModel viewModel;
+  final SketchController controller;
 
-  SketchPainter(this.viewModel);
+  SketchPainter(this.controller);
 
   @override
   void paint(Canvas canvas, Size size) {
     canvas.saveLayer(null, Paint());
 
-    for (final content in viewModel.contents) {
+    for (final content in controller.contents) {
       content.draw(canvas);
     }
 
     final currentContent = SketchContent.create(
-      offsets: viewModel.currentOffsets,
-      sketchConfig: viewModel.currentSketchConfig,
+      offsets: controller.currentOffsets,
+      sketchConfig: controller.currentSketchConfig,
     );
     currentContent.draw(canvas);
 
-    if (viewModel.toolTypeNotifier.value == SketchToolType.eraser &&
-        viewModel.eraserCirclePosition != null &&
-        viewModel.currentSketchConfig.showEraserEffect) {
-      final eraserPaint =
-          Paint()
-            ..color = Colors.grey
-            ..style = PaintingStyle.stroke;
+    if (controller.toolTypeNotifier.value == SketchToolType.eraser &&
+        controller.eraserCirclePosition != null &&
+        controller.currentSketchConfig.showEraserEffect) {
+      final eraserPaint = Paint()
+        ..color = Colors.grey
+        ..style = PaintingStyle.stroke;
 
       canvas.drawCircle(
-        viewModel.eraserCirclePosition!,
-        (viewModel.currentSketchConfig.eraserRadius),
+        controller.eraserCirclePosition!,
+        (controller.currentSketchConfig.eraserRadius),
         eraserPaint,
       );
     }
@@ -41,6 +40,6 @@ class SketchPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(SketchPainter oldDelegate) {
-    return viewModel.contents != oldDelegate.viewModel.contents;
+    return controller.contents != oldDelegate.controller.contents;
   }
 }

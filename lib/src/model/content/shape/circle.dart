@@ -25,13 +25,12 @@ class Circle extends SketchContent {
       return;
     }
 
-    final paint =
-        Paint()
-          ..color = sketchConfig.circleConfig.color.withValues(
-            alpha: sketchConfig.circleConfig.opacity,
-          )
-          ..strokeWidth = sketchConfig.circleConfig.strokeThickness
-          ..style = PaintingStyle.stroke;
+    final paint = Paint()
+      ..color = sketchConfig.circleConfig.color.withValues(
+        alpha: sketchConfig.circleConfig.opacity,
+      )
+      ..strokeWidth = sketchConfig.circleConfig.strokeThickness
+      ..style = PaintingStyle.stroke;
 
     final center = Offset((start.dx + end.dx) / 2, (start.dy + end.dy) / 2);
 
@@ -43,12 +42,12 @@ class Circle extends SketchContent {
 
   @override
   Map<String, dynamic> toJson() => {
-    'type': 'circle',
-    'offsets': offsets.map((e) => {'dx': e.dx, 'dy': e.dy}).toList(),
-    'circleColor': sketchConfig.circleConfig.color.toARGB32(),
-    'circleStrokeThickness': sketchConfig.circleConfig.strokeThickness,
-    'circleOpacity': sketchConfig.circleConfig.opacity,
-  };
+        'type': 'circle',
+        'offsets': offsets.map((e) => {'dx': e.dx, 'dy': e.dy}).toList(),
+        'circleColor': sketchConfig.circleConfig.color.toARGB32(),
+        'circleStrokeThickness': sketchConfig.circleConfig.strokeThickness,
+        'circleOpacity': sketchConfig.circleConfig.opacity,
+      };
 
   @override
   String? toSvg() {

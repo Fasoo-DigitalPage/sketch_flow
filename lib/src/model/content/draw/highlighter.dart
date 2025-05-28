@@ -18,13 +18,12 @@ class Highlighter extends SketchContent {
       path.lineTo(offsets[i].dx, offsets[i].dy);
     }
 
-    final paint =
-        Paint()
-          ..color = sketchConfig.highlighterConfig.color.withValues(
-            alpha: sketchConfig.highlighterConfig.opacity,
-          )
-          ..strokeWidth = sketchConfig.highlighterConfig.strokeThickness
-          ..style = PaintingStyle.stroke;
+    final paint = Paint()
+      ..color = sketchConfig.highlighterConfig.color.withValues(
+        alpha: sketchConfig.highlighterConfig.opacity,
+      )
+      ..strokeWidth = sketchConfig.highlighterConfig.strokeThickness
+      ..style = PaintingStyle.stroke;
 
     canvas.drawPath(path, paint);
   }

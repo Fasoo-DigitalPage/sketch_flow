@@ -1,6 +1,5 @@
 import 'dart:ui';
 import 'package:sketch_flow/sketch_model.dart';
-import 'package:sketch_flow/src/model/config/sketch_tool_config.dart';
 
 /// A utility class responsible for converting sketch data to and from JSON format.
 class SketchDataConverter {
@@ -20,18 +19,17 @@ class SketchDataConverter {
       final type = content['type'];
 
       // Convert raw offset data to List<Offset>
-      final offsets =
-          (content['offsets'] as List)
-              .map((e) {
-                final dx = e['dx'];
-                final dy = e['dy'];
-                if (dx is num && dy is num) {
-                  return Offset(dx.toDouble(), dy.toDouble());
-                }
-                return null;
-              })
-              .whereType<Offset>()
-              .toList();
+      final offsets = (content['offsets'] as List)
+          .map((e) {
+            final dx = e['dx'];
+            final dy = e['dy'];
+            if (dx is num && dy is num) {
+              return Offset(dx.toDouble(), dy.toDouble());
+            }
+            return null;
+          })
+          .whereType<Offset>()
+          .toList();
 
       // Determine the tool type
       final toolType = switch (type) {

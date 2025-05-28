@@ -25,14 +25,13 @@ class Brush extends SketchContent {
       // Avoid being too thin or too thick
       thickness = thickness.clamp(minThickness, maxThickness);
 
-      final paint =
-          Paint()
-            ..color = sketchConfig.brushConfig.color.withValues(
-              alpha: sketchConfig.brushConfig.opacity,
-            )
-            ..strokeWidth = thickness
-            ..style = PaintingStyle.stroke
-            ..strokeCap = StrokeCap.round;
+      final paint = Paint()
+        ..color = sketchConfig.brushConfig.color.withValues(
+          alpha: sketchConfig.brushConfig.opacity,
+        )
+        ..strokeWidth = thickness
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round;
 
       canvas.drawLine(p1, p2, paint);
     }

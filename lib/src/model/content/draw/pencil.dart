@@ -17,13 +17,12 @@ class Pencil extends SketchContent {
       path.lineTo(offsets[i].dx, offsets[i].dy);
     }
 
-    final paint =
-        Paint()
-          ..color = sketchConfig.pencilConfig.color.withValues(
-            alpha: sketchConfig.pencilConfig.opacity,
-          )
-          ..strokeWidth = sketchConfig.pencilConfig.strokeThickness
-          ..style = PaintingStyle.stroke;
+    final paint = Paint()
+      ..color = sketchConfig.pencilConfig.color.withValues(
+        alpha: sketchConfig.pencilConfig.opacity,
+      )
+      ..strokeWidth = sketchConfig.pencilConfig.strokeThickness
+      ..style = PaintingStyle.stroke;
 
     canvas.drawPath(path, paint);
   }

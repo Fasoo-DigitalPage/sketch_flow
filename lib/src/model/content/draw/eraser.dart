@@ -21,14 +21,13 @@ class Eraser extends SketchContent {
       path.lineTo(offsets[i].dx, offsets[i].dy);
     }
 
-    final paint =
-        Paint()
-          ..color = Colors.transparent
-          ..blendMode = BlendMode.clear
-          ..style = PaintingStyle.stroke
-          ..strokeCap = StrokeCap.round
-          ..strokeJoin = StrokeJoin.round
-          ..strokeWidth = sketchConfig.eraserRadius * 2;
+    final paint = Paint()
+      ..color = Colors.transparent
+      ..blendMode = BlendMode.clear
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..strokeWidth = sketchConfig.eraserRadius * 2;
 
     canvas.drawPath(path, paint);
   }
@@ -46,10 +45,8 @@ class Eraser extends SketchContent {
   String? toSvg() {
     final radius = sketchConfig.eraserRadius;
 
-    return offsets
-        .map((point) {
-          return '<circle cx="${point.dx}" cy="${point.dy}" r="$radius" fill="black"/>';
-        })
-        .join('\n');
+    return offsets.map((point) {
+      return '<circle cx="${point.dx}" cy="${point.dy}" r="$radius" fill="black"/>';
+    }).join('\n');
   }
 }

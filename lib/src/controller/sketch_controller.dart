@@ -1,12 +1,12 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:sketch_flow/sketch_model.dart';
-import 'package:sketch_flow/src/model/content/extension/shape/shape_erase_extension.dart';
+import 'package:sketch_flow/sketch_helper.dart';
 
-class SketchViewModel extends ChangeNotifier {
-  /// A viewModel that manages the user's sketching state on the canvas.
-  SketchViewModel({SketchConfig? sketchConfig})
-    : _sketchConfig = sketchConfig ?? SketchConfig();
+class SketchController extends ChangeNotifier {
+  /// A controller that manages the user's sketching state on the canvas.
+  SketchController({SketchConfig? sketchConfig})
+      : _sketchConfig = sketchConfig ?? SketchConfig();
 
   /// The list of all accumulated sketch contents.
   final List<SketchContent> _contents = [];
@@ -97,8 +97,7 @@ class SketchViewModel extends ChangeNotifier {
     }
 
     final isEraser = _sketchConfig.toolType == SketchToolType.eraser;
-    final isAreaEraseWithEffect =
-        isEraser &&
+    final isAreaEraseWithEffect = isEraser &&
         _sketchConfig.eraserMode == EraserMode.area &&
         _hasErasedContent;
 
@@ -301,20 +300,20 @@ class SketchViewModel extends ChangeNotifier {
   }) {
     final result = switch (toolType) {
       SketchToolType.rectangle => content.isErasedRectangleByEraser(
-        offsets: content.offsets,
-        eraserCenter: eraserCenter,
-        eraserRadius: _sketchConfig.eraserRadius,
-      ),
+          offsets: content.offsets,
+          eraserCenter: eraserCenter,
+          eraserRadius: _sketchConfig.eraserRadius,
+        ),
       SketchToolType.line => content.isErasedLineByEraser(
-        offsets: content.offsets,
-        eraserCenter: eraserCenter,
-        eraserRadius: _sketchConfig.eraserRadius,
-      ),
+          offsets: content.offsets,
+          eraserCenter: eraserCenter,
+          eraserRadius: _sketchConfig.eraserRadius,
+        ),
       SketchToolType.circle => content.isErasedCircleByEraser(
-        offsets: content.offsets,
-        eraserCenter: eraserCenter,
-        eraserRadius: _sketchConfig.eraserRadius,
-      ),
+          offsets: content.offsets,
+          eraserCenter: eraserCenter,
+          eraserRadius: _sketchConfig.eraserRadius,
+        ),
       _ => false,
     };
 

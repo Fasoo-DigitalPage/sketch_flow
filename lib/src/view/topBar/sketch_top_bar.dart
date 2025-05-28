@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sketch_flow/sketch_view_model.dart';
+import 'package:sketch_flow/sketch_controller.dart';
 import 'package:sketch_flow/sketch_view.dart';
 
 class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
@@ -38,7 +38,7 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
   /// [onClickInputTestButton] Callback function invoked when test input button
   const SketchTopBar({
     super.key,
-    required this.viewModel,
+    required this.controller,
     this.topBarHeight,
     this.topBarColor = Colors.white,
     this.topBarBorderColor = Colors.grey,
@@ -58,7 +58,7 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
     this.onClickExtractPNG,
     this.onClickExtractSVG,
   });
-  final SketchViewModel viewModel;
+  final SketchController controller;
 
   final double? topBarHeight;
   final Color topBarColor;
@@ -105,8 +105,7 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             IconButton(
-              icon:
-                  backButtonIcon ??
+              icon: backButtonIcon ??
                   Icon(Icons.arrow_back_ios, color: Colors.black),
               onPressed: () => onClickBackButton,
             ),
@@ -114,42 +113,34 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
               children: [
                 /// Undo Icon button
                 ValueListenableBuilder<bool>(
-                  valueListenable: viewModel.canUndoNotifier,
+                  valueListenable: controller.canUndoNotifier,
                   builder: (context, canUndo, _) {
                     return IconButton(
-                      icon:
-                          canUndo
-                              ? (undoIcon?.enableIcon ??
-                                  Icon(Icons.undo_rounded))
-                              : (undoIcon?.disableIcon ??
-                                  Icon(Icons.undo_rounded)),
-                      onPressed:
-                          canUndo
-                              ? () {
-                                viewModel.undo();
-                              }
-                              : null,
+                      icon: canUndo
+                          ? (undoIcon?.enableIcon ?? Icon(Icons.undo_rounded))
+                          : (undoIcon?.disableIcon ?? Icon(Icons.undo_rounded)),
+                      onPressed: canUndo
+                          ? () {
+                              controller.undo();
+                            }
+                          : null,
                     );
                   },
                 ),
 
                 /// Redo Icon button
                 ValueListenableBuilder<bool>(
-                  valueListenable: viewModel.canRedoNotifier,
+                  valueListenable: controller.canRedoNotifier,
                   builder: (context, canRedo, _) {
                     return IconButton(
-                      icon:
-                          canRedo
-                              ? (redoIcon?.enableIcon ??
-                                  Icon(Icons.redo_rounded))
-                              : (redoIcon?.disableIcon ??
-                                  Icon(Icons.redo_rounded)),
-                      onPressed:
-                          canRedo
-                              ? () {
-                                viewModel.redo();
-                              }
-                              : null,
+                      icon: canRedo
+                          ? (redoIcon?.enableIcon ?? Icon(Icons.redo_rounded))
+                          : (redoIcon?.disableIcon ?? Icon(Icons.redo_rounded)),
+                      onPressed: canRedo
+                          ? () {
+                              controller.redo();
+                            }
+                          : null,
                     );
                   },
                 ),
@@ -159,7 +150,7 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
                     if (onClickExtractSVG != null) {
                       List<Offset> offsets = [];
 
-                      for (final content in viewModel.contents) {
+                      for (final content in controller.contents) {
                         offsets.addAll(content.offsets);
                       }
 

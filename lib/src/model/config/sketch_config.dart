@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sketch_flow/src/model/config/sketch_tool_config.dart';
-import 'package:sketch_flow/src/model/content/extension/config/sketch_tool_type_extension.dart';
+import 'package:sketch_flow/sketch_model.dart';
 
 /// Defines the type of sketch tool available.
 ///
@@ -198,30 +197,24 @@ class SketchConfig {
       lastUsedColor: lastUsedColor ?? this.lastUsedColor,
       lastUsedStrokeThickness:
           lastUsedStrokeThickness ?? this.lastUsedStrokeThickness,
-      pencilConfig:
-          newToolType == SketchToolType.pencil
-              ? updatedToolConfig(pencilConfig ?? this.pencilConfig)
-              : pencilConfig ?? this.pencilConfig,
-      brushConfig:
-          newToolType == SketchToolType.brush
-              ? updatedToolConfig(brushConfig ?? this.brushConfig)
-              : brushConfig ?? this.brushConfig,
-      highlighterConfig:
-          newToolType == SketchToolType.highlighter
-              ? updatedToolConfig(highlighterConfig ?? this.highlighterConfig)
-              : highlighterConfig ?? this.highlighterConfig,
-      lineConfig:
-          newToolType == SketchToolType.line
-              ? updatedToolConfig(lineConfig ?? this.lineConfig)
-              : lineConfig ?? this.lineConfig,
-      rectangleConfig:
-          newToolType == SketchToolType.rectangle
-              ? updatedToolConfig(rectangleConfig ?? this.rectangleConfig)
-              : rectangleConfig ?? this.rectangleConfig,
-      circleConfig:
-          newToolType == SketchToolType.circle
-              ? updatedToolConfig(circleConfig ?? this.circleConfig)
-              : circleConfig ?? this.circleConfig,
+      pencilConfig: newToolType == SketchToolType.pencil
+          ? updatedToolConfig(pencilConfig ?? this.pencilConfig)
+          : pencilConfig ?? this.pencilConfig,
+      brushConfig: newToolType == SketchToolType.brush
+          ? updatedToolConfig(brushConfig ?? this.brushConfig)
+          : brushConfig ?? this.brushConfig,
+      highlighterConfig: newToolType == SketchToolType.highlighter
+          ? updatedToolConfig(highlighterConfig ?? this.highlighterConfig)
+          : highlighterConfig ?? this.highlighterConfig,
+      lineConfig: newToolType == SketchToolType.line
+          ? updatedToolConfig(lineConfig ?? this.lineConfig)
+          : lineConfig ?? this.lineConfig,
+      rectangleConfig: newToolType == SketchToolType.rectangle
+          ? updatedToolConfig(rectangleConfig ?? this.rectangleConfig)
+          : rectangleConfig ?? this.rectangleConfig,
+      circleConfig: newToolType == SketchToolType.circle
+          ? updatedToolConfig(circleConfig ?? this.circleConfig)
+          : circleConfig ?? this.circleConfig,
       colorList: colorList ?? this.colorList,
       eraserRadius: eraserRadius ?? this.eraserRadius,
       eraserRadiusMax: eraserRadiusMax ?? this.eraserRadiusMax,

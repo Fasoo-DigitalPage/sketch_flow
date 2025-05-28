@@ -40,10 +40,9 @@ class GradientTrackShape extends SliderTrackShape {
 
     _drawCheckerboard(canvas, trackRect);
 
-    final Paint paint =
-        Paint()
-          ..shader = gradient.createShader(trackRect)
-          ..style = PaintingStyle.fill;
+    final Paint paint = Paint()
+      ..shader = gradient.createShader(trackRect)
+      ..style = PaintingStyle.fill;
 
     canvas.drawRRect(
       RRect.fromRectAndRadius(trackRect, Radius.circular(height / 2)),

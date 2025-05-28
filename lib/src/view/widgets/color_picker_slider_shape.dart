@@ -55,11 +55,10 @@ class ColorPickerSliderShape extends SliderTrackShape {
 
     canvas.restore();
 
-    final Paint borderPaint =
-        Paint()
-          ..color = Colors.grey.withAlpha(80)
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 0.7;
+    final Paint borderPaint = Paint()
+      ..color = Colors.grey.withAlpha(80)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.7;
     canvas.drawRRect(roundedRect, borderPaint);
   }
 

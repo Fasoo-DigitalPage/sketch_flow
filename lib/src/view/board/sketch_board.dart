@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sketch_flow/sketch_model.dart';
-import 'package:sketch_flow/sketch_view_model.dart';
+import 'package:sketch_flow/sketch_controller.dart';
 import 'package:sketch_flow/sketch_view.dart';
 
 /// SketchBoard is the main widget that renders a drawable canvas.
@@ -10,12 +10,12 @@ import 'package:sketch_flow/sketch_view.dart';
 /// - **Move Mode**: where the canvas can be zoomed and panned.
 ///
 /// Features:
-/// - Renders handwriting using the [SketchViewModel].
+/// - Renders handwriting using the [Sketchcontroller].
 /// - Supports zoom and pan using [InteractiveViewer].
 /// - Accepts overlay widgets (e.g., images or decorations) via [overlayWidgets].
 /// - Wraps everything in a [RepaintBoundary] to support images export.
 ///
-/// [viewModel]: Required controller that holds the drawing state.
+/// [controller]: Required controller that holds the drawing state.
 /// [repaintKey]: Key used to extract the widget as an images (PNG).
 /// [overlayWidgets]: Visual widgets (images, decorations, etc.) to be rendered below the drawing.
 /// [boardColor]: Background color of the drawing area.
@@ -27,7 +27,7 @@ import 'package:sketch_flow/sketch_view.dart';
 class SketchBoard extends StatefulWidget {
   /// Main widget for the sketch board.
   ///
-  /// [viewModel] The sketch viewModel used to manage drawing state.
+  /// [controller] The sketch controller used to manage drawing state.
   ///
   /// [repaintKey] RepaintBoundary key value (required for PNG extraction)
   ///
@@ -44,7 +44,7 @@ class SketchBoard extends StatefulWidget {
   /// [overlayWidgets] The visual widgets
   const SketchBoard({
     super.key,
-    required this.viewModel,
+    required this.controller,
     this.repaintKey,
     this.boardColor,
     this.boardMaxScale,
@@ -53,7 +53,7 @@ class SketchBoard extends StatefulWidget {
     this.overlayWidgets,
   });
 
-  final SketchViewModel viewModel;
+  final SketchController controller;
   final GlobalKey? repaintKey;
   final Color? boardColor;
   final double? boardMinScale;
@@ -70,23 +70,23 @@ class _SketchBoardState extends State<SketchBoard> {
   Widget build(BuildContext context) {
     // Drawing mode widget
     Widget drawingModeWidget = Listener(
-      onPointerDown:
-          (event) => widget.viewModel.startNewLine(event.localPosition),
-      onPointerMove: (event) => widget.viewModel.addPoint(event.localPosition),
-      onPointerUp: (_) => widget.viewModel.endLine(),
+      onPointerDown: (event) =>
+          widget.controller.startNewLine(event.localPosition),
+      onPointerMove: (event) => widget.controller.addPoint(event.localPosition),
+      onPointerUp: (_) => widget.controller.endLine(),
       child: Container(
         color: widget.boardColor ?? Colors.white,
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
         child: AnimatedBuilder(
-          animation: widget.viewModel,
+          animation: widget.controller,
           builder: (context, _) {
             return RepaintBoundary(
               key: widget.repaintKey,
               child: Stack(
                 children: [
                   if (widget.overlayWidgets != null) ...?widget.overlayWidgets,
-                  CustomPaint(painter: SketchPainter(widget.viewModel)),
+                  CustomPaint(painter: SketchPainter(widget.controller)),
                 ],
               ),
             );
@@ -101,14 +101,14 @@ class _SketchBoardState extends State<SketchBoard> {
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height,
       child: AnimatedBuilder(
-        animation: widget.viewModel,
+        animation: widget.controller,
         builder: (context, _) {
           return RepaintBoundary(
             key: widget.repaintKey,
             child: Stack(
               children: [
                 if (widget.overlayWidgets != null) ...?widget.overlayWidgets,
-                CustomPaint(painter: SketchPainter(widget.viewModel)),
+                CustomPaint(painter: SketchPainter(widget.controller)),
               ],
             ),
           );
@@ -117,7 +117,7 @@ class _SketchBoardState extends State<SketchBoard> {
     );
 
     return ValueListenableBuilder<SketchToolType>(
-      valueListenable: widget.viewModel.toolTypeNotifier,
+      valueListenable: widget.controller.toolTypeNotifier,
       builder: (context, toolType, _) {
         bool isMoveArea = toolType == SketchToolType.move;
 

@@ -16,25 +16,24 @@ class Line extends SketchContent {
   void draw(Canvas canvas) {
     if (offsets.length < 2) return;
 
-    final paint =
-        Paint()
-          ..color = sketchConfig.lineConfig.color.withValues(
-            alpha: sketchConfig.lineConfig.opacity,
-          )
-          ..strokeWidth = sketchConfig.lineConfig.strokeThickness
-          ..style = PaintingStyle.stroke;
+    final paint = Paint()
+      ..color = sketchConfig.lineConfig.color.withValues(
+        alpha: sketchConfig.lineConfig.opacity,
+      )
+      ..strokeWidth = sketchConfig.lineConfig.strokeThickness
+      ..style = PaintingStyle.stroke;
 
     canvas.drawLine(offsets.first, offsets.last, paint);
   }
 
   @override
   Map<String, dynamic> toJson() => {
-    'type': 'line',
-    'offsets': offsets.map((e) => {'dx': e.dx, 'dy': e.dy}).toList(),
-    'lineColor': sketchConfig.lineConfig.color.toARGB32(),
-    'lineStrokeThickness': sketchConfig.lineConfig.strokeThickness,
-    'lineOpacity': sketchConfig.lineConfig.opacity,
-  };
+        'type': 'line',
+        'offsets': offsets.map((e) => {'dx': e.dx, 'dy': e.dy}).toList(),
+        'lineColor': sketchConfig.lineConfig.color.toARGB32(),
+        'lineStrokeThickness': sketchConfig.lineConfig.strokeThickness,
+        'lineOpacity': sketchConfig.lineConfig.opacity,
+      };
 
   @override
   String? toSvg() {

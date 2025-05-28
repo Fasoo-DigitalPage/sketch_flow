@@ -37,16 +37,14 @@ class BaseCirclePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
 
-    final fillPaint =
-        Paint()
-          ..color = color
-          ..style = PaintingStyle.fill;
+    final fillPaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
 
-    final strokePaint =
-        Paint()
-          ..color = Color(0xCFCFCFCF)
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 0.5;
+    final strokePaint = Paint()
+      ..color = Color(0xCFCFCFCF)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.5;
 
     canvas.drawCircle(center, radius, fillPaint);
     canvas.drawCircle(center, radius, strokePaint);

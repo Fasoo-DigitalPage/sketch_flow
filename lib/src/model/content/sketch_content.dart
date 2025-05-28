@@ -2,8 +2,6 @@ import 'dart:ui';
 import 'package:sketch_flow/sketch_model.dart';
 import 'package:sketch_flow/src/model/content/blank.dart';
 
-/// An abstract base class for all sketchable content types.
-///
 /// This class defines a common interface and structure for various types of
 /// drawing tools and shapes (e.g., pencil, brush, eraser, line, rectangle, etc.).
 /// It enforces the implementation of drawing, serialization to JSON, and SVG export.

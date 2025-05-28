@@ -19,13 +19,12 @@ class Rectangle extends SketchContent {
       return;
     }
 
-    final paint =
-        Paint()
-          ..color = sketchConfig.rectangleConfig.color.withValues(
-            alpha: sketchConfig.rectangleConfig.opacity,
-          )
-          ..strokeWidth = sketchConfig.rectangleConfig.strokeThickness
-          ..style = PaintingStyle.stroke;
+    final paint = Paint()
+      ..color = sketchConfig.rectangleConfig.color.withValues(
+        alpha: sketchConfig.rectangleConfig.opacity,
+      )
+      ..strokeWidth = sketchConfig.rectangleConfig.strokeThickness
+      ..style = PaintingStyle.stroke;
 
     final rect = Rect.fromPoints(start, end);
 
@@ -34,12 +33,12 @@ class Rectangle extends SketchContent {
 
   @override
   Map<String, dynamic> toJson() => {
-    'type': 'rectangle',
-    'offsets': offsets.map((e) => {'dx': e.dx, 'dy': e.dy}).toList(),
-    'lineColor': sketchConfig.rectangleConfig.color.toARGB32(),
-    'lineStrokeThickness': sketchConfig.rectangleConfig.strokeThickness,
-    'lineOpacity': sketchConfig.rectangleConfig.opacity,
-  };
+        'type': 'rectangle',
+        'offsets': offsets.map((e) => {'dx': e.dx, 'dy': e.dy}).toList(),
+        'lineColor': sketchConfig.rectangleConfig.color.toARGB32(),
+        'lineStrokeThickness': sketchConfig.rectangleConfig.strokeThickness,
+        'lineOpacity': sketchConfig.rectangleConfig.opacity,
+      };
 
   @override
   String? toSvg() {

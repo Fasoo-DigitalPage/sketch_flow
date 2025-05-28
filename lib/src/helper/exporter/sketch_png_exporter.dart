@@ -18,9 +18,8 @@ class SketchPngExporter {
     double? pixelRatio,
   }) async {
     try {
-      final boundary =
-          repaintKey.currentContext!.findRenderObject()
-              as RenderRepaintBoundary;
+      final boundary = repaintKey.currentContext!.findRenderObject()
+          as RenderRepaintBoundary;
       final image = await boundary.toImage(pixelRatio: pixelRatio ?? 3.0);
       final byteData = await image.toByteData(format: ImageByteFormat.png);
 

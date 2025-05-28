@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:example/test_data.dart';
 import 'package:flutter/material.dart';
 import 'package:jovial_svg/jovial_svg.dart';
-import 'package:sketch_flow/sketch_view_model.dart';
+import 'package:sketch_flow/sketch_controller.dart';
 import 'package:sketch_flow/sketch_model.dart';
 import 'package:sketch_flow/sketch_view.dart';
 
@@ -29,7 +29,7 @@ class DemoPage extends StatefulWidget {
 }
 
 class _DemoPageState extends State<DemoPage> {
-  final SketchViewModel _sketchViewModel = SketchViewModel(
+  final SketchController _sketchController = SketchController(
     sketchConfig: SketchConfig(showEraserEffect: true),
   );
   final GlobalKey _repaintKey = GlobalKey();
@@ -39,22 +39,22 @@ class _DemoPageState extends State<DemoPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: SketchTopBar(
-        viewModel: _sketchViewModel,
+        controller: _sketchController,
         showJsonDialogIcon: true,
         exportSVGIcon: Image.asset('assets/images/svg.png'),
         exportPNGIcon: Image.asset('assets/images/png.png'),
         exportJSONIcon: Image.asset('assets/images/json.png'),
         exportTestDataIcon: Image.asset('assets/images/import.png'),
         onClickToJsonButton: () {
-          final json = _sketchViewModel.toJson();
+          final json = _sketchController.toJson();
           _showJsonDialog(json: json);
         },
         showInputTestDataIcon: true,
         onClickInputTestButton: () {
-          _sketchViewModel.fromJson(json: testData);
+          _sketchController.fromJson(json: testData);
         },
         onClickExtractPNG: () async {
-          final image = await _sketchViewModel.extractPNG(
+          final image = await _sketchController.extractPNG(
             repaintKey: _repaintKey,
           );
           if (context.mounted && image != null) {
@@ -64,7 +64,7 @@ class _DemoPageState extends State<DemoPage> {
         onClickExtractSVG: (offsets) {
           final width = MediaQuery.of(context).size.width;
           final height = MediaQuery.of(context).size.height;
-          final svgCode = _sketchViewModel.extractSVG(
+          final svgCode = _sketchController.extractSVG(
             width: width,
             height: height,
           );
@@ -73,8 +73,8 @@ class _DemoPageState extends State<DemoPage> {
           _showSVGDialog(si: scalableImage);
         },
       ),
-      body: SketchBoard(viewModel: _sketchViewModel, repaintKey: _repaintKey),
-      bottomNavigationBar: SketchBottomBar(viewModel: _sketchViewModel),
+      body: SketchBoard(controller: _sketchController, repaintKey: _repaintKey),
+      bottomNavigationBar: SketchBottomBar(controller: _sketchController),
     );
   }
 

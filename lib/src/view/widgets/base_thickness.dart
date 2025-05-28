@@ -53,23 +53,20 @@ class BaseThicknessPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
 
-    final strokePaint =
-        Paint()
-          ..color = Color(0xCFCFCFCF)
-          ..strokeWidth = 0.5
-          ..style = PaintingStyle.stroke;
+    final strokePaint = Paint()
+      ..color = Color(0xCFCFCFCF)
+      ..strokeWidth = 0.5
+      ..style = PaintingStyle.stroke;
 
-    final fillCirclePaint =
-        Paint()
-          ..color = color
-          ..style = PaintingStyle.fill;
+    final fillCirclePaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
 
-    final thicknessPaint =
-        Paint()
-          ..color = isSelected ? Colors.white : color
-          ..strokeWidth = index * 1.5
-          ..style = PaintingStyle.stroke
-          ..strokeCap = StrokeCap.round;
+    final thicknessPaint = Paint()
+      ..color = isSelected ? Colors.white : color
+      ..strokeWidth = index * 1.5
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
 
     canvas.drawCircle(
       center,
