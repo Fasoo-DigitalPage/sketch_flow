@@ -75,7 +75,6 @@ class SketchBoard extends StatefulWidget {
 }
 
 class _SketchBoardState extends State<SketchBoard> {
-
   // Handles pointer down events.
   // Only starts a new line if the pointer is inside the drawing area.
   void _handlePointerDown(PointerDownEvent event) {
@@ -95,13 +94,11 @@ class _SketchBoardState extends State<SketchBoard> {
     }
   }
 
-
   // Handles pointer up events.
   // Ends the current line regardless of position.
   void _handlePointerUp() {
     widget.controller.endLine();
   }
-
 
   // Checks if a given position is within the drawing area bounds.
   // Returns true if the position is inside, false otherwise.
@@ -129,8 +126,7 @@ class _SketchBoardState extends State<SketchBoard> {
               key: widget.repaintKey,
               child: Stack(
                 children: [
-                  if (widget.overlayWidget != null)
-                    widget.overlayWidget!,
+                  if (widget.overlayWidget != null) widget.overlayWidget!,
                   CustomPaint(painter: SketchPainter(widget.controller)),
                 ],
               ),
@@ -152,8 +148,7 @@ class _SketchBoardState extends State<SketchBoard> {
             key: widget.repaintKey,
             child: Stack(
               children: [
-                if (widget.overlayWidget != null)
-                  widget.overlayWidget!,
+                if (widget.overlayWidget != null) widget.overlayWidget!,
                 CustomPaint(painter: SketchPainter(widget.controller)),
               ],
             ),
