@@ -674,7 +674,9 @@ class _SketchBottomBarState extends State<SketchBottomBar>
                         onChanged: (value) {
                           setState(() {
                             _selectedColorIndex = value.round();
-                            _controller.updateConfig(lastUsedColor: _rgbGradientColors[_selectedColorIndex]);
+                            _controller.updateConfig(
+                                lastUsedColor:
+                                    _rgbGradientColors[_selectedColorIndex]);
                           });
                         },
                       ),
