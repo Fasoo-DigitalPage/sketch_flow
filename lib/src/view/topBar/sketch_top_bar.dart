@@ -5,37 +5,48 @@ import 'package:sketch_flow/sketch_view.dart';
 class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
   /// Top bar widget
   ///
+  /// [controller] The sketch controller used to manage drawing state
+  ///
   /// [topBarHeight] The height of the top bar
   ///
   /// [topBarColor] The background color of the top bar
   ///
   /// [topBarBorderColor] The border color of the top bar
   ///
-  /// [topBarBorderWidth] he border width of the top bar
+  /// [topBarBorderWidth] The border width of the top bar
   ///
   /// [backButtonIcon] The icon for the back button
   ///
-  /// [onClickBackButton] Callback function invoked when the back button
+  /// [onClickBackButton] Callback function invoked when the back button is pressed
   ///
-  /// [undoIcon] Undo icon (see [SketchToolIcon])
+  /// [undoIcon] The icon for the undo action (see [SketchToolIcon])
   ///
-  /// [redoIcon] Redo icon (see [SketchToolIcon])
+  /// [redoIcon] The icon for the redo action (see [SketchToolIcon])
   ///
   /// [exportSVGIcon] Export SVG Icon
   ///
+  /// [onClickExtractSVG] Callback function invoked when SVG extract button is pressed
+  ///
+  /// [showExtractSVGIcon] Whether to show the SVG extract icon (default: false)
+  ///
   /// [exportPNGIcon] Export PNG Icon
+  ///
+  /// [onClickExtractPNG] Callback function invoked when PNG extract button is pressed
+  ///
+  /// [showExtractPNGIcon] Whether to show the PNG extract icon (default: false)
   ///
   /// [exportJSONIcon] Export JSON Icon
   ///
-  /// [exportTestDataIcon] Export test data Icon
+  /// [onClickToJsonButton] Callback function invoked when the JSON button is pressed
   ///
-  /// [showJsonDialogIcon] JSON dialog view settings (default false)
+  /// [showJsonDialogIcon] Whether to show the JSON dialog icon (default: false)
   ///
-  /// [onClickToJsonButton] Callback function invoked when the json button
+  /// [exportTestDataIcon] Export test data icon
   ///
-  /// [showInputTestDataIcon] Input Test Data view settings (default false)
+  /// [showInputTestDataIcon] Whether to show the input test data icon (default: false)
   ///
-  /// [onClickInputTestButton] Callback function invoked when test input button
+  /// [onClickInputTestButton] Callback function invoked when the test input button is pressed
+  ///
   const SketchTopBar({
     super.key,
     required this.controller,
@@ -48,16 +59,19 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
     this.undoIcon,
     this.redoIcon,
     this.exportSVGIcon,
+    this.onClickExtractSVG,
+    this.showExtractSVGIcon,
     this.exportPNGIcon,
+    this.onClickExtractPNG,
+    this.showExtractPNGIcon,
     this.exportJSONIcon,
-    this.exportTestDataIcon,
-    this.showJsonDialogIcon,
     this.onClickToJsonButton,
+    this.showJsonDialogIcon,
+    this.exportTestDataIcon,
     this.showInputTestDataIcon,
     this.onClickInputTestButton,
-    this.onClickExtractPNG,
-    this.onClickExtractSVG,
   });
+
   final SketchController controller;
 
   final double? topBarHeight;
@@ -69,23 +83,23 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
   final Function()? onClickBackButton;
 
   final SketchToolIcon? undoIcon;
-
   final SketchToolIcon? redoIcon;
 
   final Widget? exportSVGIcon;
+  final Function(List<Offset>)? onClickExtractSVG;
+  final bool? showExtractSVGIcon;
+
   final Widget? exportPNGIcon;
+  final Function()? onClickExtractPNG;
+  final bool? showExtractPNGIcon;
+
   final Widget? exportJSONIcon;
-  final Widget? exportTestDataIcon;
-
-  final bool? showJsonDialogIcon;
   final Function()? onClickToJsonButton;
+  final bool? showJsonDialogIcon;
 
+  final Widget? exportTestDataIcon;
   final bool? showInputTestDataIcon;
   final Function()? onClickInputTestButton;
-
-  final Function()? onClickExtractPNG;
-
-  final Function(List<Offset>)? onClickExtractSVG;
 
   @override
   Widget build(BuildContext context) {
@@ -149,29 +163,31 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
                   },
                 ),
 
-                IconButton(
-                  onPressed: () {
-                    if (onClickExtractSVG != null) {
-                      List<Offset> offsets = [];
+                if (showExtractSVGIcon ?? false)
+                  IconButton(
+                    onPressed: () {
+                      if (onClickExtractSVG != null) {
+                        List<Offset> offsets = [];
 
-                      for (final content in controller.contents) {
-                        offsets.addAll(content.offsets);
+                        for (final content in controller.contents) {
+                          offsets.addAll(content.offsets);
+                        }
+
+                        onClickExtractSVG!(offsets);
                       }
+                    },
+                    icon: exportSVGIcon ?? Icon(Icons.file_open_outlined),
+                  ),
 
-                      onClickExtractSVG!(offsets);
-                    }
-                  },
-                  icon: exportSVGIcon ?? Icon(Icons.file_open_outlined),
-                ),
-
-                IconButton(
-                  onPressed: () {
-                    if (onClickExtractPNG != null) {
-                      onClickExtractPNG!();
-                    }
-                  },
-                  icon: exportPNGIcon ?? Icon(Icons.image),
-                ),
+                if (showExtractPNGIcon ?? false)
+                  IconButton(
+                    onPressed: () {
+                      if (onClickExtractPNG != null) {
+                        onClickExtractPNG!();
+                      }
+                    },
+                    icon: exportPNGIcon ?? Icon(Icons.image),
+                  ),
 
                 /// Button for JSON data debugging
                 if (showJsonDialogIcon ?? false)
