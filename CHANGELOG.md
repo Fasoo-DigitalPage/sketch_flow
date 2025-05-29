@@ -1,3 +1,6 @@
+[0.1.6]
+* Refactor SketchController of updateConfig
+
 [0.1.5]
 * Fix SketchBoard overlayWidget bug
 
