@@ -75,14 +75,49 @@ class SketchBoard extends StatefulWidget {
 }
 
 class _SketchBoardState extends State<SketchBoard> {
+
+  // Handles pointer down events.
+  // Only starts a new line if the pointer is inside the drawing area.
+  void _handlePointerDown(PointerDownEvent event) {
+    if (_isInDrawingArea(event.localPosition)) {
+      widget.controller.startNewLine(event.localPosition);
+    }
+  }
+
+  // Handles pointer move events.
+  // Only adds points to the current line if the pointer is inside the drawing area.
+  // If the pointer moves outside, the current line is ended.
+  void _handlePointerMove(PointerMoveEvent event) {
+    if (_isInDrawingArea(event.localPosition)) {
+      widget.controller.addPoint(event.localPosition);
+    } else {
+      widget.controller.endLine();
+    }
+  }
+
+
+  // Handles pointer up events.
+  // Ends the current line regardless of position.
+  void _handlePointerUp() {
+    widget.controller.endLine();
+  }
+
+
+  // Checks if a given position is within the drawing area bounds.
+  // Returns true if the position is inside, false otherwise.
+  bool _isInDrawingArea(Offset pos) {
+    final width = widget.boardWidthSize ?? MediaQuery.of(context).size.width;
+    final height = widget.boardHeightSize ?? MediaQuery.of(context).size.height;
+    return pos.dx >= 0 && pos.dx <= width && pos.dy >= 0 && pos.dy <= height;
+  }
+
   @override
   Widget build(BuildContext context) {
     // Drawing mode widget
     Widget drawingModeWidget = Listener(
-      onPointerDown: (event) =>
-          widget.controller.startNewLine(event.localPosition),
-      onPointerMove: (event) => widget.controller.addPoint(event.localPosition),
-      onPointerUp: (_) => widget.controller.endLine(),
+      onPointerDown: (event) => _handlePointerDown(event),
+      onPointerMove: (event) => _handlePointerMove(event),
+      onPointerUp: (_) => _handlePointerUp(),
       child: Container(
         color: widget.boardColor ?? Colors.white,
         width: widget.boardWidthSize ?? MediaQuery.of(context).size.width,

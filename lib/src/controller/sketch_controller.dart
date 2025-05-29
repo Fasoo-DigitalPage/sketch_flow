@@ -85,7 +85,7 @@ class SketchController extends ChangeNotifier {
 
   /// Ends the current line and saves the sketch content
   void endLine() {
-    if (!_isEnabled) return;
+    if (!_isEnabled || _currentOffsets.isEmpty) return;
 
     final content = SketchContent.create(
       offsets: _currentOffsets,
