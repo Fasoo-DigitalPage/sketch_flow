@@ -77,9 +77,6 @@ class _DemoPageState extends State<DemoPage> {
         child: SketchBoard(
           controller: _sketchController,
           repaintKey: _repaintKey,
-          overlayWidget: SizedBox(
-            child: Image.asset('assets/images/example.jpg'),
-          ),
         ),
       ),
       bottomNavigationBar: SketchBottomBar(controller: _sketchController),
