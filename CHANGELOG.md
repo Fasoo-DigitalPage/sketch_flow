@@ -1,3 +1,6 @@
+[0.1.6+1]
+* Apply to set png, svg icon options
+
 [0.1.6]
 * Refactor SketchController of updateConfig
 
