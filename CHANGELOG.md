@@ -1,3 +1,6 @@
+[0.1.4]
+* Add SketchBoard width/height size settings
+
 [0.1.3]
 * Fix SketchTopBar back button bug 
 * Update README
