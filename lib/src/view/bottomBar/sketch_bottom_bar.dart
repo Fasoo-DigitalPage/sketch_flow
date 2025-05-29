@@ -185,7 +185,7 @@ class _SketchBottomBarState extends State<SketchBottomBar>
       setState(() {
         _selectedToolType = toolType;
       });
-      _controller.updateConfig(updateConfig);
+      _controller.updateConfig(toolType: toolType);
     }
   }
 
@@ -272,11 +272,7 @@ class _SketchBottomBarState extends State<SketchBottomBar>
   /// Updates the stroke width, closes the overlay, and enables drawing.
   void _onThicknessSelected({required double strokeThickness}) {
     _fadeAnimationController.reverse().then((_) async {
-      _controller.updateConfig(
-        _controller.currentSketchConfig.copyWith(
-          lastUsedStrokeThickness: strokeThickness,
-        ),
-      );
+      _controller.updateConfig(lastUsedStrokeThickness: strokeThickness);
       _controller.enableDrawing();
 
       await Future.delayed(Duration(milliseconds: 100));
@@ -292,9 +288,7 @@ class _SketchBottomBarState extends State<SketchBottomBar>
   /// Updates the drawing color, closes the overlay, and enables drawing.
   void _onColorSelected({required Color color}) {
     _fadeAnimationController.reverse().then((_) async {
-      _controller.updateConfig(
-        _controller.currentSketchConfig.copyWith(lastUsedColor: color),
-      );
+      _controller.updateConfig(lastUsedColor: color);
       _controller.enableDrawing();
 
       // Update ColorPicker thumbBar value
@@ -612,11 +606,7 @@ class _SketchBottomBarState extends State<SketchBottomBar>
                     min: 0.0,
                     max: 1.0,
                     onChanged: (opacity) {
-                      _controller.updateConfig(
-                        _controller.currentSketchConfig.copyWith(
-                          lastUsedOpacity: opacity,
-                        ),
-                      );
+                      _controller.updateConfig(lastUsedOpacity: opacity);
                     },
                   ),
                 ),
@@ -684,12 +674,7 @@ class _SketchBottomBarState extends State<SketchBottomBar>
                         onChanged: (value) {
                           setState(() {
                             _selectedColorIndex = value.round();
-                            _controller.updateConfig(
-                              _controller.currentSketchConfig.copyWith(
-                                lastUsedColor:
-                                    _rgbGradientColors[_selectedColorIndex],
-                              ),
-                            );
+                            _controller.updateConfig(lastUsedColor: _rgbGradientColors[_selectedColorIndex]);
                           });
                         },
                       ),
@@ -725,11 +710,7 @@ class _SketchBottomBarState extends State<SketchBottomBar>
                   setState(() {
                     _selectedEraserType = value!;
                   });
-                  _controller.updateConfig(
-                    _controller.currentSketchConfig.copyWith(
-                      eraserMode: EraserMode.area,
-                    ),
-                  );
+                  _controller.updateConfig(eraserMode: value);
                 },
               ),
               RadioListTile<EraserMode>(
@@ -742,9 +723,7 @@ class _SketchBottomBarState extends State<SketchBottomBar>
                   setState(() {
                     _selectedEraserType = value!;
                   });
-                  _controller.updateConfig(
-                    _controller.currentSketchConfig.copyWith(eraserMode: value),
-                  );
+                  _controller.updateConfig(eraserMode: value);
                 },
               ),
               SizedBox(height: 12),
@@ -779,11 +758,7 @@ class _SketchBottomBarState extends State<SketchBottomBar>
                       max: config.eraserRadiusMax,
                       divisions: 9,
                       onChanged: (eraserRadius) {
-                        _controller.updateConfig(
-                          _controller.currentSketchConfig.copyWith(
-                            eraserRadius: eraserRadius,
-                          ),
-                        );
+                        _controller.updateConfig(eraserRadius: eraserRadius);
                       },
                     ),
                   ),

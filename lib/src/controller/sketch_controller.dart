@@ -56,10 +56,42 @@ class SketchController extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Updates the current sketch tool configuration
-  void updateConfig(SketchConfig config) {
-    _sketchConfig = config;
-    toolTypeNotifier.value = config.toolType;
+  /// Updates the current sketch tool configuration.
+  ///
+  /// This method allows updating global tool settings such as color, thickness, opacity, and eraser options.
+  ///
+  /// The parameters prefixed with `lastUsed` (e.g., [lastUsedColor], [lastUsedStrokeThickness], [lastUsedOpacity])
+  /// represent the most recently used values for those options, **regardless of which tool is currently active**.
+  ///
+  /// This design means you don't need to manage or remember tool-specific settings yourself.
+  /// For example, if you change the color while using the pencil, [lastUsedColor] is updated,
+  /// and the next time you switch to another drawing tool, that color is automatically applied.
+  ///
+  /// **Note:** The "lastUsed" naming can be confusing at first glance, but it ensures a consistent
+  /// and user-friendly experience by always applying the most recent settings, no matter which tool is selected.
+  ///
+  /// Example usage:
+  /// ```
+  /// controller.updateConfig(lastUsedColor: Colors.red);
+  /// ```
+  /// This will set the color for the current tool and remember it for future
+  void updateConfig({
+    SketchToolType? toolType,
+    Color? lastUsedColor,
+    double? lastUsedStrokeThickness,
+    double? lastUsedOpacity,
+    double? eraserRadius,
+    EraserMode? eraserMode,
+  }) {
+    _sketchConfig = _sketchConfig.copyWith(
+      toolType: toolType,
+      lastUsedColor: lastUsedColor,
+      lastUsedStrokeThickness: lastUsedStrokeThickness,
+      lastUsedOpacity: lastUsedOpacity,
+      eraserRadius: eraserRadius,
+      eraserMode: eraserMode,
+    );
+    toolTypeNotifier.value = _sketchConfig.toolType;
     notifyListeners();
   }
 

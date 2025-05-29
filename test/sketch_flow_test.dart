@@ -63,7 +63,7 @@ void main() {
     });
 
     test('ValueNotifier is reflected when toolType is changed', () {
-      controller.updateConfig(SketchConfig(toolType: SketchToolType.eraser));
+      controller.updateConfig(toolType: SketchToolType.eraser);
       expect(controller.toolTypeNotifier.value, SketchToolType.eraser);
     });
 
@@ -85,10 +85,8 @@ void main() {
       controller.endLine();
 
       controller.updateConfig(
-        SketchConfig(
-          toolType: SketchToolType.eraser,
-          eraserMode: EraserMode.area,
-        ),
+        toolType: SketchToolType.eraser,
+        eraserMode: EraserMode.area,
       );
 
       // clear
@@ -107,10 +105,8 @@ void main() {
       controller.endLine();
 
       controller.updateConfig(
-        SketchConfig(
-          toolType: SketchToolType.eraser,
-          eraserMode: EraserMode.stroke,
-        ),
+        toolType: SketchToolType.eraser,
+        eraserMode: EraserMode.stroke,
       );
 
       // erasing
@@ -150,10 +146,8 @@ void main() {
       controller.endLine();
 
       controller.updateConfig(
-        SketchConfig(
-          toolType: SketchToolType.eraser,
-          eraserMode: EraserMode.area,
-        ),
+        toolType: SketchToolType.eraser,
+        eraserMode: EraserMode.area,
       );
 
       // erasing
