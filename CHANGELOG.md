@@ -1,3 +1,6 @@
+[0.1.5]
+* Fix SketchBoard overlayWidget bug
+
 [0.1.4]
 * Add SketchBoard width/height size settings
 

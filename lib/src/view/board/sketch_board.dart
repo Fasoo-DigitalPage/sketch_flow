@@ -130,7 +130,7 @@ class _SketchBoardState extends State<SketchBoard> {
               child: Stack(
                 children: [
                   if (widget.overlayWidget != null)
-                    Positioned.fill(child: widget.overlayWidget!),
+                    widget.overlayWidget!,
                   CustomPaint(painter: SketchPainter(widget.controller)),
                 ],
               ),
@@ -153,7 +153,7 @@ class _SketchBoardState extends State<SketchBoard> {
             child: Stack(
               children: [
                 if (widget.overlayWidget != null)
-                  Positioned.fill(child: widget.overlayWidget!),
+                  widget.overlayWidget!,
                 CustomPaint(painter: SketchPainter(widget.controller)),
               ],
             ),
@@ -168,7 +168,6 @@ class _SketchBoardState extends State<SketchBoard> {
         bool isMoveArea = toolType == SketchToolType.move;
 
         return InteractiveViewer(
-          constrained: false,
           panEnabled: isMoveArea,
           maxScale: isMoveArea ? widget.boardMaxScale ?? 5.0 : 1.0,
           minScale: isMoveArea ? widget.boardMinScale ?? 0.5 : 1.0,
