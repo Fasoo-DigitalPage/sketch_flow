@@ -42,6 +42,10 @@ class SketchBoard extends StatefulWidget {
   /// [isReadOnly] The Read-only mode (By default, the top and bottom bars are null)
   ///
   /// [overlayWidgets] The visual widgets
+  ///
+  /// [boardWidthSize] Board width size
+  ///
+  /// [boardHeightSize] Board height size
   const SketchBoard({
     super.key,
     required this.controller,
@@ -50,7 +54,9 @@ class SketchBoard extends StatefulWidget {
     this.boardMaxScale,
     this.boardMinScale,
     this.backgroundColor,
-    this.overlayWidgets,
+    this.overlayWidget,
+    this.boardWidthSize,
+    this.boardHeightSize,
   });
 
   final SketchController controller;
@@ -59,7 +65,10 @@ class SketchBoard extends StatefulWidget {
   final double? boardMinScale;
   final double? boardMaxScale;
   final Color? backgroundColor;
-  final List<Widget>? overlayWidgets;
+  final Widget? overlayWidget;
+
+  final double? boardWidthSize;
+  final double? boardHeightSize;
 
   @override
   State<StatefulWidget> createState() => _SketchBoardState();
@@ -76,8 +85,8 @@ class _SketchBoardState extends State<SketchBoard> {
       onPointerUp: (_) => widget.controller.endLine(),
       child: Container(
         color: widget.boardColor ?? Colors.white,
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
+        width: widget.boardWidthSize ?? MediaQuery.of(context).size.width,
+        height: widget.boardHeightSize ?? MediaQuery.of(context).size.height,
         child: AnimatedBuilder(
           animation: widget.controller,
           builder: (context, _) {
@@ -85,7 +94,8 @@ class _SketchBoardState extends State<SketchBoard> {
               key: widget.repaintKey,
               child: Stack(
                 children: [
-                  if (widget.overlayWidgets != null) ...?widget.overlayWidgets,
+                  if (widget.overlayWidget != null)
+                    Positioned.fill(child: widget.overlayWidget!),
                   CustomPaint(painter: SketchPainter(widget.controller)),
                 ],
               ),
@@ -98,8 +108,8 @@ class _SketchBoardState extends State<SketchBoard> {
     // Move mode widget with zoom and pan support
     Widget viewerModeWidget = Container(
       color: widget.boardColor ?? Colors.white,
-      width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height,
+      width: widget.boardWidthSize ?? MediaQuery.of(context).size.width,
+      height: widget.boardHeightSize ?? MediaQuery.of(context).size.height,
       child: AnimatedBuilder(
         animation: widget.controller,
         builder: (context, _) {
@@ -107,7 +117,8 @@ class _SketchBoardState extends State<SketchBoard> {
             key: widget.repaintKey,
             child: Stack(
               children: [
-                if (widget.overlayWidgets != null) ...?widget.overlayWidgets,
+                if (widget.overlayWidget != null)
+                  Positioned.fill(child: widget.overlayWidget!),
                 CustomPaint(painter: SketchPainter(widget.controller)),
               ],
             ),
@@ -115,6 +126,7 @@ class _SketchBoardState extends State<SketchBoard> {
         },
       ),
     );
+
 
     return ValueListenableBuilder<SketchToolType>(
       valueListenable: widget.controller.toolTypeNotifier,
