@@ -73,10 +73,7 @@ class _DemoPageState extends State<DemoPage> {
           _showSVGDialog(si: scalableImage);
         },
       ),
-      body: SketchBoard(
-        controller: _sketchController,
-        repaintKey: _repaintKey,
-      ),
+      body: SketchBoard(controller: _sketchController, repaintKey: _repaintKey),
       bottomNavigationBar: SketchBottomBar(controller: _sketchController),
     );
   }

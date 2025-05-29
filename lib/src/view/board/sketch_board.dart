@@ -127,7 +127,6 @@ class _SketchBoardState extends State<SketchBoard> {
       ),
     );
 
-
     return ValueListenableBuilder<SketchToolType>(
       valueListenable: widget.controller.toolTypeNotifier,
       builder: (context, toolType, _) {
