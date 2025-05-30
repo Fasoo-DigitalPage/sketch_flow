@@ -42,9 +42,15 @@ class SketchBottomBar extends StatefulWidget {
   ///
   /// [eraserThicknessSliderThemeData] The theme data used to customize the appearance of the eraser thickness slider
   ///
+  /// [areaEraserText] The text of the area eraser
+  ///
+  /// [strokeEraserText] The text of the stroke eraser
+  ///
   /// [penOpacitySliderThemeData] The theme data used to customize the appearance of the pen opacity slider
   ///
   /// [overlayBackgroundColor] The color of the overlay
+  ///
+  /// [overlayStrokeThicknessSelectColor] Selected thickness icon color
   ///
   /// [showColorPickerSliderBar] ColorPicker Slider active or not (base true)
   const SketchBottomBar({
@@ -67,8 +73,11 @@ class SketchBottomBar extends StatefulWidget {
     this.eraserRadioButtonColor = Colors.black,
     this.eraserThicknessTextStyle,
     this.eraserThicknessSliderThemeData,
+    this.areaEraserText,
+    this.strokeEraserText,
     this.penOpacitySliderThemeData,
     this.overlayBackgroundColor = Colors.white,
+    this.overlayStrokeThicknessSelectColor = Colors.white,
     this.showColorPickerSliderBar = true,
   });
 
@@ -95,10 +104,13 @@ class SketchBottomBar extends StatefulWidget {
   final Color eraserRadioButtonColor;
   final TextStyle? eraserThicknessTextStyle;
   final SliderThemeData? eraserThicknessSliderThemeData;
+  final Text? areaEraserText;
+  final Text? strokeEraserText;
 
   final SliderThemeData? penOpacitySliderThemeData;
 
   final Color overlayBackgroundColor;
+  final Color overlayStrokeThicknessSelectColor;
 
   final bool showColorPickerSliderBar;
 
@@ -554,6 +566,7 @@ class _SketchBottomBarState extends State<SketchBottomBar>
               (index) {
                 return BaseThickness(
                   radius: 17.5,
+                  selectColor: widget.overlayStrokeThicknessSelectColor,
                   index: index,
                   isSelected: effectiveConfig.strokeThickness ==
                       effectiveConfig.strokeThicknessList[index],
@@ -692,7 +705,7 @@ class _SketchBottomBarState extends State<SketchBottomBar>
 
   /// Build the eraser configuration widget.
   /// Allows users to choose between area erasing and stroke erasing.
-  Widget _eraserConfigWidget({Text? areaEraserText, Text? strokeEraserText}) {
+  Widget _eraserConfigWidget() {
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, _) {
@@ -703,7 +716,7 @@ class _SketchBottomBarState extends State<SketchBottomBar>
           child: Column(
             children: [
               RadioListTile<EraserMode>(
-                title: areaEraserText ??
+                title: widget.areaEraserText ??
                     Text("Area eraser", style: TextStyle(fontSize: 14)),
                 activeColor: widget.eraserRadioButtonColor,
                 value: EraserMode.area,
@@ -716,7 +729,7 @@ class _SketchBottomBarState extends State<SketchBottomBar>
                 },
               ),
               RadioListTile<EraserMode>(
-                title: strokeEraserText ??
+                title: widget.strokeEraserText ??
                     Text("Stroke eraser", style: TextStyle(fontSize: 14)),
                 activeColor: widget.eraserRadioButtonColor,
                 value: EraserMode.stroke,

@@ -1,3 +1,7 @@
+[0.1.6+3]
+* Add Area/Stroke Eraser design settings
+* Add selected strokeThickness icon color settings.
+
 [0.1.6+2]
 * Add SketchTopBar theme settings
 
