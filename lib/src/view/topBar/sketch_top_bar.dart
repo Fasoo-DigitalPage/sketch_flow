@@ -142,12 +142,14 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
                       builder: (context, canUndo, _) {
                         return IconButton(
                           icon: canUndo
-                              ? (undoIcon?.enableIcon ?? Icon(Icons.undo_rounded))
-                              : (undoIcon?.disableIcon ?? Icon(Icons.undo_rounded)),
+                              ? (undoIcon?.enableIcon ??
+                                  Icon(Icons.undo_rounded))
+                              : (undoIcon?.disableIcon ??
+                                  Icon(Icons.undo_rounded)),
                           onPressed: canUndo
                               ? () {
-                            controller.undo();
-                          }
+                                  controller.undo();
+                                }
                               : null,
                         );
                       },
@@ -159,12 +161,14 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
                       builder: (context, canRedo, _) {
                         return IconButton(
                           icon: canRedo
-                              ? (redoIcon?.enableIcon ?? Icon(Icons.redo_rounded))
-                              : (redoIcon?.disableIcon ?? Icon(Icons.redo_rounded)),
+                              ? (redoIcon?.enableIcon ??
+                                  Icon(Icons.redo_rounded))
+                              : (redoIcon?.disableIcon ??
+                                  Icon(Icons.redo_rounded)),
                           onPressed: canRedo
                               ? () {
-                            controller.redo();
-                          }
+                                  controller.redo();
+                                }
                               : null,
                         );
                       },
@@ -221,8 +225,7 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
               ],
             ),
           ),
-        )
-    );
+        ));
   }
 
   @override
