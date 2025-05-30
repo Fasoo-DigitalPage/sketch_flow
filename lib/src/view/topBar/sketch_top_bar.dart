@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:sketch_flow/sketch_controller.dart';
 import 'package:sketch_flow/sketch_view.dart';
 
@@ -47,6 +48,7 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
   ///
   /// [onClickInputTestButton] Callback function invoked when the test input button is pressed
   ///
+  /// [systemUiOverlayStyle] Specify the theme (text/icon color, etc.) of the status bar (top bar)
   const SketchTopBar({
     super.key,
     required this.controller,
@@ -70,6 +72,7 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
     this.exportTestDataIcon,
     this.showInputTestDataIcon,
     this.onClickInputTestButton,
+    this.systemUiOverlayStyle,
   });
 
   final SketchController controller;
@@ -101,119 +104,124 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
   final bool? showInputTestDataIcon;
   final Function()? onClickInputTestButton;
 
+  final SystemUiOverlayStyle? systemUiOverlayStyle;
+
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-        decoration: BoxDecoration(
-          color: topBarColor,
-          border: Border(
-            bottom: BorderSide(
-              color: topBarBorderColor,
-              width: topBarBorderWidth ?? 0.5,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+        value: systemUiOverlayStyle ?? SystemUiOverlayStyle.dark,
+        child: SafeArea(
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+            decoration: BoxDecoration(
+              color: topBarColor,
+              border: Border(
+                bottom: BorderSide(
+                  color: topBarBorderColor,
+                  width: topBarBorderWidth ?? 0.5,
+                ),
+              ),
             ),
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            IconButton(
-              icon: backButtonIcon ??
-                  Icon(Icons.arrow_back_ios, color: Colors.black),
-              onPressed: () {
-                if (onClickBackButton != null) {
-                  onClickBackButton!();
-                }
-              },
-            ),
-            Row(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                /// Undo Icon button
-                ValueListenableBuilder<bool>(
-                  valueListenable: controller.canUndoNotifier,
-                  builder: (context, canUndo, _) {
-                    return IconButton(
-                      icon: canUndo
-                          ? (undoIcon?.enableIcon ?? Icon(Icons.undo_rounded))
-                          : (undoIcon?.disableIcon ?? Icon(Icons.undo_rounded)),
-                      onPressed: canUndo
-                          ? () {
-                              controller.undo();
-                            }
-                          : null,
-                    );
+                IconButton(
+                  icon: backButtonIcon ??
+                      Icon(Icons.arrow_back_ios, color: Colors.black),
+                  onPressed: () {
+                    if (onClickBackButton != null) {
+                      onClickBackButton!();
+                    }
                   },
                 ),
+                Row(
+                  children: [
+                    /// Undo Icon button
+                    ValueListenableBuilder<bool>(
+                      valueListenable: controller.canUndoNotifier,
+                      builder: (context, canUndo, _) {
+                        return IconButton(
+                          icon: canUndo
+                              ? (undoIcon?.enableIcon ?? Icon(Icons.undo_rounded))
+                              : (undoIcon?.disableIcon ?? Icon(Icons.undo_rounded)),
+                          onPressed: canUndo
+                              ? () {
+                            controller.undo();
+                          }
+                              : null,
+                        );
+                      },
+                    ),
 
-                /// Redo Icon button
-                ValueListenableBuilder<bool>(
-                  valueListenable: controller.canRedoNotifier,
-                  builder: (context, canRedo, _) {
-                    return IconButton(
-                      icon: canRedo
-                          ? (redoIcon?.enableIcon ?? Icon(Icons.redo_rounded))
-                          : (redoIcon?.disableIcon ?? Icon(Icons.redo_rounded)),
-                      onPressed: canRedo
-                          ? () {
-                              controller.redo();
+                    /// Redo Icon button
+                    ValueListenableBuilder<bool>(
+                      valueListenable: controller.canRedoNotifier,
+                      builder: (context, canRedo, _) {
+                        return IconButton(
+                          icon: canRedo
+                              ? (redoIcon?.enableIcon ?? Icon(Icons.redo_rounded))
+                              : (redoIcon?.disableIcon ?? Icon(Icons.redo_rounded)),
+                          onPressed: canRedo
+                              ? () {
+                            controller.redo();
+                          }
+                              : null,
+                        );
+                      },
+                    ),
+
+                    if (showExtractSVGIcon ?? false)
+                      IconButton(
+                        onPressed: () {
+                          if (onClickExtractSVG != null) {
+                            List<Offset> offsets = [];
+
+                            for (final content in controller.contents) {
+                              offsets.addAll(content.offsets);
                             }
-                          : null,
-                    );
-                  },
+
+                            onClickExtractSVG!(offsets);
+                          }
+                        },
+                        icon: exportSVGIcon ?? Icon(Icons.file_open_outlined),
+                      ),
+
+                    if (showExtractPNGIcon ?? false)
+                      IconButton(
+                        onPressed: () {
+                          if (onClickExtractPNG != null) {
+                            onClickExtractPNG!();
+                          }
+                        },
+                        icon: exportPNGIcon ?? Icon(Icons.image),
+                      ),
+
+                    /// Button for JSON data debugging
+                    if (showJsonDialogIcon ?? false)
+                      IconButton(
+                        icon: exportJSONIcon ?? Icon(Icons.javascript),
+                        onPressed: () {
+                          if (onClickToJsonButton != null) {
+                            onClickToJsonButton!();
+                          }
+                        },
+                      ),
+
+                    if (showInputTestDataIcon ?? false)
+                      IconButton(
+                        icon: exportTestDataIcon ?? Icon(Icons.input),
+                        onPressed: () {
+                          if (onClickInputTestButton != null) {
+                            onClickInputTestButton!();
+                          }
+                        },
+                      ),
+                  ],
                 ),
-
-                if (showExtractSVGIcon ?? false)
-                  IconButton(
-                    onPressed: () {
-                      if (onClickExtractSVG != null) {
-                        List<Offset> offsets = [];
-
-                        for (final content in controller.contents) {
-                          offsets.addAll(content.offsets);
-                        }
-
-                        onClickExtractSVG!(offsets);
-                      }
-                    },
-                    icon: exportSVGIcon ?? Icon(Icons.file_open_outlined),
-                  ),
-
-                if (showExtractPNGIcon ?? false)
-                  IconButton(
-                    onPressed: () {
-                      if (onClickExtractPNG != null) {
-                        onClickExtractPNG!();
-                      }
-                    },
-                    icon: exportPNGIcon ?? Icon(Icons.image),
-                  ),
-
-                /// Button for JSON data debugging
-                if (showJsonDialogIcon ?? false)
-                  IconButton(
-                    icon: exportJSONIcon ?? Icon(Icons.javascript),
-                    onPressed: () {
-                      if (onClickToJsonButton != null) {
-                        onClickToJsonButton!();
-                      }
-                    },
-                  ),
-
-                if (showInputTestDataIcon ?? false)
-                  IconButton(
-                    icon: exportTestDataIcon ?? Icon(Icons.input),
-                    onPressed: () {
-                      if (onClickInputTestButton != null) {
-                        onClickInputTestButton!();
-                      }
-                    },
-                  ),
               ],
             ),
-          ],
-        ),
-      ),
+          ),
+        )
     );
   }
 
