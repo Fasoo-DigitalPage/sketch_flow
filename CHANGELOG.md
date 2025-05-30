@@ -1,3 +1,6 @@
+[0.1.6+2]
+* Add SketchTopBar theme settings
+
 [0.1.6+1]
 * Apply to set png, svg icon options
 
