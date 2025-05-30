@@ -26,12 +26,11 @@ class BaseThickness extends StatelessWidget {
         height: radius,
         child: CustomPaint(
           painter: BaseThicknessPainter(
-            radius: radius,
-            index: index,
-            isSelected: isSelected,
-            color: color,
-            selectColor: selectColor
-          ),
+              radius: radius,
+              index: index,
+              isSelected: isSelected,
+              color: color,
+              selectColor: selectColor),
         ),
       ),
       onPressed: onClickThickness,
