@@ -7,6 +7,8 @@ export 'src/model/content/shape/circle.dart';
 export 'src/model/content/shape/line.dart';
 export 'src/model/content/shape/rectangle.dart';
 
+export 'src/model/content/blank.dart';
+
 export 'src/model/content/extension/shape/shape_erase_extension.dart';
 export 'src/model/content/extension/config/sketch_tool_type_extension.dart';
 

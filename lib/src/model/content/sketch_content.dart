@@ -1,6 +1,5 @@
 import 'dart:ui';
 import 'package:sketch_flow/sketch_model.dart';
-import 'package:sketch_flow/src/model/content/blank.dart';
 
 /// This class defines a common interface and structure for various types of
 /// drawing tools and shapes (e.g., pencil, brush, eraser, line, rectangle, etc.).

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sketch_flow/sketch_model.dart';
-import 'package:sketch_flow/sketch_controller.dart';
-import 'package:sketch_flow/sketch_view.dart';
+import 'package:sketch_flow/sketch_flow.dart';
 
 /// SketchBoard is the main widget that renders a drawable canvas.
 ///

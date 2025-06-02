@@ -14,6 +14,14 @@ extension SketchToolTypeExtension on SketchToolType {
     }
   }
 
+  /// Returns true if this tool type uses [SketchConfig] settings (e.g. color, stroke width).
+  ///
+  /// This is useful for filtering out tool types that do not rely on configurable
+  /// properties like color or thickness (e.g. [palette], [eraser], [move]).
+  ///
+  /// Example:
+  /// - `pen`, `highlighter`, `shape tools` → true
+  /// - `palette`, `eraser`, `move` → false
   bool get isUsedConfig {
     switch (this) {
       case SketchToolType.palette:

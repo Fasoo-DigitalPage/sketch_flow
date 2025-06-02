@@ -1,8 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:sketch_flow/sketch_controller.dart';
-import 'package:sketch_flow/sketch_view.dart';
-import 'package:sketch_flow/sketch_model.dart';
+import 'package:sketch_flow/sketch_flow.dart';
 
 /// Number of ColorPicker representation colors
 const int _colorStepsCounts = 1792;
