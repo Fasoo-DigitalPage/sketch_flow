@@ -22,7 +22,8 @@
 
 ## 미리보기  
 웹에서 테스트 해보기: [바로가기](https://fasoo-digitalpage.github.io/sketch_flow/)  
-예제 코드 보기: [main.dart](https://github.com/fasoo-digitalpage/sketch_flow/blob/main/example/lib/main.dart)
+예제 코드 보기: [main.dart](https://github.com/fasoo-digitalpage/sketch_flow/blob/main/example/lib/main.dart)  
+sketch_flow를 활용한 예제 프로젝트 보러가기: [sketch_flow_example](https://github.com/JunYeong0314/sketch_flow_example)
 
 <p align="center">
 
