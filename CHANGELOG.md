@@ -1,3 +1,6 @@
+[1.0.0]
+* re-export core APIs to simplify imports
+
 [0.1.6+3]
 * Add Area/Stroke Eraser design settings
 * Add selected strokeThickness icon color settings.
