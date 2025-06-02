@@ -1,3 +1,6 @@
+[1.0.0+1]
+* docs update
+
 [1.0.0]
 * re-export core APIs to simplify imports
 
