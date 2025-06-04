@@ -1,4 +1,8 @@
 # Sketch Flow
+<p align="center">
+<img width = "60%" src='https://github.com/user-attachments/assets/f7d55a46-9669-4470-a70e-cf0effb293a7' border='0' />
+</p>
+
 [English](https://github.com/JunYeong0314/sketch_flow/edit/main/README.md) / [한국어](https://github.com/JunYeong0314/sketch_flow/blob/main/README-KO.md)  
 **A powerful and flexible Flutter sketching plugin**  
 Easily build drawing applications with elegant UI and comprehensive export features.  
