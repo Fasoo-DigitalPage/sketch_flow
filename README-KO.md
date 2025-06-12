@@ -1,6 +1,6 @@
 # Sketch Flow
 <p align="center">
-<img width = "60%" src='https://github.com/user-attachments/assets/f7d55a46-9669-4470-a70e-cf0effb293a7' border='0' />
+<img width = "60%" src='https://github.com/user-attachments/assets/0b9a60b3-9bc4-4ea4-b917-a4cd25d12c9b' border='0' />
 </p>
 
 
