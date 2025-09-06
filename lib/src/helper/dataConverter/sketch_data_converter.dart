@@ -127,9 +127,6 @@ class SketchDataConverter {
   /// Wrapper for [toJson]
   static BsonBinary toBson(List<SketchContent> contents) {
     final jsonList = toJson(contents);
-    print(
-        'Decode: ${BsonCodec.deserialize(BsonBinary.fromHexString('0500000000'))}');
-    print('Encode: ${BsonCodec.serialize([{}])}');
     return BsonCodec.serialize(jsonList);
   }
 
