@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:bson/bson.dart';
 import 'package:sketch_flow/sketch_model.dart';
 
 /// Represents a rectangular shape drawing tool.
@@ -39,6 +40,9 @@ class Rectangle extends SketchContent {
         'lineStrokeThickness': sketchConfig.rectangleConfig.strokeThickness,
         'lineOpacity': sketchConfig.rectangleConfig.opacity,
       };
+
+  @override
+  BsonBinary toBson() => BsonCodec.serialize(toJson());
 
   @override
   String? toSvg() {

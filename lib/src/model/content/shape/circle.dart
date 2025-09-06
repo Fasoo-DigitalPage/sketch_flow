@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:bson/bson.dart';
 import 'package:sketch_flow/sketch_model.dart';
 
 /// Represents a circle drawing tool.
@@ -48,6 +49,9 @@ class Circle extends SketchContent {
         'circleStrokeThickness': sketchConfig.circleConfig.strokeThickness,
         'circleOpacity': sketchConfig.circleConfig.opacity,
       };
+
+  @override
+  BsonBinary toBson() => BsonCodec.serialize(toJson());
 
   @override
   String? toSvg() {

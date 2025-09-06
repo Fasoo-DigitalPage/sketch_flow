@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:bson/bson.dart';
 import 'package:sketch_flow/sketch_model.dart';
 
 class Brush extends SketchContent {
@@ -47,6 +48,9 @@ class Brush extends SketchContent {
       'brushOpacity': sketchConfig.brushConfig.opacity,
     };
   }
+
+  @override
+  BsonBinary toBson() => BsonCodec.serialize(toJson());
 
   @override
   String? toSvg() {

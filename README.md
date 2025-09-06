@@ -1,27 +1,33 @@
 # Sketch Flow
+
 <p align="center">
 <img width = "60%" src='https://github.com/user-attachments/assets/0b9a60b3-9bc4-4ea4-b917-a4cd25d12c9b' border='0' />
 </p>
 
 [English](https://github.com/JunYeong0314/sketch_flow/edit/main/README.md) / [한국어](https://github.com/JunYeong0314/sketch_flow/blob/main/README-KO.md)  
 **A powerful and flexible Flutter sketching plugin**  
-Easily build drawing applications with elegant UI and comprehensive export features.  
+Easily build drawing applications with elegant UI and comprehensive export features.
 
 ## Features
 
-#### Easy-to-use SketchController  
-  - Integrate sketching functionality with just a few lines using `SketchController`. Manage tools, undo/redo, and export effortlessly.
+#### Easy-to-use SketchController
+
+- Integrate sketching functionality with just a few lines using `SketchController`. Manage tools, undo/redo, and export effortlessly.
 
 #### Export Support
+
 - `PNG`: For high-resolution image rendering
 - `SVG`: For scalable vector graphics
 - `JSON`: For precise stroke data and replaying paths
+- `BSON`: Wrapper for `JSON` that converts it into Bson bytes
 
 #### Built-in Stylish UI
+
 - Comes with ready-made top/bottom bars that offer a **clean, user-friendly design**.
 - Use directly without extra customization for quick prototyping.
 
-## Preview  
+## Preview
+
 Test it live!: [Try it](https://fasoo-digitalpage.github.io/sketch_flow/)  
 View example code: [main.dart](https://github.com/fasoo-digitalpage/sketch_flow/blob/main/example/lib/main.dart)  
 Check out an example project using sketch_flow: [sketch_flow_example](https://github.com/JunYeong0314/sketch_flow_example)
@@ -35,11 +41,12 @@ Check out an example project using sketch_flow: [sketch_flow_example](https://gi
 </p>
 
 ## Core components at a glance
-| Components                              | Description                                                        |
-| ---------------------------------- | --------------------------------------------------------- |
+
+| Components                         | Description                                                                                                            |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
 | `SketchController`                 | **(Required)** Key controller that manages drawing status and can be extracted in various formats such as JSON/SVG/PNG |
-| `SketchBoard`                      | **(Required)** Main canvas widget to handle user input (draw/er, etc.)                         |
-| `SketchTopBar` / `SketchBottomBar` | **(Optional)** Preferred UI components                             |
+| `SketchBoard`                      | **(Required)** Main canvas widget to handle user input (draw/er, etc.)                                                 |
+| `SketchTopBar` / `SketchBottomBar` | **(Optional)** Preferred UI components                                                                                 |
 
 ## Architecture
 
@@ -48,36 +55,45 @@ Check out an example project using sketch_flow: [sketch_flow_example](https://gi
 </p>
 
 ## How to Use `sketch_flow`
+
 #### Install the package
 
 - Add this to your `pubspec.yaml`: [Check latest version](https://pub.dev/packages/sketch_flow/versions)
+
 ```dart
 dependencies:
   sketch_flow: ^latest_version
 ```
 
 #### `SketchController` and `SketchBoard`
+
 - SketchController is a key class that manages drawing data.  
-By passing this controller to SketchBoard, you can process user input, extract or reload the information you need.
+  By passing this controller to SketchBoard, you can process user input, extract or reload the information you need.
+
 ```dart
 final SketchController _controller = SketchController();
 ```
 
 - And if you want to extract images with PNG or save the screen, you need to set GlobalKey on SketchBoard.  
-This key is internally connected to RepaintBoundary and is used to capture images.
+  This key is internally connected to RepaintBoundary and is used to capture images.
+
 ```dart
 final GlobalKey _repaintKey = GlobalKey();
 ```
 
 - After this definition, pass it along to `SketchBoard`:
+
 ```dart
 SketchBoard(
   controller: _controller,
   repaintKey: _repaintKey,
 )
 ```
-#### (Optional) Use `SketchTopBar` and `SketchBottomBar`  
+
+#### (Optional) Use `SketchTopBar` and `SketchBottomBar`
+
 - It's easy to use, and you can customize it in your own style through a variety of parameters.
+
 ```dart
 Scaffold(
   appBar: SketchTopBar(controller: _controller),
@@ -85,29 +101,51 @@ Scaffold(
   bottomNavigationBar: SketchBottomBar(controller: _sketchController),
 )
 ```
+
 > 💡 Of course, you can freely configure the UI.  
 > If you connect the Sketch Controller properly, you can design the UI any way you want without the top and bottom bars.
 
 ## Export & Import Drawings
+
 #### JSON (Serialization / Deserialization)
+
 - You can easily **serialize (export)** your sketch data to JSON and **deserialize (import)** it back using the controller:
+
 ```dart
 final json = _controller.toJson(); // Serialization
 
 _controller.fromJson(json: json); // Deserialization
 ```
+
+#### BSON (Serialization / Deserialization)
+
+- Used the same way as **JSON**, but it works differently, sketch data is converted into JSON and then into BSON, and vice vera. This isn't a full integration, but is a wrapper to give support for `.bson` files, here is an example of its usage:
+
+```dart
+final bson = _controller.toBson(); // Serialization
+
+_controller.fromBson(bson: bson); // Deserialization
+```
+
+There is also `.fromBsonToJson()` and `.fromJsonToBson()` that can be used to migrate/test between different formats without converting it into sketch data first.
+
 #### PNG
+
 - You can easily export your drawing as a PNG using `SketchController`.  
-Customize the image resolution with the `pixelRatio` parameter:
+  Customize the image resolution with the `pixelRatio` parameter:
+
 ```dart
 final Uint8List? image = await _controller.extractPNG(
   repaintKey: _repaintKey,
   pixelRatio: 2.0, // Customize resolution
 );
 ```
+
 #### SVG
+
 - Easily export your drawing as an SVG with `SketchController`.  
-You can define the canvas width and height to match your needs.
+  You can define the canvas width and height to match your needs.
+
 ```dart
 final String svgCode = await _controller.extractSVG(
   width: 300.0, // Define canvas width
@@ -116,18 +154,15 @@ final String svgCode = await _controller.extractSVG(
 ```
 
 ## Tools Overview
-| Tool Type   | Description                                                                                      |
-| ----------- | ------------------------------------------------------------------------------------------------ |
-| **Move**    | Enables panning and zooming of the canvas without affecting the drawings.                        |
-| **Pencil**  | Draws a continuous line based on user input. Configurable stroke thickness, color, and opacity.  |
-| **Brush**   | Simulates a brush-like stroke with smooth edges. Supports color and thickness customization.     |
-| **Highlighter**  | 	Draws semi-transparent strokes resembling a highlighter. Comes with predefined low opacity and medium thickness to simulate real highlighter effects.  |
-| **Palette** | Allows users to select colors for drawing tools. |
-| **Eraser**  | Erases drawings either by stroke or by area.    |
-| **Line**  |   Draws a straight line between the first and last touch point. Line color and thickness are customizable.  |
-| **Rectangle**  |  Draws a rectangle defined by the first and last touch points.   |
-| **Circle**  | 	Draws a circle or ellipse bounded by the first and last touch points. |
 
-
-
-
+| Tool Type       | Description                                                                                                                                           |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Move**        | Enables panning and zooming of the canvas without affecting the drawings.                                                                             |
+| **Pencil**      | Draws a continuous line based on user input. Configurable stroke thickness, color, and opacity.                                                       |
+| **Brush**       | Simulates a brush-like stroke with smooth edges. Supports color and thickness customization.                                                          |
+| **Highlighter** | Draws semi-transparent strokes resembling a highlighter. Comes with predefined low opacity and medium thickness to simulate real highlighter effects. |
+| **Palette**     | Allows users to select colors for drawing tools.                                                                                                      |
+| **Eraser**      | Erases drawings either by stroke or by area.                                                                                                          |
+| **Line**        | Draws a straight line between the first and last touch point. Line color and thickness are customizable.                                              |
+| **Rectangle**   | Draws a rectangle defined by the first and last touch points.                                                                                         |
+| **Circle**      | Draws a circle or ellipse bounded by the first and last touch points.                                                                                 |

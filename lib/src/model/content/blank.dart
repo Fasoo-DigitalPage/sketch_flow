@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:bson/bson.dart';
 import 'package:sketch_flow/sketch_model.dart';
 
 class Blank extends SketchContent {
@@ -10,6 +11,12 @@ class Blank extends SketchContent {
   @override
   Map<String, dynamic> toJson() {
     return {};
+  }
+
+  @override
+  BsonBinary toBson() {
+    return BsonBinary.fromHexString('0500000000');
+    // Hex string is same as '0x05 0x00 0x00 0x00 0x00'
   }
 
   @override

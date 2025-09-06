@@ -1,3 +1,4 @@
+import 'package:bson/bson.dart';
 import 'package:flutter/material.dart';
 import 'package:sketch_flow/sketch_model.dart';
 
@@ -40,6 +41,9 @@ class Eraser extends SketchContent {
       'eraserRadius': sketchConfig.eraserRadius,
     };
   }
+
+  @override
+  BsonBinary toBson() => BsonCodec.serialize(toJson());
 
   @override
   String? toSvg() {

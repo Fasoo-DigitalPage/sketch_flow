@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:bson/bson.dart';
 import 'package:flutter/material.dart';
 import 'package:sketch_flow/sketch_flow.dart';
 
@@ -189,6 +190,27 @@ class SketchController extends ChangeNotifier {
       ..clear()
       ..addAll(data);
     notifyListeners();
+  }
+
+  BsonBinary toBson() {
+    return SketchDataConverter.toBson(_contents);
+  }
+
+  void fromBson({required BsonBinary bson}) {
+    final data = SketchDataConverter.fromBson(bson);
+
+    _contents
+      ..clear()
+      ..addAll(data);
+    notifyListeners();
+  }
+
+  List<Map<String, dynamic>> fromBsonToJson(BsonBinary bson) {
+    return SketchDataConverter.fromBsonToJson(bson);
+  }
+
+  BsonBinary fromJsonToBson({required List<Map<String, dynamic>> json}) {
+    return SketchDataConverter.fromJsonToBson(json);
   }
 
   Future<Uint8List?> extractPNG({

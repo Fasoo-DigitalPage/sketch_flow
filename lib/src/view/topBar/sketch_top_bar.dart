@@ -41,6 +41,12 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
   ///
   /// [showJsonDialogIcon] Whether to show the JSON dialog icon (default: false)
   ///
+  /// [exportBSONIcon] Export BSON Icon
+  ///
+  /// [onClickToBsonButton] Callback function invoked when the BSON button is pressed
+  ///
+  /// [showBsonDialogIcon] Whether to show the BSON dialog icon (default: false)
+  ///
   /// [exportTestDataIcon] Export test data icon
   ///
   /// [showInputTestDataIcon] Whether to show the input test data icon (default: false)
@@ -68,6 +74,9 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
     this.exportJSONIcon,
     this.onClickToJsonButton,
     this.showJsonDialogIcon,
+    this.exportBSONIcon,
+    this.onClickToBsonButton,
+    this.showBsonDialogIcon,
     this.exportTestDataIcon,
     this.showInputTestDataIcon,
     this.onClickInputTestButton,
@@ -98,6 +107,10 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
   final Widget? exportJSONIcon;
   final Function()? onClickToJsonButton;
   final bool? showJsonDialogIcon;
+
+  final Widget? exportBSONIcon;
+  final Function()? onClickToBsonButton;
+  final bool? showBsonDialogIcon;
 
   final Widget? exportTestDataIcon;
   final bool? showInputTestDataIcon;
@@ -206,6 +219,17 @@ class SketchTopBar extends StatelessWidget implements PreferredSizeWidget {
                         onPressed: () {
                           if (onClickToJsonButton != null) {
                             onClickToJsonButton!();
+                          }
+                        },
+                      ),
+
+                    /// Button for BSON data debugging
+                    if (showBsonDialogIcon ?? false)
+                      IconButton(
+                        icon: exportBSONIcon ?? Icon(Icons.data_array),
+                        onPressed: () {
+                          if (onClickToBsonButton != null) {
+                            onClickToBsonButton!();
                           }
                         },
                       ),

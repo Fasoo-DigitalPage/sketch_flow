@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:bson/bson.dart';
 import 'package:sketch_flow/sketch_model.dart';
 
 /// Represents a highlighter tool for drawing semi-transparent strokes.
@@ -39,6 +40,9 @@ class Highlighter extends SketchContent {
       'highlighterOpacity': sketchConfig.highlighterConfig.opacity,
     };
   }
+
+  @override
+  BsonBinary toBson() => BsonCodec.serialize(toJson());
 
   @override
   String? toSvg() {

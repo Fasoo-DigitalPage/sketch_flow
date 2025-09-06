@@ -1,9 +1,10 @@
 import 'dart:ui';
+import 'package:bson/bson.dart';
 import 'package:sketch_flow/sketch_model.dart';
 
 /// This class defines a common interface and structure for various types of
 /// drawing tools and shapes (e.g., pencil, brush, eraser, line, rectangle, etc.).
-/// It enforces the implementation of drawing, serialization to JSON, and SVG export.
+/// It enforces the implementation of drawing, serialization to JSON, BSON, and SVG export.
 abstract class SketchContent {
   /// A list of offset points that define the shape or path of the drawing.
   final List<Offset> offsets;
@@ -53,6 +54,9 @@ abstract class SketchContent {
 
   /// Serializes the content into a JSON-compatible map.
   Map<String, dynamic> toJson();
+
+  /// Serializes the content into a BSON binary
+  BsonBinary toBson();
 
   /// Converts the content to an SVG string representation.
   ///

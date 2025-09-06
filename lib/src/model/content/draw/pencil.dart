@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:bson/bson.dart';
 import 'package:sketch_flow/sketch_model.dart';
 
 /// Represents a pencil tool for freehand drawing.
@@ -37,6 +38,9 @@ class Pencil extends SketchContent {
       'pencilOpacity': sketchConfig.pencilConfig.opacity,
     };
   }
+
+  @override
+  BsonBinary toBson() => BsonCodec.serialize(toJson());
 
   @override
   String? toSvg() {
