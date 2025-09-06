@@ -19,7 +19,7 @@ Easily build drawing applications with elegant UI and comprehensive export featu
 - `PNG`: For high-resolution image rendering
 - `SVG`: For scalable vector graphics
 - `JSON`: For precise stroke data and replaying paths
-- `BSON`: Wrapper for `JSON` that converts it into Bson bytes
+- `BSON`: Wrapper for `JSON` that converts it into `List<int>`
 
 #### Built-in Stylish UI
 
@@ -122,9 +122,17 @@ _controller.fromJson(json: json); // Deserialization
 - Used the same way as **JSON**, but it works differently, sketch data is converted into JSON and then into BSON, and vice vera. This isn't a full integration, but is a wrapper to give support for `.bson` files, here is an example of its usage:
 
 ```dart
-final bson = _controller.toBson(); // Serialization
+final List<int> bson = _controller.toBson(); // Serialization
 
 _controller.fromBson(bson: bson); // Deserialization
+```
+
+To read bytes from a file:
+
+```dart
+final data = await File(filePath).readAsBytes();
+
+_controller.fromBson(bson: data);
 ```
 
 There is also `.fromBsonToJson()` and `.fromJsonToBson()` that can be used to migrate/test between different formats without converting it into sketch data first.

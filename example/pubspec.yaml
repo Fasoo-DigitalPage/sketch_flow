@@ -33,7 +33,6 @@ dependencies:
   sketch_flow:
     path: ../
   jovial_svg: ^1.1.25
-  bson: ^5.0.7
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

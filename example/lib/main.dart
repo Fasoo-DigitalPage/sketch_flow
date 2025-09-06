@@ -6,7 +6,6 @@ import 'package:example/test_data_bson.dart';
 
 import 'package:flutter/material.dart';
 import 'package:jovial_svg/jovial_svg.dart';
-import 'package:bson/bson.dart';
 import 'package:sketch_flow/sketch_flow.dart';
 
 void main() {
@@ -115,7 +114,7 @@ class _DemoPageState extends State<DemoPage> {
     );
   }
 
-  void _showBsonDialog({required BsonBinary bson}) {
+  void _showBsonDialog({required List<int> bson}) {
     showDialog(
       context: context,
       builder:
@@ -123,7 +122,7 @@ class _DemoPageState extends State<DemoPage> {
             title: const Text("Sketch BSON Hex"),
             content: SingleChildScrollView(
               child: SelectableText(
-                bson.hexString.toString(),
+                bson.toString(),
                 style: const TextStyle(fontSize: 12),
               ),
             ),

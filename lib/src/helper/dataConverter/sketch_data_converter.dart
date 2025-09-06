@@ -125,31 +125,39 @@ class SketchDataConverter {
   /// Converts a list of [SketchContent] objects into BSON bytes.
   ///
   /// Wrapper for [toJson]
-  static BsonBinary toBson(List<SketchContent> contents) {
+  static List<int> toBson(List<SketchContent> contents) {
     final jsonList = toJson(contents);
-    return BsonCodec.serialize(jsonList);
+    return BsonCodec.serialize(jsonList).byteList;
   }
 
   /// Converts BSON bytes into a list of [SketchContent] objects.
-  static List<SketchContent> fromBson(BsonBinary bytes) {
-    final content = BsonCodec.deserialize(bytes);
+  static List<SketchContent> fromBson(List<int> byteList) {
+    // If empty, error: corrupt bson message < 5 bytes long
+    if (byteList.isNotEmpty) {
+      final content = BsonCodec.deserialize(BsonBinary.from(byteList));
 
-    return fromJson(content.entries
-        .map((e) => _normalizeForJson(e.value) as Map<String, dynamic>)
-        .toList());
+      return fromJson(content.entries
+          .map((e) => _normalizeForJson(e.value) as Map<String, dynamic>)
+          .toList());
+    }
+    return [];
   }
 
   /// Converts BSON bytes into a list of JSON maps.
-  static List<Map<String, dynamic>> fromBsonToJson(BsonBinary bson) {
-    final output = BsonCodec.deserialize(bson);
-    return output.entries
-        .map((e) => _normalizeForJson(e.value) as Map<String, dynamic>)
-        .toList();
+  static List<Map<String, dynamic>> fromBsonToJson(List<int> byteList) {
+    // If empty, error: corrupt bson message < 5 bytes long
+    if (byteList.isNotEmpty) {
+      final output = BsonCodec.deserialize(BsonBinary.from(byteList));
+      return output.entries
+          .map((e) => _normalizeForJson(e.value) as Map<String, dynamic>)
+          .toList();
+    }
+    return [];
   }
 
   /// Converts a list of JSON maps into BSON bytes.
-  static BsonBinary fromJsonToBson(List<Map<String, dynamic>> content) {
-    return BsonCodec.serialize(content);
+  static List<int> fromJsonToBson(List<Map<String, dynamic>> content) {
+    return BsonCodec.serialize(content).byteList;
   }
 
   /// Recursively normalizes a BSON-decoded object into pure JSON-safe values.

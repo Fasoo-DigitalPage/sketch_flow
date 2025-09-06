@@ -192,11 +192,11 @@ class SketchController extends ChangeNotifier {
     notifyListeners();
   }
 
-  BsonBinary toBson() {
+  List<int> toBson() {
     return SketchDataConverter.toBson(_contents);
   }
 
-  void fromBson({required BsonBinary bson}) {
+  void fromBson({required List<int> bson}) {
     final data = SketchDataConverter.fromBson(bson);
 
     _contents
@@ -205,11 +205,11 @@ class SketchController extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<Map<String, dynamic>> fromBsonToJson(BsonBinary bson) {
+  List<Map<String, dynamic>> fromBsonToJson(List<int> bson) {
     return SketchDataConverter.fromBsonToJson(bson);
   }
 
-  BsonBinary fromJsonToBson({required List<Map<String, dynamic>> json}) {
+  List<int> fromJsonToBson({required List<Map<String, dynamic>> json}) {
     return SketchDataConverter.fromJsonToBson(json);
   }
 
