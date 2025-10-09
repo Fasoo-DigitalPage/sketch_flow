@@ -1,4 +1,6 @@
 import 'dart:ui';
+import 'package:fixnum/fixnum.dart';
+import 'package:bson/bson.dart';
 import 'package:sketch_flow/sketch_model.dart';
 
 /// A utility class responsible for converting sketch data to and from JSON format.
@@ -118,5 +120,55 @@ class SketchDataConverter {
     }
 
     return result;
+  }
+
+  /// Converts a list of [SketchContent] objects into BSON bytes.
+  ///
+  /// Wrapper for [toJson]
+  static List<int> toBson(List<SketchContent> contents) {
+    final jsonList = toJson(contents);
+    return BsonCodec.serialize(jsonList).byteList;
+  }
+
+  /// Converts BSON bytes into a list of [SketchContent] objects.
+  static List<SketchContent> fromBson(List<int> byteList) {
+    // If empty, error: corrupt bson message < 5 bytes long
+    if (byteList.isNotEmpty) {
+      final content = BsonCodec.deserialize(BsonBinary.from(byteList));
+
+      return fromJson(content.entries
+          .map((e) => _normalizeForJson(e.value) as Map<String, dynamic>)
+          .toList());
+    }
+    return [];
+  }
+
+  /// Converts BSON bytes into a list of JSON maps.
+  static List<Map<String, dynamic>> fromBsonToJson(List<int> byteList) {
+    // If empty, error: corrupt bson message < 5 bytes long
+    if (byteList.isNotEmpty) {
+      final output = BsonCodec.deserialize(BsonBinary.from(byteList));
+      return output.entries
+          .map((e) => _normalizeForJson(e.value) as Map<String, dynamic>)
+          .toList();
+    }
+    return [];
+  }
+
+  /// Converts a list of JSON maps into BSON bytes.
+  static List<int> fromJsonToBson(List<Map<String, dynamic>> content) {
+    return BsonCodec.serialize(content).byteList;
+  }
+
+  /// Recursively normalizes a BSON-decoded object into pure JSON-safe values.
+  static dynamic _normalizeForJson(dynamic value) {
+    if (value is Int64) {
+      return value.toInt();
+    } else if (value is Map) {
+      return value.map((k, v) => MapEntry(k.toString(), _normalizeForJson(v)));
+    } else if (value is List) {
+      return value.map(_normalizeForJson).toList();
+    }
+    return value;
   }
 }

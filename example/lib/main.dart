@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'dart:typed_data';
+
 import 'package:example/test_data.dart';
+import 'package:example/test_data_bson.dart';
+
 import 'package:flutter/material.dart';
 import 'package:jovial_svg/jovial_svg.dart';
 import 'package:sketch_flow/sketch_flow.dart';
@@ -39,6 +42,7 @@ class _DemoPageState extends State<DemoPage> {
       appBar: SketchTopBar(
         controller: _sketchController,
         showJsonDialogIcon: true,
+        showBsonDialogIcon: true,
         exportSVGIcon: Image.asset('assets/images/svg.png'),
         exportPNGIcon: Image.asset('assets/images/png.png'),
         exportJSONIcon: Image.asset('assets/images/json.png'),
@@ -49,7 +53,12 @@ class _DemoPageState extends State<DemoPage> {
         },
         showInputTestDataIcon: true,
         onClickInputTestButton: () {
+          // _sketchController.fromBson(bson: testDataBson);
           _sketchController.fromJson(json: testData);
+        },
+        onClickToBsonButton: () {
+          final bson = _sketchController.toBson();
+          _showBsonDialog(bson: bson);
         },
         onClickExtractPNG: () async {
           final image = await _sketchController.extractPNG(
@@ -92,6 +101,28 @@ class _DemoPageState extends State<DemoPage> {
             content: SingleChildScrollView(
               child: SelectableText(
                 prettyJson,
+                style: const TextStyle(fontSize: 12),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text("Close"),
+              ),
+            ],
+          ),
+    );
+  }
+
+  void _showBsonDialog({required List<int> bson}) {
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text("Sketch BSON Hex"),
+            content: SingleChildScrollView(
+              child: SelectableText(
+                bson.toString(),
                 style: const TextStyle(fontSize: 12),
               ),
             ),

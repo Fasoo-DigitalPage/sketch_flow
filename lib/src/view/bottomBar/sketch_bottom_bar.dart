@@ -54,7 +54,6 @@ class SketchBottomBar extends StatefulWidget {
   const SketchBottomBar({
     super.key,
     required this.controller,
-    this.scrollController,
     this.bottomBarHeight,
     this.bottomBarColor = Colors.white,
     this.bottomBarBorderColor = Colors.grey,
@@ -81,7 +80,6 @@ class SketchBottomBar extends StatefulWidget {
   });
 
   final SketchController controller;
-  final ScrollController? scrollController;
 
   final double? bottomBarHeight;
   final Color bottomBarColor;
@@ -121,7 +119,6 @@ class SketchBottomBar extends StatefulWidget {
 class _SketchBottomBarState extends State<SketchBottomBar>
     with TickerProviderStateMixin {
   late final _controller = widget.controller;
-  late ScrollController _scrollController;
 
   late AnimationController _fadeAnimationController;
   late Animation<double> _fadeAnimation;
@@ -153,7 +150,6 @@ class _SketchBottomBarState extends State<SketchBottomBar>
       parent: _fadeAnimationController,
       curve: Curves.easeInOut,
     );
-    _scrollController = widget.scrollController ?? ScrollController();
   }
 
   @override
@@ -173,7 +169,6 @@ class _SketchBottomBarState extends State<SketchBottomBar>
   void dispose() {
     super.dispose();
     _fadeAnimationController.dispose();
-    if (widget.scrollController == null) _scrollController.dispose();
   }
 
   /// Handles tool selection.
@@ -341,7 +336,6 @@ class _SketchBottomBarState extends State<SketchBottomBar>
         ),
         child: Center(
           child: SingleChildScrollView(
-            controller: _scrollController,
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [

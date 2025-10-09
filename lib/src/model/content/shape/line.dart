@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:bson/bson.dart';
 import 'package:sketch_flow/sketch_model.dart';
 
 /// Represents a straight line drawing tool.
@@ -34,6 +35,9 @@ class Line extends SketchContent {
         'lineStrokeThickness': sketchConfig.lineConfig.strokeThickness,
         'lineOpacity': sketchConfig.lineConfig.opacity,
       };
+
+  @override
+  BsonBinary toBson() => BsonCodec.serialize(toJson());
 
   @override
   String? toSvg() {
