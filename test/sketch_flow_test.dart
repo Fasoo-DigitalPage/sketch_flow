@@ -1,6 +1,37 @@
+import 'dart:ui';
+
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sketch_flow/sketch_controller.dart';
-import 'package:sketch_flow/sketch_model.dart';
+import 'package:sketch_flow/sketch_flow.dart';
+
+Future<void> pumpSketchBoard(
+    WidgetTester tester, {
+      required SketchController controller,
+      bool isPadDevice = false,
+      bool multiTouchPanZoomEnabled = true,
+      SketchToolType toolType = SketchToolType.pencil,
+    }) async {
+  controller.updateConfig(toolType: toolType);
+
+  await tester.pumpWidget(
+    MaterialApp(
+      home: Scaffold(
+        body: SketchBoard(
+          controller: controller,
+          boardWidthSize: 800,
+          boardHeightSize: 600,
+          isPadDevice: isPadDevice,
+          multiTouchPanZoomEnabled: multiTouchPanZoomEnabled,
+        ),
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
+}
+
+InteractiveViewer findActiveViewer(WidgetTester tester) {
+  return tester.widget<InteractiveViewer>(find.byType(InteractiveViewer));
+}
 
 void main() {
   group('SketchController', () {
@@ -158,5 +189,88 @@ void main() {
 
       expect(controller.contents[1].offsets.length, 2);
     });
+  });
+
+  group('SketchBoard Interaction', () {
+    late SketchController controller;
+
+    setUp(() {
+      controller = SketchController();
+    });
+
+    testWidgets('Pad Mode (isPadDevice: true): Stylus draws, single-touch pans', (tester) async {
+          await pumpSketchBoard(tester, controller: controller, isPadDevice: true);
+
+          TestGesture stylusGesture = await tester.startGesture(
+            Offset(100, 100),
+            kind: PointerDeviceKind.stylus,
+          );
+          await stylusGesture.moveTo(Offset(150, 150));
+          await stylusGesture.up();
+          await tester.pumpAndSettle();
+
+          expect(controller.contents.length, 1);
+
+          controller.clear();
+          expect(controller.contents.isEmpty, isTrue);
+
+          TestGesture touchGesture = await tester.startGesture(
+            Offset(100, 100),
+            kind: PointerDeviceKind.touch,
+          );
+          await tester.pumpAndSettle();
+
+          var viewer = findActiveViewer(tester);
+          expect(viewer.panEnabled, isTrue);
+          expect(viewer.scaleEnabled, isFalse);
+
+          await touchGesture.moveTo(Offset(150, 150));
+          await touchGesture.up();
+          await tester.pumpAndSettle();
+
+          expect(controller.contents.isEmpty, isTrue);
+        });
+
+    testWidgets('Phone Mode (isPadDevice: false): Single-touch draws',
+            (tester) async {
+          await pumpSketchBoard(tester, controller: controller, isPadDevice: false);
+
+          TestGesture touchGesture = await tester.startGesture(
+            Offset(100, 100),
+            kind: PointerDeviceKind.touch,
+          );
+          await tester.pump();
+
+          var viewer = findActiveViewer(tester);
+          expect(viewer.panEnabled, isFalse);
+          expect(viewer.scaleEnabled, isFalse);
+
+          await touchGesture.moveTo(Offset(150, 150));
+          await touchGesture.up();
+          await tester.pumpAndSettle();
+
+          expect(controller.contents.length, 1);
+        });
+
+    testWidgets('Move Mode (isMoveArea: true): Single-touch pans, no drawing',
+            (tester) async {
+          await pumpSketchBoard(
+            tester,
+            controller: controller,
+            isPadDevice: false,
+            toolType: SketchToolType.move,
+          );
+
+          var viewer = findActiveViewer(tester);
+          expect(viewer.panEnabled, isTrue);
+          expect(viewer.scaleEnabled, isTrue);
+
+          TestGesture touchGesture = await tester.startGesture(Offset(100, 100));
+          await touchGesture.moveTo(Offset(150, 150));
+          await touchGesture.up();
+          await tester.pumpAndSettle();
+
+          expect(controller.contents.isEmpty, isTrue);
+        });
   });
 }

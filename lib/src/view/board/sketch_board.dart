@@ -1,3 +1,6 @@
+import 'dart:math';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:sketch_flow/sketch_flow.dart';
 
@@ -19,6 +22,7 @@ import 'package:sketch_flow/sketch_flow.dart';
 /// [boardColor]: Background color of the drawing area.
 /// [boardMinScale], [boardMaxScale]: Zoom scale limits when in move mode.
 /// [backgroundColor]: Scaffold background (outside the canvas).
+/// [isPadDevice]: Enable palm rejection by separating stylus and touch input.
 ///
 /// Note:
 /// - All content, including overlay widgets and the canvas, will be captured when exporting as an images.
@@ -44,6 +48,30 @@ class SketchBoard extends StatefulWidget {
   /// [boardWidthSize] Board width size
   ///
   /// [boardHeightSize] Board height size
+  ///
+  /// [isPadDevice] Enables palm rejection by differentiating between touch and stylus input.
+  ///
+  /// When `true` (typically for tablets):
+  /// - Drawing is restricted to [PointerDeviceKind.stylus] (pen).
+  /// - Panning and zooming are handled by [PointerDeviceKind.touch] (finger).
+  ///
+  /// When `false` (typically for phones):
+  /// - Drawing is handled by [PointerDeviceKind.touch].
+  /// - Panning and zooming are only active in [SketchToolType.move].
+  ///
+  /// Defaults to `false`.
+  ///
+  /// [multiTouchPanZoomEnabled] Enable pan and zoom via multi-touch (two or more fingers)
+  /// even when the tool type is set to Draw or Erase
+  ///
+  /// when `true`:
+  /// - Two or more finger gesture will activate panning and zooming.
+  /// - A single-finger gesture will still perform drawing/erasing
+  ///
+  /// When `false`:
+  /// - Panning and zooming are only possible when `controller.toolType` is `SketchToolType.move`.
+  ///
+  /// Default to `false`.
   const SketchBoard({
     super.key,
     required this.controller,
@@ -55,6 +83,8 @@ class SketchBoard extends StatefulWidget {
     this.overlayWidget,
     this.boardWidthSize,
     this.boardHeightSize,
+    this.isPadDevice = false,
+    this.multiTouchPanZoomEnabled = false
   });
 
   final SketchController controller;
@@ -68,16 +98,55 @@ class SketchBoard extends StatefulWidget {
   final double? boardWidthSize;
   final double? boardHeightSize;
 
+  final bool isPadDevice;
+  final bool multiTouchPanZoomEnabled;
+
   @override
   State<StatefulWidget> createState() => _SketchBoardState();
 }
 
 class _SketchBoardState extends State<SketchBoard> {
+  bool _isDrawing = false;
+  final Set<int> _activePointers = {};
+
   // Handles pointer down events.
   // Only starts a new line if the pointer is inside the drawing area.
   void _handlePointerDown(PointerDownEvent event) {
-    if (_isInDrawingArea(event.localPosition)) {
-      widget.controller.startNewLine(event.localPosition);
+    final int previousCount = _activePointers.length;
+    _activePointers.add(event.pointer);
+
+    if (_activePointers.length != previousCount) {
+      setState(() {});
+    }
+
+    final bool multiTouchZoomActive = widget.multiTouchPanZoomEnabled && _activePointers.length > 1;
+
+    if (multiTouchZoomActive) {
+      if (_isDrawing) {
+        widget.controller.endLine();
+        if (mounted) setState(() => _isDrawing = false);
+      }
+      return;
+    }
+
+    if (_activePointers.length > 1) {
+      if (_isDrawing) {
+        widget.controller.endLine();
+        if (mounted) setState(() => _isDrawing = false);
+      }
+
+      if (!widget.multiTouchPanZoomEnabled) return;
+      return;
+    }
+
+    if (_activePointers.length == 1) {
+      final bool isStylus = event.kind == PointerDeviceKind.stylus;
+      if ((widget.isPadDevice && isStylus) || (!widget.isPadDevice)) {
+        if (_isInDrawingArea(event.localPosition)) {
+          widget.controller.startNewLine(event.localPosition);
+          if (mounted) setState(() => _isDrawing = true);
+        }
+      }
     }
   }
 
@@ -85,17 +154,56 @@ class _SketchBoardState extends State<SketchBoard> {
   // Only adds points to the current line if the pointer is inside the drawing area.
   // If the pointer moves outside, the current line is ended.
   void _handlePointerMove(PointerMoveEvent event) {
-    if (_isInDrawingArea(event.localPosition)) {
-      widget.controller.addPoint(event.localPosition);
-    } else {
-      widget.controller.endLine();
+    if (_activePointers.length > 1) {
+      return;
+    }
+
+    if (_isDrawing) {
+      final bool isStylus = event.kind == PointerDeviceKind.stylus;
+      if ((widget.isPadDevice && isStylus) || (!widget.isPadDevice)) {
+        if (_isInDrawingArea(event.localPosition)) {
+          widget.controller.addPoint(event.localPosition);
+        } else {
+          widget.controller.endLine();
+        }
+      }
     }
   }
 
   // Handles pointer up events.
   // Ends the current line regardless of position.
-  void _handlePointerUp() {
-    widget.controller.endLine();
+  void _handlePointerUp(PointerUpEvent event) {
+    final int previousCount = _activePointers.length;
+    _activePointers.remove(event.pointer);
+    if (_activePointers.length != previousCount) {
+      setState(() {});
+    }
+
+    if (_isDrawing) {
+      widget.controller.endLine();
+      if (mounted) {
+        setState(() {
+          _isDrawing = false;
+        });
+      }
+    }
+  }
+
+  void _handlePointerCancel(PointerCancelEvent event) {
+    final int previousCount = _activePointers.length;
+    _activePointers.remove(event.pointer);
+    if (_activePointers.length != previousCount) {
+      setState(() {});
+    }
+
+    if (_isDrawing) {
+      widget.controller.endLine();
+      if (mounted) {
+        setState(() {
+          _isDrawing = false;
+        });
+      }
+    }
   }
 
   // Checks if a given position is within the drawing area bounds.
@@ -108,34 +216,7 @@ class _SketchBoardState extends State<SketchBoard> {
 
   @override
   Widget build(BuildContext context) {
-    // Drawing mode widget
-    Widget drawingModeWidget = Listener(
-      onPointerDown: (event) => _handlePointerDown(event),
-      onPointerMove: (event) => _handlePointerMove(event),
-      onPointerUp: (_) => _handlePointerUp(),
-      child: Container(
-        color: widget.boardColor ?? Colors.white,
-        width: widget.boardWidthSize ?? MediaQuery.of(context).size.width,
-        height: widget.boardHeightSize ?? MediaQuery.of(context).size.height,
-        child: AnimatedBuilder(
-          animation: widget.controller,
-          builder: (context, _) {
-            return RepaintBoundary(
-              key: widget.repaintKey,
-              child: Stack(
-                children: [
-                  if (widget.overlayWidget != null) widget.overlayWidget!,
-                  CustomPaint(painter: SketchPainter(widget.controller)),
-                ],
-              ),
-            );
-          },
-        ),
-      ),
-    );
-
-    // Move mode widget with zoom and pan support
-    Widget viewerModeWidget = Container(
+    Widget canvasWidget = Container(
       color: widget.boardColor ?? Colors.white,
       width: widget.boardWidthSize ?? MediaQuery.of(context).size.width,
       height: widget.boardHeightSize ?? MediaQuery.of(context).size.height,
@@ -160,11 +241,51 @@ class _SketchBoardState extends State<SketchBoard> {
       builder: (context, toolType, _) {
         bool isMoveArea = toolType == SketchToolType.move;
 
+        if (isMoveArea) {
+          return InteractiveViewer(
+            panEnabled: true,
+            scaleEnabled: true,
+            maxScale: widget.boardMaxScale ?? 5.0,
+            minScale: widget.boardMinScale ?? 0.5,
+            child: canvasWidget,
+          );
+        }
+        // 멀티터치 활성화 플래그가 켜져있고, 실제 멀티터치 중인가?
+        final bool multiTouchZoomActive =
+            widget.multiTouchPanZoomEnabled && _activePointers.length > 1;
+
+        // 패드 기기에서 스타일러스가 아닌 손가락으로 '단일 터치' 이동 중인가?
+        final bool padSingleTouchPanActive =
+            widget.isPadDevice && !_isDrawing && _activePointers.length == 1;
+
+        final bool panActive;
+        final bool scaleActive;
+
+        if (multiTouchZoomActive) {
+          panActive = true;
+          scaleActive = true;
+        } else if (padSingleTouchPanActive) {
+          panActive = true;
+          scaleActive = false;
+        } else {
+          panActive = false;
+          scaleActive = false;
+        }
+
+        final bool isPanZoomedEnabled = panActive || scaleActive;
+
         return InteractiveViewer(
-          panEnabled: isMoveArea,
-          maxScale: isMoveArea ? widget.boardMaxScale ?? 5.0 : 1.0,
-          minScale: isMoveArea ? widget.boardMinScale ?? 0.5 : 1.0,
-          child: isMoveArea ? viewerModeWidget : drawingModeWidget,
+          panEnabled: panActive,
+          scaleEnabled: scaleActive,
+          maxScale: isPanZoomedEnabled ? widget.boardMaxScale ?? 5.0 : 1.0,
+          minScale: isPanZoomedEnabled ? widget.boardMinScale ?? 0.5 : 1.0,
+          child: Listener(
+            onPointerDown: (event) => _handlePointerDown(event),
+            onPointerMove: (event) => _handlePointerMove(event),
+            onPointerUp: (event) => _handlePointerUp(event),
+            onPointerCancel: (event) => _handlePointerCancel(event),
+            child: canvasWidget,
+          ),
         );
       },
     );
