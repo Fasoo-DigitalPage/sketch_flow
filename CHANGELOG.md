@@ -1,3 +1,7 @@
+[1.1.0]
+* **FEAT**: Add `isPadDevice` option to separate stylus and touch inputs.
+* **FEAT**: Add `multiTouchPanZoomEnabled` to allow zooming/panning while drawing.
+
 [1.0.0+2]
 * license update
 
