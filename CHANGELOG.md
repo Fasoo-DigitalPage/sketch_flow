@@ -1,3 +1,7 @@
+[1.2.1]
+* Added `exportCroppedPNG` method to `SketchController`. This allows exporting a high-resolution PNG image that is automatically cropped to fit the bounds of both the drawn sketches and the optional `overlayWidget`.
+* Added an `toolConfigOffset` parameter to `SketchBottomBar`. This provides a new way to adjust the tool's position, allowing for more precise control and custom UI interactions (e.g., displaying the tool config menu at a specific location).
+
 [1.2.0]
 This release introduces comprehensive UI customization options for `SketchBottomBar` and improves responsive layouts for tablet devices.
 

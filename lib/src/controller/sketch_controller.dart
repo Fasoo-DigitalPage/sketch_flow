@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:sketch_flow/sketch_flow.dart';
@@ -362,5 +363,53 @@ class SketchController extends ChangeNotifier {
     };
 
     return result;
+  }
+
+  Future<Uint8List?> exportCroppedPNG({
+    required GlobalKey repaintKey,
+    Rect? overlayBounds,
+    double padding = 20.0,
+    double? pixelRatio,
+  }) async {
+    Rect? totalBounds = _drawingBounds;
+    if (overlayBounds != null) {
+      totalBounds = (totalBounds == null)
+          ? overlayBounds
+          : totalBounds.expandToInclude(overlayBounds);
+    }
+    if (totalBounds == null) return null;
+    totalBounds = totalBounds.inflate(padding);
+
+    return SketchPngExporter.extractCroppedPNG(
+      repaintKey: repaintKey,
+      cropBounds: totalBounds,
+      pixelRatio: pixelRatio,
+    );
+  }
+
+  Rect? get _drawingBounds {
+    if (_contents.isEmpty) return null;
+
+    double minX = double.infinity;
+    double minY = double.infinity;
+    double maxX = double.negativeInfinity;
+    double maxY = double.negativeInfinity;
+
+    for (final content in _contents) {
+      if (content.offsets.isEmpty) continue;
+
+      for (final offset in content.offsets) {
+        minX = min(minX, offset.dx);
+        minY = min(minY, offset.dy);
+        maxX = max(maxX, offset.dx);
+        maxY = max(maxY, offset.dy);
+      }
+    }
+
+    if (minX == double.infinity) return null;
+
+    const double strokePadding = 10.0;
+
+    return Rect.fromLTRB(minX, minY, maxX, maxY).inflate(strokePadding);
   }
 }

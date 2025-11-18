@@ -219,20 +219,22 @@ class _SketchBoardState extends State<SketchBoard> {
       color: widget.boardColor ?? Colors.white,
       width: widget.boardWidthSize ?? MediaQuery.of(context).size.width,
       height: widget.boardHeightSize ?? MediaQuery.of(context).size.height,
-      child: AnimatedBuilder(
-        animation: widget.controller,
-        builder: (context, _) {
-          return RepaintBoundary(
-            key: widget.repaintKey,
-            child: Stack(
-              children: [
-                if (widget.overlayWidget != null) widget.overlayWidget!,
-                CustomPaint(painter: SketchPainter(widget.controller)),
-              ],
-            ),
-          );
-        },
+      child: Stack(
+        children: [
+          if (widget.overlayWidget != null) widget.overlayWidget!,
+          AnimatedBuilder(
+            animation: widget.controller,
+            builder: (context, _) {
+              return CustomPaint(painter: SketchPainter(widget.controller));
+            },
+          ),
+        ],
       ),
+    );
+
+    Widget repaintWrapper = RepaintBoundary(
+      key: widget.repaintKey,
+      child: canvasWidget,
     );
 
     return ValueListenableBuilder<SketchToolType>(
@@ -246,7 +248,7 @@ class _SketchBoardState extends State<SketchBoard> {
             scaleEnabled: true,
             maxScale: widget.boardMaxScale ?? 5.0,
             minScale: widget.boardMinScale ?? 0.5,
-            child: canvasWidget,
+            child: repaintWrapper,
           );
         }
         final bool multiTouchZoomActive =
@@ -281,7 +283,7 @@ class _SketchBoardState extends State<SketchBoard> {
             onPointerMove: (event) => _handlePointerMove(event),
             onPointerUp: (event) => _handlePointerUp(event),
             onPointerCancel: (event) => _handlePointerCancel(event),
-            child: canvasWidget,
+            child: repaintWrapper,
           ),
         );
       },

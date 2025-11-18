@@ -100,6 +100,7 @@ class SketchBottomBar extends StatefulWidget {
     this.overlayStrokeThicknessSelectColor = Colors.white,
     this.showColorPickerSliderBar = true,
     this.customEraserConfig,
+    this.toolConfigOffset,
   });
 
   final SketchController controller;
@@ -157,6 +158,8 @@ class SketchBottomBar extends StatefulWidget {
   final bool showColorPickerSliderBar;
   final EraserConfigBuilder? customEraserConfig;
 
+  final Offset? toolConfigOffset;
+
   @override
   State<StatefulWidget> createState() => _SketchBottomBarState();
 }
@@ -171,6 +174,8 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
 
   /// The overlay entry for showing tool configuration options.
   OverlayEntry? _toolConfigOverlay;
+
+  final LayerLink _layerLink = LayerLink();
 
   /// The currently selected drawing tool.
   SketchToolType _selectedToolType = SketchToolType.pencil;
@@ -280,40 +285,54 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
         child: Stack(
           children: [
             Positioned(
-              bottom: (widget.bottomBarHeight ?? 70) + (_safeAreaBottomPadding),
-              left: 25,
-              right: 25,
-              child: GestureDetector(
-                onTap: () {},
-                child: FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: Container(
-                    decoration: widget.overlayDecoration ??
-                        BoxDecoration(
-                          color: widget.overlayBackgroundColor,
-                          border: Border.all(color: Colors.grey, width: 0.2),
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.15),
-                              blurRadius: 2,
-                              offset: Offset(0, 2),
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: CompositedTransformFollower(
+                  link: _layerLink,
+                  showWhenUnlinked: false,
+                  followerAnchor: Alignment.bottomCenter,
+                  targetAnchor: Alignment.topCenter,
+                  offset: const Offset(0, -8.0),
+                  child: GestureDetector(
+                    onTap: () {},
+                    child: FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: Material(
+                        color: Colors.transparent,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 25),
+                          child: Container(
+                            constraints: const BoxConstraints(maxWidth: 632),
+                            decoration: widget.overlayDecoration ??
+                                BoxDecoration(
+                                  color: widget.overlayBackgroundColor,
+                                  border: Border.all(color: Colors.grey, width: 0.2),
+                                  borderRadius: BorderRadius.circular(10),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(alpha: 0.15),
+                                      blurRadius: 2,
+                                      offset: Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                            padding: EdgeInsets.symmetric(
+                              vertical: 10,
+                              horizontal: 4,
                             ),
-                          ],
+                            child: StatefulBuilder(
+                              builder: (context, selModalState) {
+                                return applyWidget;
+                              },
+                            ),
+                          ),
                         ),
-                    padding: EdgeInsets.symmetric(
-                      vertical: 10,
-                      horizontal: 4,
-                    ),
-                    child: StatefulBuilder(
-                      builder: (context, selModalState) {
-                        return applyWidget;
-                      },
+                      ),
                     ),
                   ),
-                ),
-              ),
-            ),
+                )
+            )
           ],
         ),
       ),
@@ -369,183 +388,186 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
     /// Bottom safe area padding for proper positioning of the overlay.
     _safeAreaBottomPadding = MediaQuery.of(context).padding.bottom;
 
-    return SafeArea(
-      child: Container(
-        height: widget.bottomBarHeight ?? 60,
-        decoration: BoxDecoration(
-          color: widget.bottomBarColor,
-          border: Border(
-            top: BorderSide(
-              color: widget.bottomBarBorderColor,
-              width: widget.bottomBarBorderWidth ?? 0.5,
+    return CompositedTransformTarget(
+        link: _layerLink,
+        child: SafeArea(
+          child: Container(
+            height: widget.bottomBarHeight ?? 60,
+            decoration: BoxDecoration(
+              color: widget.bottomBarColor,
+              border: Border(
+                top: BorderSide(
+                  color: widget.bottomBarBorderColor,
+                  width: widget.bottomBarBorderWidth ?? 0.5,
+                ),
+              ),
+            ),
+            child: Center(
+              child: SingleChildScrollView(
+                controller: _scrollController,
+                scrollDirection: Axis.horizontal,
+                child: (widget.customBuilder != null)
+                    ? widget.customBuilder!(context, actions, _controller, _selectedToolType)
+                    : Row(
+                  children: [
+                    /// Move tool
+                    if (widget.showMoveIcon)
+                      _toolButtonWidget(
+                        toolType: SketchToolType.move,
+                        icon: SketchToolIcon(
+                          enableIcon: widget.moveIcon?.enableIcon ?? Icon(Icons.pinch),
+                          disableIcon: widget.moveIcon?.disableIcon ?? Icon(Icons.pinch_outlined),
+                        ),
+                        onClickToolButton: () => _onToolTap(toolType: SketchToolType.move),
+                      ),
+
+                    /// Default pen tool
+                    if (widget.showPencilIcon)
+                      _toolButtonWidget(
+                        toolType: SketchToolType.pencil,
+                        icon: SketchToolIcon(
+                          enableIcon: widget.pencilIcon?.enableIcon ??
+                              Icon(
+                                Icons.mode_edit_outline,
+                                color: _controller.currentSketchConfig.pencilConfig.color,
+                              ),
+                          disableIcon: widget.pencilIcon?.disableIcon ??
+                              Icon(
+                                Icons.mode_edit_outline_outlined,
+                                color: _controller.currentSketchConfig.pencilConfig.color,
+                              ),
+                        ),
+                        onClickToolButton: () => _onToolTap(toolType: SketchToolType.pencil),
+                      ),
+
+                    /// Brush tool
+                    if (widget.showBrushIcon)
+                      _toolButtonWidget(
+                        toolType: SketchToolType.brush,
+                        icon: SketchToolIcon(
+                          enableIcon: widget.brushIcon?.enableIcon ??
+                              Icon(
+                                Icons.brush_rounded,
+                                color: _controller.currentSketchConfig.brushConfig.color,
+                              ),
+                          disableIcon: widget.brushIcon?.disableIcon ??
+                              Icon(
+                                Icons.brush_outlined,
+                                color: _controller.currentSketchConfig.brushConfig.color,
+                              ),
+                        ),
+                        onClickToolButton: () => _onToolTap(toolType: SketchToolType.brush),
+                      ),
+
+                    /// highlighter tool
+                    if (widget.showHighlightIcon)
+                      _toolButtonWidget(
+                        toolType: SketchToolType.highlighter,
+                        icon: SketchToolIcon(
+                          enableIcon: widget.highlighterIcon?.enableIcon ??
+                              Icon(
+                                Icons.colorize_rounded,
+                                color: _controller.currentSketchConfig.highlighterConfig.color,
+                              ),
+                          disableIcon: widget.highlighterIcon?.disableIcon ??
+                              Icon(
+                                Icons.colorize_outlined,
+                                color: _controller.currentSketchConfig.highlighterConfig.color,
+                              ),
+                        ),
+                        onClickToolButton: () => _onToolTap(toolType: SketchToolType.highlighter),
+                      ),
+
+                    /// Eraser tool
+                    if (widget.showEraserIcon)
+                      _toolButtonWidget(
+                        toolType: SketchToolType.eraser,
+                        icon: SketchToolIcon(
+                          enableIcon: widget.eraserIcon?.enableIcon ?? Icon(CupertinoIcons.bandage_fill),
+                          disableIcon: widget.eraserIcon?.disableIcon ?? Icon(CupertinoIcons.bandage),
+                        ),
+                        onClickToolButton: () => _onToolTap(toolType: SketchToolType.eraser),
+                      ),
+
+                    /// Line tool
+                    if (widget.showLineIcon)
+                      _toolButtonWidget(
+                        toolType: SketchToolType.line,
+                        icon: SketchToolIcon(
+                          enableIcon: widget.lineIcon?.enableIcon ??
+                              Icon(
+                                Icons.show_chart_rounded,
+                                color: _controller.currentSketchConfig.lineConfig.color,
+                              ),
+                          disableIcon: widget.lineIcon?.disableIcon ??
+                              Icon(
+                                Icons.show_chart_outlined,
+                                color: _controller.currentSketchConfig.lineConfig.color,
+                              ),
+                        ),
+                        onClickToolButton: () => _onToolTap(toolType: SketchToolType.line),
+                      ),
+
+                    /// Rectangle tool
+                    if (widget.showRectangleIcon)
+                      _toolButtonWidget(
+                        toolType: SketchToolType.rectangle,
+                        icon: SketchToolIcon(
+                          enableIcon: widget.rectangleIcon?.enableIcon ??
+                              Icon(
+                                Icons.rectangle,
+                                color: _controller.currentSketchConfig.rectangleConfig.color,
+                              ),
+                          disableIcon: widget.rectangleIcon?.disableIcon ??
+                              Icon(
+                                Icons.rectangle_outlined,
+                                color: _controller.currentSketchConfig.rectangleConfig.color,
+                              ),
+                        ),
+                        onClickToolButton: () => _onToolTap(toolType: SketchToolType.rectangle),
+                      ),
+
+                    /// Circle tool
+                    if (widget.showCircleIcon)
+                      _toolButtonWidget(
+                        toolType: SketchToolType.circle,
+                        icon: SketchToolIcon(
+                          enableIcon: widget.circleIcon?.enableIcon ??
+                              Icon(
+                                Icons.circle_rounded,
+                                color: _controller.currentSketchConfig.circleConfig.color,
+                              ),
+                          disableIcon: widget.circleIcon?.disableIcon ??
+                              Icon(
+                                Icons.circle_outlined,
+                                color: _controller.currentSketchConfig.circleConfig.color,
+                              ),
+                        ),
+                        onClickToolButton: () => _onToolTap(toolType: SketchToolType.circle),
+                      ),
+
+                    /// Color palette
+                    if (widget.showPaletteIcon)
+                      IconButton(
+                        icon: widget.paletteIcon ?? Icon(Icons.palette_rounded),
+                        onPressed: () => _onToolTap(toolType: SketchToolType.palette),
+                        iconSize: 24,
+                      ),
+
+                    /// Clear all drawings
+                    if (widget.showPaletteIcon)
+                      IconButton(
+                        icon: widget.clearIcon ?? Icon(Icons.cleaning_services_rounded),
+                        onPressed: () {
+                          _controller.clear();
+                        },
+                      ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),
-        child: Center(
-          child: SingleChildScrollView(
-            controller: _scrollController,
-            scrollDirection: Axis.horizontal,
-            child: (widget.customBuilder != null)
-                ? widget.customBuilder!(context, actions, _controller, _selectedToolType)
-                : Row(
-                    children: [
-                      /// Move tool
-                      if (widget.showMoveIcon)
-                        _toolButtonWidget(
-                          toolType: SketchToolType.move,
-                          icon: SketchToolIcon(
-                            enableIcon: widget.moveIcon?.enableIcon ?? Icon(Icons.pinch),
-                            disableIcon: widget.moveIcon?.disableIcon ?? Icon(Icons.pinch_outlined),
-                          ),
-                          onClickToolButton: () => _onToolTap(toolType: SketchToolType.move),
-                        ),
-
-                      /// Default pen tool
-                      if (widget.showPencilIcon)
-                        _toolButtonWidget(
-                          toolType: SketchToolType.pencil,
-                          icon: SketchToolIcon(
-                            enableIcon: widget.pencilIcon?.enableIcon ??
-                                Icon(
-                                  Icons.mode_edit_outline,
-                                  color: _controller.currentSketchConfig.pencilConfig.color,
-                                ),
-                            disableIcon: widget.pencilIcon?.disableIcon ??
-                                Icon(
-                                  Icons.mode_edit_outline_outlined,
-                                  color: _controller.currentSketchConfig.pencilConfig.color,
-                                ),
-                          ),
-                          onClickToolButton: () => _onToolTap(toolType: SketchToolType.pencil),
-                        ),
-
-                      /// Brush tool
-                      if (widget.showBrushIcon)
-                        _toolButtonWidget(
-                          toolType: SketchToolType.brush,
-                          icon: SketchToolIcon(
-                            enableIcon: widget.brushIcon?.enableIcon ??
-                                Icon(
-                                  Icons.brush_rounded,
-                                  color: _controller.currentSketchConfig.brushConfig.color,
-                                ),
-                            disableIcon: widget.brushIcon?.disableIcon ??
-                                Icon(
-                                  Icons.brush_outlined,
-                                  color: _controller.currentSketchConfig.brushConfig.color,
-                                ),
-                          ),
-                          onClickToolButton: () => _onToolTap(toolType: SketchToolType.brush),
-                        ),
-
-                      /// highlighter tool
-                      if (widget.showHighlightIcon)
-                        _toolButtonWidget(
-                          toolType: SketchToolType.highlighter,
-                          icon: SketchToolIcon(
-                            enableIcon: widget.highlighterIcon?.enableIcon ??
-                                Icon(
-                                  Icons.colorize_rounded,
-                                  color: _controller.currentSketchConfig.highlighterConfig.color,
-                                ),
-                            disableIcon: widget.highlighterIcon?.disableIcon ??
-                                Icon(
-                                  Icons.colorize_outlined,
-                                  color: _controller.currentSketchConfig.highlighterConfig.color,
-                                ),
-                          ),
-                          onClickToolButton: () => _onToolTap(toolType: SketchToolType.highlighter),
-                        ),
-
-                      /// Eraser tool
-                      if (widget.showEraserIcon)
-                        _toolButtonWidget(
-                          toolType: SketchToolType.eraser,
-                          icon: SketchToolIcon(
-                            enableIcon: widget.eraserIcon?.enableIcon ?? Icon(CupertinoIcons.bandage_fill),
-                            disableIcon: widget.eraserIcon?.disableIcon ?? Icon(CupertinoIcons.bandage),
-                          ),
-                          onClickToolButton: () => _onToolTap(toolType: SketchToolType.eraser),
-                        ),
-
-                      /// Line tool
-                      if (widget.showLineIcon)
-                        _toolButtonWidget(
-                          toolType: SketchToolType.line,
-                          icon: SketchToolIcon(
-                            enableIcon: widget.lineIcon?.enableIcon ??
-                                Icon(
-                                  Icons.show_chart_rounded,
-                                  color: _controller.currentSketchConfig.lineConfig.color,
-                                ),
-                            disableIcon: widget.lineIcon?.disableIcon ??
-                                Icon(
-                                  Icons.show_chart_outlined,
-                                  color: _controller.currentSketchConfig.lineConfig.color,
-                                ),
-                          ),
-                          onClickToolButton: () => _onToolTap(toolType: SketchToolType.line),
-                        ),
-
-                      /// Rectangle tool
-                      if (widget.showRectangleIcon)
-                        _toolButtonWidget(
-                          toolType: SketchToolType.rectangle,
-                          icon: SketchToolIcon(
-                            enableIcon: widget.rectangleIcon?.enableIcon ??
-                                Icon(
-                                  Icons.rectangle,
-                                  color: _controller.currentSketchConfig.rectangleConfig.color,
-                                ),
-                            disableIcon: widget.rectangleIcon?.disableIcon ??
-                                Icon(
-                                  Icons.rectangle_outlined,
-                                  color: _controller.currentSketchConfig.rectangleConfig.color,
-                                ),
-                          ),
-                          onClickToolButton: () => _onToolTap(toolType: SketchToolType.rectangle),
-                        ),
-
-                      /// Circle tool
-                      if (widget.showCircleIcon)
-                        _toolButtonWidget(
-                          toolType: SketchToolType.circle,
-                          icon: SketchToolIcon(
-                            enableIcon: widget.circleIcon?.enableIcon ??
-                                Icon(
-                                  Icons.circle_rounded,
-                                  color: _controller.currentSketchConfig.circleConfig.color,
-                                ),
-                            disableIcon: widget.circleIcon?.disableIcon ??
-                                Icon(
-                                  Icons.circle_outlined,
-                                  color: _controller.currentSketchConfig.circleConfig.color,
-                                ),
-                          ),
-                          onClickToolButton: () => _onToolTap(toolType: SketchToolType.circle),
-                        ),
-
-                      /// Color palette
-                      if (widget.showPaletteIcon)
-                        IconButton(
-                          icon: widget.paletteIcon ?? Icon(Icons.palette_rounded),
-                          onPressed: () => _onToolTap(toolType: SketchToolType.palette),
-                          iconSize: 24,
-                        ),
-
-                      /// Clear all drawings
-                      if (widget.showPaletteIcon)
-                        IconButton(
-                          icon: widget.clearIcon ?? Icon(Icons.cleaning_services_rounded),
-                          onPressed: () {
-                            _controller.clear();
-                          },
-                        ),
-                    ],
-                  ),
-          ),
-        ),
-      ),
     );
   }
 
