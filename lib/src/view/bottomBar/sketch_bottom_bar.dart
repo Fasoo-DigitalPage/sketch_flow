@@ -98,6 +98,8 @@ class SketchBottomBar extends StatefulWidget {
     this.overlayBackgroundColor = Colors.white,
     this.overlayDecoration,
     this.overlayStrokeThicknessSelectColor = Colors.white,
+    this.overlayMargin,
+    this.overlayPadding,
     this.showColorPickerSliderBar = true,
     this.customEraserConfig,
     this.toolConfigOffset,
@@ -154,6 +156,8 @@ class SketchBottomBar extends StatefulWidget {
   final BoxDecoration? overlayDecoration;
   final Color overlayBackgroundColor;
   final Color overlayStrokeThicknessSelectColor;
+  final EdgeInsetsGeometry? overlayPadding;
+  final EdgeInsetsGeometry? overlayMargin;
 
   final bool showColorPickerSliderBar;
   final EraserConfigBuilder? customEraserConfig;
@@ -300,7 +304,7 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
                       child: Material(
                         color: Colors.transparent,
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 25),
+                          padding: widget.overlayMargin ?? const EdgeInsets.symmetric(horizontal: 16),
                           child: Container(
                             constraints: const BoxConstraints(maxWidth: 632),
                             decoration: widget.overlayDecoration ??
@@ -316,8 +320,8 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
                                     ),
                                   ],
                                 ),
-                            padding: EdgeInsets.symmetric(
-                              vertical: 10,
+                            padding: widget.overlayPadding ?? EdgeInsets.symmetric(
+                              vertical: 16,
                               horizontal: 4,
                             ),
                             child: StatefulBuilder(

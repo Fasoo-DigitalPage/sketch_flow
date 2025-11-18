@@ -1,3 +1,6 @@
+[1.2.2]
+* Added `overlayMargin` and `overlayPadding` parameters to `SketchBottomBar`. These new options allow for precise control over the spacing inside and outside the tool configuration overlay container.
+
 [1.2.1+1]
 * Corrected an error in the v1.2.1 changelog. The `toolConfigOffset` parameter was added to `SketchBottomBar`, not `ToolConfig` as previously stated.
 
