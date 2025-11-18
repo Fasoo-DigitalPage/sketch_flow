@@ -1,3 +1,18 @@
+[1.2.0]
+This release introduces comprehensive UI customization options for `SketchBottomBar` and improves responsive layouts for tablet devices.
+
+### Added
+
+* **Full Bottom Bar Customization**: Added an optional `customBuilder` parameter to `SketchBottomBar`. Developers can now provide a `SketchBarBuilder` function to build a completely custom list of tool icons, while still accessing internal state (`controller`, `selectedToolType`) and actions (`onToolTap`).
+* **Custom Eraser Config UI**: Added an optional `customEraserConfig` parameter. This allows providing an `EraserConfigBuilder` function to build a custom UI for the eraser settings overlay (e.g., using `ToggleButtons` instead of `RadioListTile`).
+* **Custom Thickness Icon UI**: Added `enableIconStrokeThicknessList` and `disableIconStrokeThicknessList` to `SketchToolConfig`. Developers can now pass a `List<Widget>` to override the default thickness icons for any specific drawing tool.
+* Added `assert`s to `SketchToolConfig` to throw an error if the length of custom icon lists does not match the `strokeThicknessList`.
+
+### Changed
+
+* **Responsive Overlays (Tablet Support)**: The default tool configuration overlays (for thickness/opacity and color palette) now use `LayoutBuilder`. They will automatically display as a `Row` on wide screens (like tablets) and a `Column` on narrow screens (like phones).
+* **Refined Slider UI**: The default opacity and color picker sliders have been redesigned with a custom `GradientTrackShape` (featuring a 2-row checkerboard background and rounded ends) and a custom `ColorSliderThumbShape` (white border with selected color interior).
+
 [1.1.0]
 * **FEAT**: Add `isPadDevice` option to separate stylus and touch inputs.
 * **FEAT**: Add `multiTouchPanZoomEnabled` to allow zooming/panning while drawing.
