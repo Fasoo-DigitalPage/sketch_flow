@@ -22,6 +22,9 @@ class SketchController extends ChangeNotifier {
   /// Notifier for the redo
   final ValueNotifier<bool> canRedoNotifier = ValueNotifier(false);
 
+  /// Notifier for the clear
+  final ValueNotifier<bool> canClearNotifier = ValueNotifier(false);
+
   /// The current configuration of the sketch tool
   SketchConfig _sketchConfig;
   SketchConfig get currentSketchConfig => _sketchConfig;
@@ -136,6 +139,7 @@ class SketchController extends ChangeNotifier {
     if (!isEraser || isAreaEraseWithEffect) {
       _saveToUndoStack();
       _contents.add(content);
+      _updateClearStatus();
     }
 
     _hasErasedContent = false;
@@ -147,6 +151,7 @@ class SketchController extends ChangeNotifier {
   void clear() {
     _saveToUndoStack();
     _contents.clear();
+    _updateClearStatus();
     notifyListeners();
   }
 
@@ -159,6 +164,7 @@ class SketchController extends ChangeNotifier {
     _contents
       ..clear()
       ..addAll(_undoStack.removeLast());
+    _updateClearStatus();
     _updateUndoRedoStatus();
 
     notifyListeners();
@@ -173,6 +179,7 @@ class SketchController extends ChangeNotifier {
     _contents
       ..clear()
       ..addAll(_redoStack.removeLast());
+    _updateClearStatus();
     _updateUndoRedoStatus();
 
     notifyListeners();
@@ -223,6 +230,11 @@ class SketchController extends ChangeNotifier {
     canRedoNotifier.value = _redoStack.isNotEmpty;
   }
 
+  void _updateClearStatus() {
+    canClearNotifier.value = _contents.isNotEmpty;
+  }
+
+
   /// Stroke eraser
   void _eraserStroke({required Offset center}) {
     List<SketchContent> removedContents = [];
@@ -258,6 +270,7 @@ class SketchController extends ChangeNotifier {
       _undoStack.add(_contents + removedContents);
       _redoStack.clear();
       _updateUndoRedoStatus();
+      _updateClearStatus();
     }
 
     notifyListeners();

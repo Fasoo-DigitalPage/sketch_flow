@@ -249,11 +249,9 @@ class _SketchBoardState extends State<SketchBoard> {
             child: canvasWidget,
           );
         }
-        // 멀티터치 활성화 플래그가 켜져있고, 실제 멀티터치 중인가?
         final bool multiTouchZoomActive =
             widget.multiTouchPanZoomEnabled && _activePointers.length > 1;
 
-        // 패드 기기에서 스타일러스가 아닌 손가락으로 '단일 터치' 이동 중인가?
         final bool padSingleTouchPanActive =
             widget.isPadDevice && !_isDrawing && _activePointers.length == 1;
 

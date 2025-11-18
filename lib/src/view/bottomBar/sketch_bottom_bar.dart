@@ -1,6 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sketch_flow/sketch_flow.dart';
+import 'package:sketch_flow/src/view/bottomBar/custom_eraser_config.dart';
+import 'package:sketch_flow/src/view/bottomBar/custom_sketch_bottom_bar_builder.dart';
+import 'package:sketch_flow/src/view/widgets/color_slider_thumb_shape.dart';
 
 /// Number of ColorPicker representation colors
 const int _colorStepsCounts = 1792;
@@ -13,6 +16,8 @@ class SketchBottomBar extends StatefulWidget {
   /// [bottomBarHeight] The height of the bottom bar.
   ///
   /// [bottomBarColor] The background color of the bottom bar.
+  ///
+  /// [customBuilder] A custom widget builder for the bottom bar items. (see [CustomSketchBottomBarBuilder])
   ///
   /// [moveIcon] Move icon (see [SketchToolIcon])
   ///
@@ -51,6 +56,10 @@ class SketchBottomBar extends StatefulWidget {
   /// [overlayStrokeThicknessSelectColor] Selected thickness icon color
   ///
   /// [showColorPickerSliderBar] ColorPicker Slider active or not (base true)
+  ///
+  /// [customLineThicknessWidget] Custom widget for configuring line thickness (e.g., pencil, brush).
+  ///
+  /// [customDiagramThicknessWidget] Custom widget for configuring diagram thickness (e.g., line, rectangle, circle).
   const SketchBottomBar({
     super.key,
     required this.controller,
@@ -59,16 +68,27 @@ class SketchBottomBar extends StatefulWidget {
     this.bottomBarColor = Colors.white,
     this.bottomBarBorderColor = Colors.grey,
     this.bottomBarBorderWidth,
+    this.customBuilder,
     this.moveIcon,
+    this.showMoveIcon = true,
     this.pencilIcon,
+    this.showPencilIcon = true,
     this.eraserIcon,
+    this.showEraserIcon = true,
     this.lineIcon,
+    this.showLineIcon = true,
     this.brushIcon,
+    this.showBrushIcon = true,
     this.highlighterIcon,
+    this.showHighlightIcon = true,
     this.clearIcon,
+    this.showClearIcon = true,
     this.paletteIcon,
+    this.showPaletteIcon = true,
     this.rectangleIcon,
+    this.showRectangleIcon = true,
     this.circleIcon,
+    this.showCircleIcon = true,
     this.eraserRadioButtonColor = Colors.black,
     this.eraserThicknessTextStyle,
     this.eraserThicknessSliderThemeData,
@@ -76,8 +96,10 @@ class SketchBottomBar extends StatefulWidget {
     this.strokeEraserText,
     this.penOpacitySliderThemeData,
     this.overlayBackgroundColor = Colors.white,
+    this.overlayDecoration,
     this.overlayStrokeThicknessSelectColor = Colors.white,
     this.showColorPickerSliderBar = true,
+    this.customEraserConfig,
   });
 
   final SketchController controller;
@@ -88,18 +110,37 @@ class SketchBottomBar extends StatefulWidget {
   final Color bottomBarBorderColor;
   final double? bottomBarBorderWidth;
 
+  final CustomSketchBottomBarBuilder? customBuilder;
+
   final SketchToolIcon? moveIcon;
+  final bool showMoveIcon;
+
   final SketchToolIcon? pencilIcon;
+  final bool showPencilIcon;
+
   final SketchToolIcon? brushIcon;
+  final bool showBrushIcon;
+
   final SketchToolIcon? highlighterIcon;
+  final bool showHighlightIcon;
+
   final SketchToolIcon? eraserIcon;
+  final bool showEraserIcon;
 
   final SketchToolIcon? lineIcon;
+  final bool showLineIcon;
+
   final SketchToolIcon? rectangleIcon;
+  final bool showRectangleIcon;
+
   final SketchToolIcon? circleIcon;
+  final bool showCircleIcon;
 
   final Widget? paletteIcon;
+  final bool showPaletteIcon;
+
   final Widget? clearIcon;
+  final bool showClearIcon;
 
   final Color eraserRadioButtonColor;
   final TextStyle? eraserThicknessTextStyle;
@@ -109,17 +150,18 @@ class SketchBottomBar extends StatefulWidget {
 
   final SliderThemeData? penOpacitySliderThemeData;
 
+  final BoxDecoration? overlayDecoration;
   final Color overlayBackgroundColor;
   final Color overlayStrokeThicknessSelectColor;
 
   final bool showColorPickerSliderBar;
+  final EraserConfigBuilder? customEraserConfig;
 
   @override
   State<StatefulWidget> createState() => _SketchBottomBarState();
 }
 
-class _SketchBottomBarState extends State<SketchBottomBar>
-    with TickerProviderStateMixin {
+class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderStateMixin {
   late final _controller = widget.controller;
   late ScrollController _scrollController;
 
@@ -132,9 +174,6 @@ class _SketchBottomBarState extends State<SketchBottomBar>
 
   /// The currently selected drawing tool.
   SketchToolType _selectedToolType = SketchToolType.pencil;
-
-  /// The currently selected eraser mode (stroke or area).
-  EraserMode _selectedEraserType = EraserMode.area;
 
   /// ColorPicker color value list
   late List<Color> _rgbGradientColors;
@@ -220,7 +259,7 @@ class _SketchBottomBarState extends State<SketchBottomBar>
       applyWidget = _drawingConfigWidget();
     } else {
       applyWidget = switch (toolType) {
-        SketchToolType.eraser => _eraserConfigWidget(),
+        SketchToolType.eraser => (widget.customEraserConfig != null) ? _customEraserConfigWidget() : _eraserConfigWidget(),
         SketchToolType.palette => _paletteConfigWidget(colorList: colorList),
         _ => SizedBox.shrink(),
       };
@@ -249,18 +288,19 @@ class _SketchBottomBarState extends State<SketchBottomBar>
                 child: FadeTransition(
                   opacity: _fadeAnimation,
                   child: Container(
-                    decoration: BoxDecoration(
-                      color: widget.overlayBackgroundColor,
-                      border: Border.all(color: Colors.grey, width: 0.2),
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.15),
-                          blurRadius: 2,
-                          offset: Offset(0, 2),
+                    decoration: widget.overlayDecoration ??
+                        BoxDecoration(
+                          color: widget.overlayBackgroundColor,
+                          border: Border.all(color: Colors.grey, width: 0.2),
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.15),
+                              blurRadius: 2,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
                     padding: EdgeInsets.symmetric(
                       vertical: 10,
                       horizontal: 4,
@@ -324,6 +364,8 @@ class _SketchBottomBarState extends State<SketchBottomBar>
 
   @override
   Widget build(BuildContext context) {
+    final actions = SketchBarActions(onToolTap: _onToolTap);
+
     /// Bottom safe area padding for proper positioning of the overlay.
     _safeAreaBottomPadding = MediaQuery.of(context).padding.bottom;
 
@@ -343,177 +385,164 @@ class _SketchBottomBarState extends State<SketchBottomBar>
           child: SingleChildScrollView(
             controller: _scrollController,
             scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                /// Move tool
-                _toolButtonWidget(
-                  toolType: SketchToolType.move,
-                  icon: SketchToolIcon(
-                    enableIcon:
-                        widget.moveIcon?.enableIcon ?? Icon(Icons.pinch),
-                    disableIcon: widget.moveIcon?.disableIcon ??
-                        Icon(Icons.pinch_outlined),
+            child: (widget.customBuilder != null)
+                ? widget.customBuilder!(context, actions, _controller, _selectedToolType)
+                : Row(
+                    children: [
+                      /// Move tool
+                      if (widget.showMoveIcon)
+                        _toolButtonWidget(
+                          toolType: SketchToolType.move,
+                          icon: SketchToolIcon(
+                            enableIcon: widget.moveIcon?.enableIcon ?? Icon(Icons.pinch),
+                            disableIcon: widget.moveIcon?.disableIcon ?? Icon(Icons.pinch_outlined),
+                          ),
+                          onClickToolButton: () => _onToolTap(toolType: SketchToolType.move),
+                        ),
+
+                      /// Default pen tool
+                      if (widget.showPencilIcon)
+                        _toolButtonWidget(
+                          toolType: SketchToolType.pencil,
+                          icon: SketchToolIcon(
+                            enableIcon: widget.pencilIcon?.enableIcon ??
+                                Icon(
+                                  Icons.mode_edit_outline,
+                                  color: _controller.currentSketchConfig.pencilConfig.color,
+                                ),
+                            disableIcon: widget.pencilIcon?.disableIcon ??
+                                Icon(
+                                  Icons.mode_edit_outline_outlined,
+                                  color: _controller.currentSketchConfig.pencilConfig.color,
+                                ),
+                          ),
+                          onClickToolButton: () => _onToolTap(toolType: SketchToolType.pencil),
+                        ),
+
+                      /// Brush tool
+                      if (widget.showBrushIcon)
+                        _toolButtonWidget(
+                          toolType: SketchToolType.brush,
+                          icon: SketchToolIcon(
+                            enableIcon: widget.brushIcon?.enableIcon ??
+                                Icon(
+                                  Icons.brush_rounded,
+                                  color: _controller.currentSketchConfig.brushConfig.color,
+                                ),
+                            disableIcon: widget.brushIcon?.disableIcon ??
+                                Icon(
+                                  Icons.brush_outlined,
+                                  color: _controller.currentSketchConfig.brushConfig.color,
+                                ),
+                          ),
+                          onClickToolButton: () => _onToolTap(toolType: SketchToolType.brush),
+                        ),
+
+                      /// highlighter tool
+                      if (widget.showHighlightIcon)
+                        _toolButtonWidget(
+                          toolType: SketchToolType.highlighter,
+                          icon: SketchToolIcon(
+                            enableIcon: widget.highlighterIcon?.enableIcon ??
+                                Icon(
+                                  Icons.colorize_rounded,
+                                  color: _controller.currentSketchConfig.highlighterConfig.color,
+                                ),
+                            disableIcon: widget.highlighterIcon?.disableIcon ??
+                                Icon(
+                                  Icons.colorize_outlined,
+                                  color: _controller.currentSketchConfig.highlighterConfig.color,
+                                ),
+                          ),
+                          onClickToolButton: () => _onToolTap(toolType: SketchToolType.highlighter),
+                        ),
+
+                      /// Eraser tool
+                      if (widget.showEraserIcon)
+                        _toolButtonWidget(
+                          toolType: SketchToolType.eraser,
+                          icon: SketchToolIcon(
+                            enableIcon: widget.eraserIcon?.enableIcon ?? Icon(CupertinoIcons.bandage_fill),
+                            disableIcon: widget.eraserIcon?.disableIcon ?? Icon(CupertinoIcons.bandage),
+                          ),
+                          onClickToolButton: () => _onToolTap(toolType: SketchToolType.eraser),
+                        ),
+
+                      /// Line tool
+                      if (widget.showLineIcon)
+                        _toolButtonWidget(
+                          toolType: SketchToolType.line,
+                          icon: SketchToolIcon(
+                            enableIcon: widget.lineIcon?.enableIcon ??
+                                Icon(
+                                  Icons.show_chart_rounded,
+                                  color: _controller.currentSketchConfig.lineConfig.color,
+                                ),
+                            disableIcon: widget.lineIcon?.disableIcon ??
+                                Icon(
+                                  Icons.show_chart_outlined,
+                                  color: _controller.currentSketchConfig.lineConfig.color,
+                                ),
+                          ),
+                          onClickToolButton: () => _onToolTap(toolType: SketchToolType.line),
+                        ),
+
+                      /// Rectangle tool
+                      if (widget.showRectangleIcon)
+                        _toolButtonWidget(
+                          toolType: SketchToolType.rectangle,
+                          icon: SketchToolIcon(
+                            enableIcon: widget.rectangleIcon?.enableIcon ??
+                                Icon(
+                                  Icons.rectangle,
+                                  color: _controller.currentSketchConfig.rectangleConfig.color,
+                                ),
+                            disableIcon: widget.rectangleIcon?.disableIcon ??
+                                Icon(
+                                  Icons.rectangle_outlined,
+                                  color: _controller.currentSketchConfig.rectangleConfig.color,
+                                ),
+                          ),
+                          onClickToolButton: () => _onToolTap(toolType: SketchToolType.rectangle),
+                        ),
+
+                      /// Circle tool
+                      if (widget.showCircleIcon)
+                        _toolButtonWidget(
+                          toolType: SketchToolType.circle,
+                          icon: SketchToolIcon(
+                            enableIcon: widget.circleIcon?.enableIcon ??
+                                Icon(
+                                  Icons.circle_rounded,
+                                  color: _controller.currentSketchConfig.circleConfig.color,
+                                ),
+                            disableIcon: widget.circleIcon?.disableIcon ??
+                                Icon(
+                                  Icons.circle_outlined,
+                                  color: _controller.currentSketchConfig.circleConfig.color,
+                                ),
+                          ),
+                          onClickToolButton: () => _onToolTap(toolType: SketchToolType.circle),
+                        ),
+
+                      /// Color palette
+                      if (widget.showPaletteIcon)
+                        IconButton(
+                          icon: widget.paletteIcon ?? Icon(Icons.palette_rounded),
+                          onPressed: () => _onToolTap(toolType: SketchToolType.palette),
+                          iconSize: 24,
+                        ),
+
+                      /// Clear all drawings
+                      if (widget.showPaletteIcon)
+                        IconButton(
+                          icon: widget.clearIcon ?? Icon(Icons.cleaning_services_rounded),
+                          onPressed: () {
+                            _controller.clear();
+                          },
+                        ),
+                    ],
                   ),
-                  onClickToolButton: () =>
-                      _onToolTap(toolType: SketchToolType.move),
-                ),
-
-                /// Default pen tool
-                _toolButtonWidget(
-                  toolType: SketchToolType.pencil,
-                  icon: SketchToolIcon(
-                    enableIcon: widget.pencilIcon?.enableIcon ??
-                        Icon(
-                          Icons.mode_edit_outline,
-                          color: _controller
-                              .currentSketchConfig.pencilConfig.color,
-                        ),
-                    disableIcon: widget.pencilIcon?.disableIcon ??
-                        Icon(
-                          Icons.mode_edit_outline_outlined,
-                          color: _controller
-                              .currentSketchConfig.pencilConfig.color,
-                        ),
-                  ),
-                  onClickToolButton: () =>
-                      _onToolTap(toolType: SketchToolType.pencil),
-                ),
-
-                /// Brush tool
-                _toolButtonWidget(
-                  toolType: SketchToolType.brush,
-                  icon: SketchToolIcon(
-                    enableIcon: widget.brushIcon?.enableIcon ??
-                        Icon(
-                          Icons.brush_rounded,
-                          color:
-                              _controller.currentSketchConfig.brushConfig.color,
-                        ),
-                    disableIcon: widget.brushIcon?.disableIcon ??
-                        Icon(
-                          Icons.brush_outlined,
-                          color:
-                              _controller.currentSketchConfig.brushConfig.color,
-                        ),
-                  ),
-                  onClickToolButton: () =>
-                      _onToolTap(toolType: SketchToolType.brush),
-                ),
-
-                /// highlighter tool
-                _toolButtonWidget(
-                  toolType: SketchToolType.highlighter,
-                  icon: SketchToolIcon(
-                    enableIcon: widget.highlighterIcon?.enableIcon ??
-                        Icon(
-                          Icons.colorize_rounded,
-                          color: _controller
-                              .currentSketchConfig.highlighterConfig.color,
-                        ),
-                    disableIcon: widget.highlighterIcon?.disableIcon ??
-                        Icon(
-                          Icons.colorize_outlined,
-                          color: _controller
-                              .currentSketchConfig.highlighterConfig.color,
-                        ),
-                  ),
-                  onClickToolButton: () =>
-                      _onToolTap(toolType: SketchToolType.highlighter),
-                ),
-
-                /// Eraser tool
-                _toolButtonWidget(
-                  toolType: SketchToolType.eraser,
-                  icon: SketchToolIcon(
-                    enableIcon: widget.eraserIcon?.enableIcon ??
-                        Icon(CupertinoIcons.bandage_fill),
-                    disableIcon: widget.eraserIcon?.disableIcon ??
-                        Icon(CupertinoIcons.bandage),
-                  ),
-                  onClickToolButton: () =>
-                      _onToolTap(toolType: SketchToolType.eraser),
-                ),
-
-                /// Line tool
-                _toolButtonWidget(
-                  toolType: SketchToolType.line,
-                  icon: SketchToolIcon(
-                    enableIcon: widget.lineIcon?.enableIcon ??
-                        Icon(
-                          Icons.show_chart_rounded,
-                          color:
-                              _controller.currentSketchConfig.lineConfig.color,
-                        ),
-                    disableIcon: widget.lineIcon?.disableIcon ??
-                        Icon(
-                          Icons.show_chart_outlined,
-                          color:
-                              _controller.currentSketchConfig.lineConfig.color,
-                        ),
-                  ),
-                  onClickToolButton: () =>
-                      _onToolTap(toolType: SketchToolType.line),
-                ),
-
-                /// Rectangle tool
-                _toolButtonWidget(
-                  toolType: SketchToolType.rectangle,
-                  icon: SketchToolIcon(
-                    enableIcon: widget.rectangleIcon?.enableIcon ??
-                        Icon(
-                          Icons.rectangle,
-                          color: _controller
-                              .currentSketchConfig.rectangleConfig.color,
-                        ),
-                    disableIcon: widget.rectangleIcon?.disableIcon ??
-                        Icon(
-                          Icons.rectangle_outlined,
-                          color: _controller
-                              .currentSketchConfig.rectangleConfig.color,
-                        ),
-                  ),
-                  onClickToolButton: () =>
-                      _onToolTap(toolType: SketchToolType.rectangle),
-                ),
-
-                /// Circle tool
-                _toolButtonWidget(
-                  toolType: SketchToolType.circle,
-                  icon: SketchToolIcon(
-                    enableIcon: widget.circleIcon?.enableIcon ??
-                        Icon(
-                          Icons.circle_rounded,
-                          color: _controller
-                              .currentSketchConfig.circleConfig.color,
-                        ),
-                    disableIcon: widget.circleIcon?.disableIcon ??
-                        Icon(
-                          Icons.circle_outlined,
-                          color: _controller
-                              .currentSketchConfig.circleConfig.color,
-                        ),
-                  ),
-                  onClickToolButton: () =>
-                      _onToolTap(toolType: SketchToolType.circle),
-                ),
-
-                /// Color palette
-                IconButton(
-                  icon: widget.paletteIcon ?? Icon(Icons.palette_rounded),
-                  onPressed: () => _onToolTap(toolType: SketchToolType.palette),
-                  iconSize: 24,
-                ),
-
-                /// Clear all drawings
-                IconButton(
-                  icon:
-                      widget.clearIcon ?? Icon(Icons.cleaning_services_rounded),
-                  onPressed: () {
-                    _controller.clear();
-                  },
-                ),
-              ],
-            ),
           ),
         ),
       ),
@@ -559,152 +588,197 @@ class _SketchBottomBarState extends State<SketchBottomBar>
   Widget _drawingConfigWidget() {
     final effectiveConfig = _controller.currentSketchConfig.effectiveConfig;
 
-    return Column(
-      children: [
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: List.generate(
-              effectiveConfig.strokeThicknessList.length,
-              (index) {
-                return BaseThickness(
-                  radius: 17.5,
-                  selectColor: widget.overlayStrokeThicknessSelectColor,
-                  index: index,
-                  isSelected: effectiveConfig.strokeThickness ==
-                      effectiveConfig.strokeThicknessList[index],
-                  color: effectiveConfig.color,
-                  onClickThickness: () => _onThicknessSelected(
-                    strokeThickness: effectiveConfig.strokeThicknessList[index],
-                  ),
-                );
-              },
-            ),
-          ),
-        ),
-        SizedBox(height: 4.0),
-        AnimatedBuilder(
-          animation: _controller,
-          builder: (context, _) {
-            final effectiveConfig =
-                _controller.currentSketchConfig.effectiveConfig;
+    Widget thicknessSelector = SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: List.generate(
+          effectiveConfig.strokeThicknessList.length,
+          (index) {
+            final isSelected = effectiveConfig.strokeThickness == effectiveConfig.strokeThicknessList[index];
+            if (effectiveConfig.enableIconStrokeThicknessList != null && effectiveConfig.disableIconStrokeThicknessList != null) {
+              final icon = isSelected ? effectiveConfig.enableIconStrokeThicknessList![index] : effectiveConfig.disableIconStrokeThicknessList![index];
 
-            return Material(
-              color: widget.overlayBackgroundColor,
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width * 0.6,
-                child: SliderTheme(
-                  data: widget.penOpacitySliderThemeData ??
-                      SliderTheme.of(context).copyWith(
-                        padding: EdgeInsets.symmetric(vertical: 4),
-                        activeTrackColor: Colors.transparent,
-                        inactiveTrackColor: Colors.transparent,
-                        trackShape: GradientTrackShape(
-                          trackHeight: 8.0,
-                          gradient: LinearGradient(
-                            colors: [
-                              effectiveConfig.color.withValues(alpha: 0.0),
-                              effectiveConfig.color.withValues(alpha: 1.0),
-                            ],
-                          ),
-                        ),
-                        inactiveTickMarkColor: effectiveConfig.color,
-                        thumbColor: effectiveConfig.color,
-                        overlayColor: effectiveConfig.color.withValues(
-                          alpha: 0.05,
-                        ),
-                        thumbShape: RoundSliderThumbShape(
-                          enabledThumbRadius: 10,
-                        ),
-                      ),
-                  child: Slider(
-                    value: effectiveConfig.opacity,
-                    min: 0.0,
-                    max: 1.0,
-                    onChanged: (opacity) {
-                      _controller.updateConfig(lastUsedOpacity: opacity);
-                    },
-                  ),
+              return IconButton(
+                icon: icon,
+                onPressed: () => _onThicknessSelected(
+                  strokeThickness: effectiveConfig.strokeThicknessList[index],
                 ),
+              );
+            }
+            return BaseThickness(
+              radius: 17.5,
+              selectColor: widget.overlayStrokeThicknessSelectColor,
+              index: index,
+              isSelected: isSelected,
+              color: effectiveConfig.color,
+              onClickThickness: () => _onThicknessSelected(
+                strokeThickness: effectiveConfig.strokeThicknessList[index],
               ),
             );
           },
         ),
-      ],
+      ),
+    );
+
+    Widget opacitySlider = AnimatedBuilder(
+      animation: _controller,
+      builder: (context, _) {
+        final effectiveConfig = _controller.currentSketchConfig.effectiveConfig;
+
+        return Material(
+          color: widget.overlayBackgroundColor,
+          child: SliderTheme(
+            data: widget.penOpacitySliderThemeData ??
+                SliderTheme.of(context).copyWith(
+                  padding: EdgeInsets.symmetric(vertical: 4),
+                  activeTrackColor: Colors.transparent,
+                  inactiveTrackColor: Colors.transparent,
+                  trackShape: GradientTrackShape(
+                    trackHeight: 24.0,
+                    gradient: LinearGradient(
+                      colors: [
+                        effectiveConfig.color.withValues(alpha: 0.0),
+                        effectiveConfig.color.withValues(alpha: 1.0),
+                      ],
+                    ),
+                  ),
+                  inactiveTickMarkColor: effectiveConfig.color,
+                  thumbColor: effectiveConfig.color,
+                  overlayColor: effectiveConfig.color.withValues(
+                    alpha: 0.05,
+                  ),
+                  thumbShape: ColorSliderThumbShape(
+                    enabledThumbRadius: 14,
+                    borderWidth: 4,
+                  ),
+                ),
+            child: Slider(
+              value: effectiveConfig.opacity,
+              min: 0.0,
+              max: 1.0,
+              onChanged: (opacity) {
+                _controller.updateConfig(lastUsedOpacity: opacity);
+              },
+            ),
+          ),
+        );
+      },
+    );
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const double tabletBreakpoint = 480.0;
+
+        if (constraints.maxWidth > tabletBreakpoint) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            child: Row(
+              children: [
+                Expanded(
+                  child: thicknessSelector,
+                ),
+                Expanded(
+                  child: opacitySlider,
+                ),
+              ],
+            ),
+          );
+        } else {
+          return Column(
+            children: [
+              thicknessSelector,
+              SizedBox(height: 4.0),
+              SizedBox(
+                width: constraints.maxWidth * 0.95,
+                child: opacitySlider,
+              ),
+            ],
+          );
+        }
+      },
     );
   }
 
   /// Builds the color palette selection widget.
   Widget _paletteConfigWidget({required List<Color> colorList}) {
-    return Center(
-      child: Column(
-        children: [
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: List.generate(colorList.length, (index) {
-                return BaseCircle(
-                  radius: 17.5,
-                  color: colorList[index],
-                  onClickCircle: () =>
-                      _onColorSelected(color: colorList[index]),
-                );
-              }),
-            ),
-          ),
-          if (widget.showColorPickerSliderBar)
-            AnimatedBuilder(
-              animation: _controller,
-              builder: (context, _) {
-                final effectiveConfig =
-                    _controller.currentSketchConfig.effectiveConfig;
-
-                return Material(
-                  color: widget.overlayBackgroundColor,
-                  child: SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.6,
-                    child: SliderTheme(
-                      data: SliderTheme.of(context).copyWith(
-                        padding: EdgeInsets.symmetric(vertical: 4),
-                        activeTrackColor: Colors.transparent,
-                        inactiveTrackColor: Colors.transparent,
-                        trackShape: ColorPickerSliderShape(
-                          trackHeight: 10.0,
-                          colorStepCount: _colorStepsCounts,
-                          colors: _rgbGradientColors,
-                        ),
-                        inactiveTickMarkColor: effectiveConfig.color,
-                        thumbColor: effectiveConfig.color,
-                        overlayColor: effectiveConfig.color.withValues(
-                          alpha: 0.05,
-                        ),
-                        thumbShape: RoundSliderThumbShape(
-                          enabledThumbRadius: 10,
-                        ),
-                      ),
-                      child: Slider(
-                        value: _selectedColorIndex.toDouble(),
-                        min: 0.0,
-                        max: (_colorStepsCounts - 1).toDouble(),
-                        onChanged: (value) {
-                          setState(() {
-                            _selectedColorIndex = value.round();
-                            _controller.updateConfig(
-                                lastUsedColor:
-                                    _rgbGradientColors[_selectedColorIndex]);
-                          });
-                        },
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-        ],
+    Widget paletteWidget = SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: List.generate(colorList.length, (index) {
+          return BaseCircle(
+            radius: 17.5,
+            color: colorList[index],
+            onClickCircle: () => _onColorSelected(color: colorList[index]),
+          );
+        }),
       ),
     );
+
+    Widget colorPickerSliderBar = AnimatedBuilder(
+      animation: _controller,
+      builder: (context, _) {
+        final effectiveConfig = _controller.currentSketchConfig.effectiveConfig;
+
+        return Material(
+          color: widget.overlayBackgroundColor,
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width * 0.95,
+            child: SliderTheme(
+              data: SliderTheme.of(context).copyWith(
+                padding: EdgeInsets.symmetric(vertical: 4),
+                activeTrackColor: Colors.transparent,
+                inactiveTrackColor: Colors.transparent,
+                trackShape: ColorPickerSliderShape(
+                  trackHeight: 24.0,
+                  colorStepCount: _colorStepsCounts,
+                  colors: _rgbGradientColors,
+                ),
+                inactiveTickMarkColor: effectiveConfig.color,
+                thumbColor: effectiveConfig.color,
+                overlayColor: effectiveConfig.color.withValues(
+                  alpha: 0.05,
+                ),
+                thumbShape: ColorSliderThumbShape(
+                  enabledThumbRadius: 14,
+                  borderWidth: 4,
+                ),
+              ),
+              child: Slider(
+                value: _selectedColorIndex.toDouble(),
+                min: 0.0,
+                max: (_colorStepsCounts - 1).toDouble(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedColorIndex = value.round();
+                    _controller.updateConfig(lastUsedColor: _rgbGradientColors[_selectedColorIndex]);
+                  });
+                },
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+    return LayoutBuilder(builder: (context, constraints) {
+      const double tabletBreakpoint = 480.0;
+
+      if (constraints.maxWidth > tabletBreakpoint) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          child: Row(
+            children: [Expanded(child: paletteWidget), if (widget.showColorPickerSliderBar) Expanded(child: colorPickerSliderBar)],
+          ),
+        );
+      } else {
+        return Column(
+          spacing: 8,
+          children: [paletteWidget, colorPickerSliderBar],
+        );
+      }
+    });
   }
 
   /// Build the eraser configuration widget.
@@ -720,28 +794,20 @@ class _SketchBottomBarState extends State<SketchBottomBar>
           child: Column(
             children: [
               RadioListTile<EraserMode>(
-                title: widget.areaEraserText ??
-                    Text("Area eraser", style: TextStyle(fontSize: 14)),
+                title: widget.areaEraserText ?? Text("Area eraser", style: TextStyle(fontSize: 14)),
                 activeColor: widget.eraserRadioButtonColor,
                 value: EraserMode.area,
-                groupValue: _selectedEraserType,
+                groupValue: config.eraserMode,
                 onChanged: (value) {
-                  setState(() {
-                    _selectedEraserType = value!;
-                  });
                   _controller.updateConfig(eraserMode: value);
                 },
               ),
               RadioListTile<EraserMode>(
-                title: widget.strokeEraserText ??
-                    Text("Stroke eraser", style: TextStyle(fontSize: 14)),
+                title: widget.strokeEraserText ?? Text("Stroke eraser", style: TextStyle(fontSize: 14)),
                 activeColor: widget.eraserRadioButtonColor,
                 value: EraserMode.stroke,
-                groupValue: _selectedEraserType,
+                groupValue: config.eraserMode,
                 onChanged: (value) {
-                  setState(() {
-                    _selectedEraserType = value!;
-                  });
                   _controller.updateConfig(eraserMode: value);
                 },
               ),
@@ -750,8 +816,7 @@ class _SketchBottomBarState extends State<SketchBottomBar>
                 children: [
                   Text(
                     "${(config.eraserRadius % 1 >= 0.75) ? config.eraserRadius.ceil() : config.eraserRadius.floor()}",
-                    style: widget.eraserThicknessTextStyle ??
-                        TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                    style: widget.eraserThicknessTextStyle ?? TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                   ),
                   SliderTheme(
                     data: widget.eraserThicknessSliderThemeData ??
@@ -786,6 +851,31 @@ class _SketchBottomBarState extends State<SketchBottomBar>
             ],
           ),
         );
+      },
+    );
+  }
+
+  Widget _customEraserConfigWidget() {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, _) {
+        final config = _controller.currentSketchConfig;
+
+        final data = CustomEraserConfig(
+          currentMode: config.eraserMode,
+          currentRadius: config.eraserRadius,
+          minRadius: config.eraserRadiusMin,
+          maxRadius: config.eraserRadiusMax,
+          onModeChanged: (value) {
+            if (value == null) return;
+            _controller.updateConfig(eraserMode: value);
+          },
+          onRadiusChanged: (radius) {
+            _controller.updateConfig(eraserRadius: radius);
+          },
+        );
+
+        return widget.customEraserConfig!(context, data);
       },
     );
   }

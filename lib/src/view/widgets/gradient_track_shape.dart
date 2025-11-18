@@ -3,12 +3,10 @@ import 'package:flutter/material.dart';
 class GradientTrackShape extends SliderTrackShape {
   final LinearGradient gradient;
   final double trackHeight;
-  final double squareSize;
 
   GradientTrackShape({
     required this.gradient,
     this.trackHeight = 4.0,
-    this.squareSize = 4.0,
   });
 
   @override
@@ -36,35 +34,47 @@ class GradientTrackShape extends SliderTrackShape {
       height,
     );
 
+    final double thumbRadius =
+        sliderTheme.thumbShape!.getPreferredSize(isEnabled, isDiscrete).height / 2;
+
+    final RRect trackRRect = RRect.fromRectAndRadius(
+      trackRect,
+      Radius.circular(thumbRadius),
+    );
+
     final Canvas canvas = context.canvas;
+
+    canvas.save();
+    canvas.clipRRect(trackRRect);
 
     _drawCheckerboard(canvas, trackRect);
 
     final Paint paint = Paint()
       ..shader = gradient.createShader(trackRect)
       ..style = PaintingStyle.fill;
-
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(trackRect, Radius.circular(height / 2)),
-      paint,
-    );
+    canvas.drawRRect(trackRRect, paint);
+    
+    canvas.restore();
   }
 
   void _drawCheckerboard(Canvas canvas, Rect rect) {
     final Paint lightPaint = Paint()..color = Colors.white;
     final Paint darkPaint = Paint()..color = Colors.grey.shade300;
 
-    final int horSquares = (rect.width / squareSize).ceil();
-    final int verSquares = (rect.height / squareSize).ceil();
+    final int verSquares = 2;
+
+    final double newSquareSize = rect.height / verSquares;
+
+    final int horSquares = (rect.width / newSquareSize).ceil();
 
     for (int y = 0; y < verSquares; y++) {
       for (int x = 0; x < horSquares; x++) {
         final paint = (x + y) % 2 == 0 ? lightPaint : darkPaint;
         final squareRect = Rect.fromLTWH(
-          rect.left + x * squareSize,
-          rect.top + y * squareSize,
-          squareSize,
-          squareSize,
+          rect.left + x * newSquareSize,
+          rect.top + y * newSquareSize,
+          newSquareSize,
+          newSquareSize,
         );
         canvas.drawRect(squareRect, paint);
       }
