@@ -292,7 +292,7 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
                   showWhenUnlinked: false,
                   followerAnchor: Alignment.bottomCenter,
                   targetAnchor: Alignment.topCenter,
-                  offset: const Offset(0, -8.0),
+                  offset: widget.toolConfigOffset ?? const Offset(0, -8.0),
                   child: GestureDetector(
                     onTap: () {},
                     child: FadeTransition(
