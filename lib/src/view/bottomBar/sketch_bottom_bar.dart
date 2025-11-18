@@ -170,7 +170,6 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
 
   late AnimationController _fadeAnimationController;
   late Animation<double> _fadeAnimation;
-  late double _safeAreaBottomPadding;
 
   /// The overlay entry for showing tool configuration options.
   OverlayEntry? _toolConfigOverlay;
@@ -384,9 +383,6 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
   @override
   Widget build(BuildContext context) {
     final actions = SketchBarActions(onToolTap: _onToolTap);
-
-    /// Bottom safe area padding for proper positioning of the overlay.
-    _safeAreaBottomPadding = MediaQuery.of(context).padding.bottom;
 
     return CompositedTransformTarget(
         link: _layerLink,
