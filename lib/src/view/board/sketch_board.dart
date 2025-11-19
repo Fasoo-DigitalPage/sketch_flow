@@ -221,7 +221,10 @@ class _SketchBoardState extends State<SketchBoard> {
       height: widget.boardHeightSize ?? MediaQuery.of(context).size.height,
       child: Stack(
         children: [
-          if (widget.overlayWidget != null) widget.overlayWidget!,
+          if (widget.overlayWidget != null)
+            Positioned.fill(
+                child: widget.overlayWidget!
+            ),
           AnimatedBuilder(
             animation: widget.controller,
             builder: (context, _) {

@@ -1,3 +1,6 @@
+[1.2.3+1]
+* Wrapped `overlayWidget` within `SketchBoard` in a `Positioned.fill` widget. This ensures that the overlay content expands to cover the entire canvas area, resolving issues where the overlay would render at its intrinsic size instead of fitting the board.
+
 [1.2.3]
 * Removed the default `SingleChildScrollView` wrapper when using `customBuilder` in `SketchBottomBar`. This resolves the issue where the entire bottom bar container would scroll instead of its content. 
 
