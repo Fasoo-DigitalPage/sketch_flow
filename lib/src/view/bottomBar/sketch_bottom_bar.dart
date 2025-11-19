@@ -399,12 +399,12 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
               ),
             ),
             child: Center(
-              child: SingleChildScrollView(
+              child: (widget.customBuilder != null)
+                  ? widget.customBuilder!(context, actions, _controller, _selectedToolType)
+                  : SingleChildScrollView(
                 controller: _scrollController,
                 scrollDirection: Axis.horizontal,
-                child: (widget.customBuilder != null)
-                    ? widget.customBuilder!(context, actions, _controller, _selectedToolType)
-                    : Row(
+                child: Row(
                   children: [
                     /// Move tool
                     if (widget.showMoveIcon)
@@ -560,7 +560,7 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
                       ),
                   ],
                 ),
-              ),
+              )
             ),
           ),
         ),

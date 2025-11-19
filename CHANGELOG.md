@@ -1,3 +1,6 @@
+[1.2.3]
+* Removed the default `SingleChildScrollView` wrapper when using `customBuilder` in `SketchBottomBar`. This resolves the issue where the entire bottom bar container would scroll instead of its content. 
+
 [1.2.2+2]
 * Remove `overlayMargin`, Refined the layout and padding logic in `_showToolConfig` to better adapt to content size. 
 
