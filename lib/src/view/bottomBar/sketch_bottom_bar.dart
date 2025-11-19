@@ -305,30 +305,35 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
                         color: Colors.transparent,
                         child: Padding(
                           padding: widget.overlayMargin ?? const EdgeInsets.symmetric(horizontal: 16),
-                          child: Container(
-                            constraints: const BoxConstraints(maxWidth: 632),
-                            decoration: widget.overlayDecoration ??
-                                BoxDecoration(
-                                  color: widget.overlayBackgroundColor,
-                                  border: Border.all(color: Colors.grey, width: 0.2),
-                                  borderRadius: BorderRadius.circular(10),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withValues(alpha: 0.15),
-                                      blurRadius: 2,
-                                      offset: Offset(0, 2),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                constraints: const BoxConstraints(maxWidth: 632),
+                                decoration: widget.overlayDecoration ??
+                                    BoxDecoration(
+                                      color: widget.overlayBackgroundColor,
+                                      border: Border.all(color: Colors.grey, width: 0.2),
+                                      borderRadius: BorderRadius.circular(10),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withValues(alpha: 0.15),
+                                          blurRadius: 2,
+                                          offset: Offset(0, 2),
+                                        ),
+                                      ],
                                     ),
-                                  ],
+                                padding: widget.overlayPadding ?? EdgeInsets.symmetric(
+                                  vertical: 16,
+                                  horizontal: 4,
                                 ),
-                            padding: widget.overlayPadding ?? EdgeInsets.symmetric(
-                              vertical: 16,
-                              horizontal: 4,
-                            ),
-                            child: StatefulBuilder(
-                              builder: (context, selModalState) {
-                                return applyWidget;
-                              },
-                            ),
+                                child: StatefulBuilder(
+                                  builder: (context, selModalState) {
+                                    return applyWidget;
+                                  },
+                                ),
+                              )
+                            ],
                           ),
                         ),
                       ),
@@ -693,28 +698,28 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
         const double tabletBreakpoint = 480.0;
 
         if (constraints.maxWidth > tabletBreakpoint) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14),
-            child: Row(
-              children: [
-                Expanded(
+          return Row(
+            spacing: 4,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                  padding: const EdgeInsets.only(left: 16),
                   child: thicknessSelector,
-                ),
-                Expanded(
-                  child: opacitySlider,
-                ),
-              ],
-            ),
+              ),
+              Container(
+                padding: const EdgeInsets.only(right: 16),
+                constraints: BoxConstraints(maxWidth: 360),
+                child: opacitySlider,
+              )
+            ],
           );
         } else {
           return Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               thicknessSelector,
               SizedBox(height: 4.0),
-              SizedBox(
-                width: constraints.maxWidth * 0.95,
-                child: opacitySlider,
-              ),
+              opacitySlider
             ],
           );
         }
@@ -746,7 +751,6 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
         return Material(
           color: widget.overlayBackgroundColor,
           child: SizedBox(
-            width: MediaQuery.of(context).size.width * 0.95,
             child: SliderTheme(
               data: SliderTheme.of(context).copyWith(
                 padding: EdgeInsets.symmetric(vertical: 4),
@@ -783,19 +787,31 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
         );
       },
     );
-
     return LayoutBuilder(builder: (context, constraints) {
       const double tabletBreakpoint = 480.0;
 
       if (constraints.maxWidth > tabletBreakpoint) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14),
-          child: Row(
-            children: [Expanded(child: paletteWidget), if (widget.showColorPickerSliderBar) Expanded(child: colorPickerSliderBar)],
-          ),
+        return Row(
+          spacing: 4,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+                padding: const EdgeInsets.only(left: 16),
+                child: paletteWidget,
+            ),
+            if (widget.showColorPickerSliderBar)
+              Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.only(right: 16),
+                    constraints: BoxConstraints(maxWidth: 360),
+                    child: colorPickerSliderBar,
+                  )
+              )
+          ],
         );
       } else {
         return Column(
+          mainAxisSize: MainAxisSize.min,
           spacing: 8,
           children: [paletteWidget, colorPickerSliderBar],
         );
