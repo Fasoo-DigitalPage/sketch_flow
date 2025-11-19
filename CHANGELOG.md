@@ -1,5 +1,5 @@
 [1.2.2+1]
-* Redesign `_showToolConfig` padding value.
+* Refined the layout and padding logic in `_showToolConfig` to better adapt to content size.
 
 [1.2.2]
 * Added `overlayMargin` and `overlayPadding` parameters to `SketchBottomBar`. These new options allow for precise control over the spacing inside and outside the tool configuration overlay container.
