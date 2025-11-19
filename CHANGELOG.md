@@ -1,3 +1,6 @@
+[1.2.2+2]
+* Remove `overlayMargin`, Refined the layout and padding logic in `_showToolConfig` to better adapt to content size. 
+
 [1.2.2+1]
 * Refined the layout and padding logic in `_showToolConfig` to better adapt to content size.
 

@@ -98,7 +98,6 @@ class SketchBottomBar extends StatefulWidget {
     this.overlayBackgroundColor = Colors.white,
     this.overlayDecoration,
     this.overlayStrokeThicknessSelectColor = Colors.white,
-    this.overlayMargin,
     this.overlayPadding,
     this.showColorPickerSliderBar = true,
     this.customEraserConfig,
@@ -157,7 +156,6 @@ class SketchBottomBar extends StatefulWidget {
   final Color overlayBackgroundColor;
   final Color overlayStrokeThicknessSelectColor;
   final EdgeInsetsGeometry? overlayPadding;
-  final EdgeInsetsGeometry? overlayMargin;
 
   final bool showColorPickerSliderBar;
   final EraserConfigBuilder? customEraserConfig;
@@ -303,38 +301,31 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
                       opacity: _fadeAnimation,
                       child: Material(
                         color: Colors.transparent,
-                        child: Padding(
-                          padding: widget.overlayMargin ?? const EdgeInsets.symmetric(horizontal: 16),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Container(
-                                constraints: const BoxConstraints(maxWidth: 632),
-                                decoration: widget.overlayDecoration ??
-                                    BoxDecoration(
-                                      color: widget.overlayBackgroundColor,
-                                      border: Border.all(color: Colors.grey, width: 0.2),
-                                      borderRadius: BorderRadius.circular(10),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withValues(alpha: 0.15),
-                                          blurRadius: 2,
-                                          offset: Offset(0, 2),
-                                        ),
-                                      ],
-                                    ),
-                                padding: widget.overlayPadding ?? EdgeInsets.symmetric(
-                                  vertical: 16,
-                                  horizontal: 4,
-                                ),
-                                child: StatefulBuilder(
-                                  builder: (context, selModalState) {
-                                    return applyWidget;
-                                  },
-                                ),
-                              )
-                            ],
-                          ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              constraints: const BoxConstraints(maxWidth: 632),
+                              decoration: widget.overlayDecoration ??
+                                  BoxDecoration(
+                                    color: widget.overlayBackgroundColor,
+                                    border: Border.all(color: Colors.grey, width: 0.2),
+                                    borderRadius: BorderRadius.circular(10),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(alpha: 0.15),
+                                        blurRadius: 2,
+                                        offset: Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                              child: StatefulBuilder(
+                                builder: (context, selModalState) {
+                                  return applyWidget;
+                                },
+                              ),
+                            )
+                          ],
                         ),
                       ),
                     ),
@@ -658,7 +649,6 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
           child: SliderTheme(
             data: widget.penOpacitySliderThemeData ??
                 SliderTheme.of(context).copyWith(
-                  padding: EdgeInsets.symmetric(vertical: 4),
                   activeTrackColor: Colors.transparent,
                   inactiveTrackColor: Colors.transparent,
                   trackShape: GradientTrackShape(
@@ -698,29 +688,38 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
         const double tabletBreakpoint = 480.0;
 
         if (constraints.maxWidth > tabletBreakpoint) {
-          return Row(
-            spacing: 4,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                  padding: const EdgeInsets.only(left: 16),
-                  child: thicknessSelector,
+          return Padding(
+              padding: widget.overlayPadding ?? const EdgeInsets.all(16),
+              child: Row(
+                spacing: 4,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  thicknessSelector,
+                  Flexible(
+                      child: Container(
+                        constraints: BoxConstraints(maxWidth: 360),
+                        child: opacitySlider,
+                      )
+                  )
+                ],
               ),
-              Container(
-                padding: const EdgeInsets.only(right: 16),
-                constraints: BoxConstraints(maxWidth: 360),
-                child: opacitySlider,
-              )
-            ],
           );
         } else {
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              thicknessSelector,
-              SizedBox(height: 4.0),
-              opacitySlider
-            ],
+          return Padding(
+              padding: widget.overlayPadding ?? const EdgeInsets.all(16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                spacing: 4,
+                children: [
+                  thicknessSelector,
+                  Flexible(
+                      child: Container(
+                        constraints: BoxConstraints(maxWidth: 360),
+                        child: opacitySlider,
+                      )
+                  )
+                ],
+              ),
           );
         }
       },
@@ -747,13 +746,11 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
       animation: _controller,
       builder: (context, _) {
         final effectiveConfig = _controller.currentSketchConfig.effectiveConfig;
-
         return Material(
           color: widget.overlayBackgroundColor,
           child: SizedBox(
             child: SliderTheme(
               data: SliderTheme.of(context).copyWith(
-                padding: EdgeInsets.symmetric(vertical: 4),
                 activeTrackColor: Colors.transparent,
                 inactiveTrackColor: Colors.transparent,
                 trackShape: ColorPickerSliderShape(
@@ -791,29 +788,39 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
       const double tabletBreakpoint = 480.0;
 
       if (constraints.maxWidth > tabletBreakpoint) {
-        return Row(
-          spacing: 4,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-                padding: const EdgeInsets.only(left: 16),
-                child: paletteWidget,
-            ),
-            if (widget.showColorPickerSliderBar)
-              Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.only(right: 16),
-                    constraints: BoxConstraints(maxWidth: 360),
-                    child: colorPickerSliderBar,
+        return Padding(
+            padding: widget.overlayPadding ?? const EdgeInsets.all(16),
+            child: Row(
+              spacing: 4,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                paletteWidget,
+                if (widget.showColorPickerSliderBar)
+                  Flexible(
+                      child: Container(
+                        constraints: BoxConstraints(maxWidth: 360),
+                        child: colorPickerSliderBar,
+                      )
                   )
-              )
-          ],
+              ],
+            ),
         );
       } else {
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          spacing: 8,
-          children: [paletteWidget, colorPickerSliderBar],
+        return Padding(
+            padding: widget.overlayPadding ?? const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              spacing: 8,
+              children: [
+                paletteWidget,
+                Flexible(
+                    child: Container(
+                      constraints: BoxConstraints(maxWidth: 360),
+                      child: colorPickerSliderBar,
+                    )
+                )
+              ],
+            ),
         );
       }
     });
@@ -827,67 +834,71 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
       builder: (context, _) {
         final config = _controller.currentSketchConfig;
 
-        return Material(
-          color: widget.overlayBackgroundColor,
-          child: Column(
-            children: [
-              RadioListTile<EraserMode>(
-                title: widget.areaEraserText ?? Text("Area eraser", style: TextStyle(fontSize: 14)),
-                activeColor: widget.eraserRadioButtonColor,
-                value: EraserMode.area,
-                groupValue: config.eraserMode,
-                onChanged: (value) {
-                  _controller.updateConfig(eraserMode: value);
-                },
-              ),
-              RadioListTile<EraserMode>(
-                title: widget.strokeEraserText ?? Text("Stroke eraser", style: TextStyle(fontSize: 14)),
-                activeColor: widget.eraserRadioButtonColor,
-                value: EraserMode.stroke,
-                groupValue: config.eraserMode,
-                onChanged: (value) {
-                  _controller.updateConfig(eraserMode: value);
-                },
-              ),
-              SizedBox(height: 12),
-              Column(
+        return Padding(
+            padding: widget.overlayPadding ?? const EdgeInsets.all(16),
+            child: Material(
+              color: widget.overlayBackgroundColor,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    "${(config.eraserRadius % 1 >= 0.75) ? config.eraserRadius.ceil() : config.eraserRadius.floor()}",
-                    style: widget.eraserThicknessTextStyle ?? TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                  RadioListTile<EraserMode>(
+                    title: widget.areaEraserText ?? Text("Area eraser", style: TextStyle(fontSize: 14)),
+                    activeColor: widget.eraserRadioButtonColor,
+                    value: EraserMode.area,
+                    groupValue: config.eraserMode,
+                    onChanged: (value) {
+                      _controller.updateConfig(eraserMode: value);
+                    },
                   ),
-                  SliderTheme(
-                    data: widget.eraserThicknessSliderThemeData ??
-                        SliderTheme.of(context).copyWith(
-                          padding: EdgeInsets.symmetric(
-                            vertical: 4,
-                            horizontal: 25,
-                          ),
-                          activeTrackColor: Colors.black,
-                          inactiveTrackColor: Colors.black.withAlpha(15),
-                          inactiveTickMarkColor: Colors.black,
-                          thumbColor: Colors.black,
-                          overlayColor: Colors.black.withValues(alpha: 0.05),
-                          secondaryActiveTrackColor: Colors.black,
-                          trackHeight: 4,
-                          thumbShape: RoundSliderThumbShape(
-                            enabledThumbRadius: 10,
-                          ),
+                  RadioListTile<EraserMode>(
+                    title: widget.strokeEraserText ?? Text("Stroke eraser", style: TextStyle(fontSize: 14)),
+                    activeColor: widget.eraserRadioButtonColor,
+                    value: EraserMode.stroke,
+                    groupValue: config.eraserMode,
+                    onChanged: (value) {
+                      _controller.updateConfig(eraserMode: value);
+                    },
+                  ),
+                  SizedBox(height: 12),
+                  Column(
+                    children: [
+                      Text(
+                        "${(config.eraserRadius % 1 >= 0.75) ? config.eraserRadius.ceil() : config.eraserRadius.floor()}",
+                        style: widget.eraserThicknessTextStyle ?? TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                      ),
+                      SliderTheme(
+                        data: widget.eraserThicknessSliderThemeData ??
+                            SliderTheme.of(context).copyWith(
+                              padding: EdgeInsets.symmetric(
+                                vertical: 4,
+                                horizontal: 25,
+                              ),
+                              activeTrackColor: Colors.black,
+                              inactiveTrackColor: Colors.black.withAlpha(15),
+                              inactiveTickMarkColor: Colors.black,
+                              thumbColor: Colors.black,
+                              overlayColor: Colors.black.withValues(alpha: 0.05),
+                              secondaryActiveTrackColor: Colors.black,
+                              trackHeight: 4,
+                              thumbShape: RoundSliderThumbShape(
+                                enabledThumbRadius: 10,
+                              ),
+                            ),
+                        child: Slider(
+                          value: config.eraserRadius,
+                          min: config.eraserRadiusMin,
+                          max: config.eraserRadiusMax,
+                          divisions: 9,
+                          onChanged: (eraserRadius) {
+                            _controller.updateConfig(eraserRadius: eraserRadius);
+                          },
                         ),
-                    child: Slider(
-                      value: config.eraserRadius,
-                      min: config.eraserRadiusMin,
-                      max: config.eraserRadiusMax,
-                      divisions: 9,
-                      onChanged: (eraserRadius) {
-                        _controller.updateConfig(eraserRadius: eraserRadius);
-                      },
-                    ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
-          ),
+            ),
         );
       },
     );
