@@ -9,6 +9,7 @@ class CustomEraserConfig {
   final double maxRadius;
   final ValueChanged<EraserMode?> onModeChanged;
   final ValueChanged<double> onRadiusChanged;
+  final Function() closeEraserConfigOverlay;
 
   const CustomEraserConfig({
     required this.currentMode,
@@ -17,6 +18,7 @@ class CustomEraserConfig {
     required this.maxRadius,
     required this.onModeChanged,
     required this.onRadiusChanged,
+    required this.closeEraserConfigOverlay,
   });
 }
 

@@ -221,6 +221,15 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
     if (widget.scrollController == null) _scrollController.dispose();
   }
 
+  void _closeToolConfigOverlay() {
+    _controller.enableDrawing();
+
+    if (_toolConfigOverlay != null) {
+      _toolConfigOverlay!.remove();
+      _toolConfigOverlay = null;
+    }
+  }
+
   /// Handles tool selection.
   /// Call _showToolConfig if the tabs currently pressed are the same
   void _onToolTap({required SketchToolType toolType}) {
@@ -275,14 +284,7 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
       builder: (context) => GestureDetector(
         // Close the overlay when touching the external area.
         behavior: HitTestBehavior.translucent,
-        onTap: () {
-          _controller.enableDrawing();
-
-          if (_toolConfigOverlay != null) {
-            _toolConfigOverlay!.remove();
-            _toolConfigOverlay = null;
-          }
-        },
+        onTap: () => _closeToolConfigOverlay(),
         child: Stack(
           children: [
             Positioned(
@@ -922,6 +924,9 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
           onRadiusChanged: (radius) {
             _controller.updateConfig(eraserRadius: radius);
           },
+          closeEraserConfigOverlay: () {
+            _closeToolConfigOverlay();
+          }
         );
 
         return widget.customEraserConfig!(context, data);

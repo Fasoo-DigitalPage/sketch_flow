@@ -1,3 +1,6 @@
+[1.2.3+2]
+* Refactored `SketchBottomBar` to use a unified `_closeToolConfigOverlay` method. This reduces code duplication and ensures consistent behavior (closing the overlay and re-enabling drawing) across thickness selection, color selection, and background tap events.
+
 [1.2.3+1]
 * Wrapped `overlayWidget` within `SketchBoard` in a `Positioned.fill` widget. This ensures that the overlay content expands to cover the entire canvas area, resolving issues where the overlay would render at its intrinsic size instead of fitting the board.
 
