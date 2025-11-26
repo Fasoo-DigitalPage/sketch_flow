@@ -1,3 +1,9 @@
+[1.2.4+1]
+### Added
+- Added `isOverlayWidgetCenter` parameter to `SketchBoard`.
+    - When set to `true`, the `overlayWidget` is centered within the board, preserving its intrinsic size and aspect ratio.
+    - When set to `false` (default), the `overlayWidget` stretches to fill the entire board area using `Positioned.fill`.
+
 [1.2.4]
 ### Fixed
 - Fixed an issue where drawing was allowed outside the right and bottom boundaries when `SketchBoard` was smaller than the screen size.

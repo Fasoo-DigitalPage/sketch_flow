@@ -71,6 +71,8 @@ class SketchBoard extends StatefulWidget {
   /// - Panning and zooming are only possible when `controller.toolType` is `SketchToolType.move`.
   ///
   /// Default to `false`.
+  ///
+  /// [isOverlayWidgetCenter] Whether to center the overlay widget.
   const SketchBoard({
     super.key,
     required this.controller,
@@ -83,7 +85,8 @@ class SketchBoard extends StatefulWidget {
     this.boardWidthSize,
     this.boardHeightSize,
     this.isPadDevice = false,
-    this.multiTouchPanZoomEnabled = false
+    this.multiTouchPanZoomEnabled = false,
+    this.isOverlayWidgetCenter = false,
   });
 
   final SketchController controller;
@@ -99,6 +102,7 @@ class SketchBoard extends StatefulWidget {
 
   final bool isPadDevice;
   final bool multiTouchPanZoomEnabled;
+  final bool isOverlayWidgetCenter;
 
   @override
   State<StatefulWidget> createState() => _SketchBoardState();
@@ -210,25 +214,15 @@ class _SketchBoardState extends State<SketchBoard> {
   // Checks if a given position is within the drawing area bounds.
   // Returns true if the position is inside, false otherwise.
   bool _isInDrawingArea(Offset pos) {
-    return pos.dx >= 0 &&
-        pos.dx <= _currentBoardSize.width &&
-        pos.dy >= 0 &&
-        pos.dy <= _currentBoardSize.height;
+    return pos.dx >= 0 && pos.dx <= _currentBoardSize.width && pos.dy >= 0 && pos.dy <= _currentBoardSize.height;
   }
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final double width = widget.boardWidthSize ??
-            (constraints.maxWidth.isFinite
-                ? constraints.maxWidth
-                : MediaQuery.of(context).size.width);
-
-        final double height = widget.boardHeightSize ??
-            (constraints.maxHeight.isFinite
-                ? constraints.maxHeight
-                : MediaQuery.of(context).size.height);
+        final double width = widget.boardWidthSize ?? (constraints.maxWidth.isFinite ? constraints.maxWidth : MediaQuery.of(context).size.width);
+        final double height = widget.boardHeightSize ?? (constraints.maxHeight.isFinite ? constraints.maxHeight : MediaQuery.of(context).size.height);
 
         _currentBoardSize = Size(width, height);
 
@@ -239,7 +233,13 @@ class _SketchBoardState extends State<SketchBoard> {
           child: Stack(
             children: [
               if (widget.overlayWidget != null)
-                Positioned.fill(child: widget.overlayWidget!),
+                Positioned.fill(
+                    child: widget.isOverlayWidgetCenter
+                        ? Center(
+                            child: widget.overlayWidget!,
+                          )
+                        : widget.overlayWidget!
+                ),
               AnimatedBuilder(
                 animation: widget.controller,
                 builder: (context, _) {
@@ -269,11 +269,9 @@ class _SketchBoardState extends State<SketchBoard> {
                 child: repaintWrapper,
               );
             }
-            final bool multiTouchZoomActive =
-                widget.multiTouchPanZoomEnabled && _activePointers.length > 1;
+            final bool multiTouchZoomActive = widget.multiTouchPanZoomEnabled && _activePointers.length > 1;
 
-            final bool padSingleTouchPanActive =
-                widget.isPadDevice && !_isDrawing && _activePointers.length == 1;
+            final bool padSingleTouchPanActive = widget.isPadDevice && !_isDrawing && _activePointers.length == 1;
 
             final bool panActive;
             final bool scaleActive;
