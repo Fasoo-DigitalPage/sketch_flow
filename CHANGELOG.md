@@ -1,3 +1,11 @@
+[1.2.4]
+### Fixed
+- Fixed an issue where drawing was allowed outside the right and bottom boundaries when `SketchBoard` was smaller than the screen size.
+
+### Changed
+- Refactored `SketchBoard` to use `LayoutBuilder`. The board size is now calculated based on parent constraints or explicit dimensions instead of relying solely on `MediaQuery`.
+- Updated `_isInDrawingArea` to validate coordinates against the actual calculated board size (`_currentBoardSize`).
+
 [1.2.3+2]
 * Refactored `SketchBottomBar` to use a unified `_closeToolConfigOverlay` method. This reduces code duplication and ensures consistent behavior (closing the overlay and re-enabling drawing) across thickness selection, color selection, and background tap events.
 

@@ -108,6 +108,8 @@ class _SketchBoardState extends State<SketchBoard> {
   bool _isDrawing = false;
   final Set<int> _activePointers = {};
 
+  Size _currentBoardSize = Size.zero;
+
   // Handles pointer down events.
   // Only starts a new line if the pointer is inside the drawing area.
   void _handlePointerDown(PointerDownEvent event) {
@@ -208,86 +210,101 @@ class _SketchBoardState extends State<SketchBoard> {
   // Checks if a given position is within the drawing area bounds.
   // Returns true if the position is inside, false otherwise.
   bool _isInDrawingArea(Offset pos) {
-    final width = widget.boardWidthSize ?? MediaQuery.of(context).size.width;
-    final height = widget.boardHeightSize ?? MediaQuery.of(context).size.height;
-    return pos.dx >= 0 && pos.dx <= width && pos.dy >= 0 && pos.dy <= height;
+    return pos.dx >= 0 &&
+        pos.dx <= _currentBoardSize.width &&
+        pos.dy >= 0 &&
+        pos.dy <= _currentBoardSize.height;
   }
 
   @override
   Widget build(BuildContext context) {
-    Widget canvasWidget = Container(
-      color: widget.boardColor ?? Colors.white,
-      width: widget.boardWidthSize ?? MediaQuery.of(context).size.width,
-      height: widget.boardHeightSize ?? MediaQuery.of(context).size.height,
-      child: Stack(
-        children: [
-          if (widget.overlayWidget != null)
-            Positioned.fill(
-                child: widget.overlayWidget!
-            ),
-          AnimatedBuilder(
-            animation: widget.controller,
-            builder: (context, _) {
-              return CustomPaint(painter: SketchPainter(widget.controller));
-            },
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double width = widget.boardWidthSize ??
+            (constraints.maxWidth.isFinite
+                ? constraints.maxWidth
+                : MediaQuery.of(context).size.width);
+
+        final double height = widget.boardHeightSize ??
+            (constraints.maxHeight.isFinite
+                ? constraints.maxHeight
+                : MediaQuery.of(context).size.height);
+
+        _currentBoardSize = Size(width, height);
+
+        Widget canvasWidget = Container(
+          color: widget.boardColor ?? Colors.white,
+          width: width,
+          height: height,
+          child: Stack(
+            children: [
+              if (widget.overlayWidget != null)
+                Positioned.fill(child: widget.overlayWidget!),
+              AnimatedBuilder(
+                animation: widget.controller,
+                builder: (context, _) {
+                  return CustomPaint(painter: SketchPainter(widget.controller));
+                },
+              ),
+            ],
           ),
-        ],
-      ),
-    );
+        );
 
-    Widget repaintWrapper = RepaintBoundary(
-      key: widget.repaintKey,
-      child: canvasWidget,
-    );
+        Widget repaintWrapper = RepaintBoundary(
+          key: widget.repaintKey,
+          child: canvasWidget,
+        );
 
-    return ValueListenableBuilder<SketchToolType>(
-      valueListenable: widget.controller.toolTypeNotifier,
-      builder: (context, toolType, _) {
-        bool isMoveArea = toolType == SketchToolType.move;
+        return ValueListenableBuilder<SketchToolType>(
+          valueListenable: widget.controller.toolTypeNotifier,
+          builder: (context, toolType, _) {
+            bool isMoveArea = toolType == SketchToolType.move;
 
-        if (isMoveArea) {
-          return InteractiveViewer(
-            panEnabled: true,
-            scaleEnabled: true,
-            maxScale: widget.boardMaxScale ?? 5.0,
-            minScale: widget.boardMinScale ?? 0.5,
-            child: repaintWrapper,
-          );
-        }
-        final bool multiTouchZoomActive =
-            widget.multiTouchPanZoomEnabled && _activePointers.length > 1;
+            if (isMoveArea) {
+              return InteractiveViewer(
+                panEnabled: true,
+                scaleEnabled: true,
+                maxScale: widget.boardMaxScale ?? 5.0,
+                minScale: widget.boardMinScale ?? 0.5,
+                child: repaintWrapper,
+              );
+            }
+            final bool multiTouchZoomActive =
+                widget.multiTouchPanZoomEnabled && _activePointers.length > 1;
 
-        final bool padSingleTouchPanActive =
-            widget.isPadDevice && !_isDrawing && _activePointers.length == 1;
+            final bool padSingleTouchPanActive =
+                widget.isPadDevice && !_isDrawing && _activePointers.length == 1;
 
-        final bool panActive;
-        final bool scaleActive;
+            final bool panActive;
+            final bool scaleActive;
 
-        if (multiTouchZoomActive) {
-          panActive = true;
-          scaleActive = true;
-        } else if (padSingleTouchPanActive) {
-          panActive = true;
-          scaleActive = false;
-        } else {
-          panActive = false;
-          scaleActive = false;
-        }
+            if (multiTouchZoomActive) {
+              panActive = true;
+              scaleActive = true;
+            } else if (padSingleTouchPanActive) {
+              panActive = true;
+              scaleActive = false;
+            } else {
+              panActive = false;
+              scaleActive = false;
+            }
 
-        final bool isPanZoomedEnabled = panActive || scaleActive;
+            final bool isPanZoomedEnabled = panActive || scaleActive;
 
-        return InteractiveViewer(
-          panEnabled: panActive,
-          scaleEnabled: scaleActive,
-          maxScale: isPanZoomedEnabled ? widget.boardMaxScale ?? 5.0 : 1.0,
-          minScale: isPanZoomedEnabled ? widget.boardMinScale ?? 0.5 : 1.0,
-          child: Listener(
-            onPointerDown: (event) => _handlePointerDown(event),
-            onPointerMove: (event) => _handlePointerMove(event),
-            onPointerUp: (event) => _handlePointerUp(event),
-            onPointerCancel: (event) => _handlePointerCancel(event),
-            child: repaintWrapper,
-          ),
+            return InteractiveViewer(
+              panEnabled: panActive,
+              scaleEnabled: scaleActive,
+              maxScale: isPanZoomedEnabled ? widget.boardMaxScale ?? 5.0 : 1.0,
+              minScale: isPanZoomedEnabled ? widget.boardMinScale ?? 0.5 : 1.0,
+              child: Listener(
+                onPointerDown: (event) => _handlePointerDown(event),
+                onPointerMove: (event) => _handlePointerMove(event),
+                onPointerUp: (event) => _handlePointerUp(event),
+                onPointerCancel: (event) => _handlePointerCancel(event),
+                child: repaintWrapper,
+              ),
+            );
+          },
         );
       },
     );
