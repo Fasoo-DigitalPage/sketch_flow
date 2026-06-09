@@ -243,7 +243,8 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
     }
 
     if (toolType != SketchToolType.palette) {
-      if (toolType != _controller.currentSketchConfig.toolType) {
+      if (widget.showColorPickerSliderBar &&
+          toolType != _controller.currentSketchConfig.toolType) {
         setState(() {
           _selectedColorIndex = _findClosestColorIndex(
             target: updateConfig.effectiveConfig.color,
@@ -553,7 +554,7 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
                       ),
 
                     /// Clear all drawings
-                    if (widget.showPaletteIcon)
+                    if (widget.showClearIcon)
                       IconButton(
                         icon: widget.clearIcon ?? Icon(Icons.cleaning_services_rounded),
                         onPressed: () {
@@ -815,12 +816,13 @@ class _SketchBottomBarState extends State<SketchBottomBar> with TickerProviderSt
               spacing: 8,
               children: [
                 paletteWidget,
-                Flexible(
-                    child: Container(
-                      constraints: BoxConstraints(maxWidth: 360),
-                      child: colorPickerSliderBar,
+                if (widget.showColorPickerSliderBar)
+                  Flexible(
+                      child: Container(
+                        constraints: BoxConstraints(maxWidth: 360),
+                        child: colorPickerSliderBar,
+                      )
                     )
-                )
               ],
             ),
         );

@@ -39,6 +39,7 @@ class SketchDataConverter {
         'highlighter' => SketchToolType.highlighter,
         'line' => SketchToolType.line,
         'rectangle' => SketchToolType.rectangle,
+        'circle' => SketchToolType.circle,
         _ => SketchToolType.pencil,
       };
 
@@ -68,9 +69,16 @@ class SketchDataConverter {
       );
 
       final rectangleConfig = SketchToolConfig(
-        opacity: content['rectangleOpacity']?.toDouble() ?? 1.0,
-        color: Color(content['rectangleColor'] ?? 0xFF000000),
-        strokeThickness: content['rectangleThickness']?.toDouble() ?? 1.0,
+        opacity:
+            (content['rectangleOpacity'] ?? content['lineOpacity'])?.toDouble() ??
+                1.0,
+        color:
+            Color(content['rectangleColor'] ?? content['lineColor'] ?? 0xFF000000),
+        strokeThickness: (content['rectangleStrokeThickness'] ??
+                    content['rectangleThickness'] ??
+                    content['lineStrokeThickness'])
+                ?.toDouble() ??
+            1.0,
       );
 
       final circleConfig = SketchToolConfig(

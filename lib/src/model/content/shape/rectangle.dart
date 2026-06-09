@@ -35,9 +35,10 @@ class Rectangle extends SketchContent {
   Map<String, dynamic> toJson() => {
         'type': 'rectangle',
         'offsets': offsets.map((e) => {'dx': e.dx, 'dy': e.dy}).toList(),
-        'lineColor': sketchConfig.rectangleConfig.color.toARGB32(),
-        'lineStrokeThickness': sketchConfig.rectangleConfig.strokeThickness,
-        'lineOpacity': sketchConfig.rectangleConfig.opacity,
+        'rectangleColor': sketchConfig.rectangleConfig.color.toARGB32(),
+        'rectangleStrokeThickness':
+            sketchConfig.rectangleConfig.strokeThickness,
+        'rectangleOpacity': sketchConfig.rectangleConfig.opacity,
       };
 
   @override

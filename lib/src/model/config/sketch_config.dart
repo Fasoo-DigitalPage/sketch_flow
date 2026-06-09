@@ -197,6 +197,7 @@ class SketchConfig {
       lastUsedColor: lastUsedColor ?? this.lastUsedColor,
       lastUsedStrokeThickness:
           lastUsedStrokeThickness ?? this.lastUsedStrokeThickness,
+      lastUsedOpacity: lastUsedOpacity ?? this.lastUsedOpacity,
       pencilConfig: newToolType == SketchToolType.pencil
           ? updatedToolConfig(pencilConfig ?? this.pencilConfig)
           : pencilConfig ?? this.pencilConfig,

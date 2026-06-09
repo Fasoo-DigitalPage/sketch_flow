@@ -98,6 +98,13 @@ void main() {
       expect(controller.toolTypeNotifier.value, SketchToolType.eraser);
     });
 
+    test('lastUsedOpacity is preserved when opacity is changed', () {
+      controller.updateConfig(lastUsedOpacity: 0.4);
+
+      expect(controller.currentSketchConfig.lastUsedOpacity, 0.4);
+      expect(controller.currentSketchConfig.pencilConfig.opacity, 0.4);
+    });
+
     test('Verify deduplication on consecutive input of the same offset', () {
       final offset = Offset(10, 10);
       controller.startNewLine(offset);
@@ -166,6 +173,55 @@ void main() {
       controller.fromJson(json: json);
 
       expect(controller.contents, isNotEmpty);
+    });
+
+    test('Verify circle JSON deserialization keeps circle tool type', () {
+      controller.fromJson(json: [
+        {
+          'type': 'circle',
+          'offsets': [
+            {'dx': 10, 'dy': 10},
+            {'dx': 30, 'dy': 30},
+          ],
+          'circleColor': Colors.blue.toARGB32(),
+          'circleStrokeThickness': 5,
+          'circleOpacity': 0.5,
+        }
+      ]);
+
+      expect(controller.contents.first, isA<Circle>());
+      expect(
+        controller.contents.first.sketchConfig.toolType,
+        SketchToolType.circle,
+      );
+      expect(controller.canClearNotifier.value, isTrue);
+      expect(controller.canUndoNotifier.value, isFalse);
+      expect(controller.canRedoNotifier.value, isFalse);
+    });
+
+    test('Verify rectangle JSON deserialization keeps legacy style keys', () {
+      controller.fromJson(json: [
+        {
+          'type': 'rectangle',
+          'offsets': [
+            {'dx': 10, 'dy': 10},
+            {'dx': 30, 'dy': 30},
+          ],
+          'lineColor': Colors.red.toARGB32(),
+          'lineStrokeThickness': 5,
+          'lineOpacity': 0.5,
+        }
+      ]);
+
+      final rectangle = controller.contents.first;
+
+      expect(rectangle, isA<Rectangle>());
+      expect(
+        rectangle.sketchConfig.rectangleConfig.color.toARGB32(),
+        Colors.red.toARGB32(),
+      );
+      expect(rectangle.sketchConfig.rectangleConfig.strokeThickness, 5);
+      expect(rectangle.sketchConfig.rectangleConfig.opacity, 0.5);
     });
 
     test('Verifying that only erased coordinates remain', () {
@@ -271,6 +327,46 @@ void main() {
           await tester.pumpAndSettle();
 
           expect(controller.contents.isEmpty, isTrue);
+        });
+
+    testWidgets('Bottom bar respects clear icon visibility',
+            (tester) async {
+          await tester.pumpWidget(
+            MaterialApp(
+              home: Scaffold(
+                bottomNavigationBar: SketchBottomBar(
+                  controller: controller,
+                  showPaletteIcon: false,
+                  showClearIcon: true,
+                ),
+              ),
+            ),
+          );
+
+          expect(find.byIcon(Icons.palette_rounded), findsNothing);
+          expect(find.byIcon(Icons.cleaning_services_rounded), findsOneWidget);
+        });
+
+    testWidgets('Bottom bar switches tools when color picker slider is hidden',
+            (tester) async {
+          await tester.pumpWidget(
+            MaterialApp(
+              home: Scaffold(
+                bottomNavigationBar: SketchBottomBar(
+                  controller: controller,
+                  showColorPickerSliderBar: false,
+                ),
+              ),
+            ),
+          );
+
+          await tester.tap(find.byIcon(Icons.brush_outlined));
+          await tester.pumpAndSettle();
+
+          expect(
+            controller.currentSketchConfig.toolType,
+            SketchToolType.brush,
+          );
         });
   });
 }

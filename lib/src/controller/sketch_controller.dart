@@ -196,6 +196,10 @@ class SketchController extends ChangeNotifier {
     _contents
       ..clear()
       ..addAll(data);
+    _undoStack.clear();
+    _redoStack.clear();
+    _updateClearStatus();
+    _updateUndoRedoStatus();
     notifyListeners();
   }
 
