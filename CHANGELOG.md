@@ -1,3 +1,17 @@
+[1.2.5]
+### Changed
+- Improved `Pencil` and `Highlighter` rendering with quadratic smoothing, rounded caps, and rounded joins for softer freehand strokes.
+- Improved `Brush` rendering with smoothed curve segments while preserving speed-based stroke thickness.
+- Updated SVG export output for `Pencil`, `Highlighter`, and `Brush` to match the smoother rendered stroke paths.
+
+### Fixed
+- Fixed `circle` JSON deserialization so imported circle contents keep `SketchToolType.circle`.
+- Fixed `rectangle` JSON export/import style keys and preserved compatibility with legacy rectangle data that used line style keys.
+- Fixed `SketchController.fromJson` to update clear, undo, and redo notifier states after import.
+- Fixed `SketchConfig.copyWith` to preserve `lastUsedOpacity`.
+- Fixed `SketchBottomBar` to respect `showClearIcon`.
+- Fixed `SketchBottomBar` behavior when `showColorPickerSliderBar` is disabled.
+
 [1.2.4+1]
 ### Added
 - Added `isOverlayWidgetCenter` parameter to `SketchBoard`.
